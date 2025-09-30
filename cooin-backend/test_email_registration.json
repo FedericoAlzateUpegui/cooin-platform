@@ -1,0 +1,9 @@
+{
+  "email": "testmail2@example.com",
+  "username": "testmail2",
+  "password": "Test123!",
+  "confirm_password": "Test123!",
+  "full_name": "Test Mail User 2",
+  "role": "borrower",
+  "agree_to_terms": true
+}

@@ -1,0 +1,10 @@
+{
+  "receiver_id": 6,
+  "connection_type": "lending_inquiry",
+  "message": "Hi! I'm looking to borrow $5,000 for home improvements. I have steady employment and can pay back over 12 months.",
+  "loan_amount_requested": 5000,
+  "loan_term_months": 12,
+  "interest_rate_proposed": 8.5,
+  "loan_purpose": "home improvement",
+  "priority_level": 2
+}

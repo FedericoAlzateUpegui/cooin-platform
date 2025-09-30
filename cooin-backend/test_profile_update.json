@@ -1,0 +1,18 @@
+{
+  "first_name": "John",
+  "last_name": "Doe", 
+  "bio": "Experienced borrower looking for business expansion loan",
+  "phone_number": "+1234567890",
+  "country": "United States",
+  "city": "New York",
+  "income_range": "50k_75k",
+  "employment_status": "employed_full_time",
+  "employer_name": "Tech Corp",
+  "years_employed": 3,
+  "requested_loan_amount": 25000.0,
+  "loan_purpose": "business",
+  "preferred_loan_term": 24,
+  "max_acceptable_rate": 8.5,
+  "is_profile_public": true,
+  "show_real_name": true
+}

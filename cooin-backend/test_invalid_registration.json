@@ -1,0 +1,8 @@
+{
+  "email": "invalid-email",
+  "username": "us",
+  "password": "weak",
+  "confirm_password": "different",
+  "role": "invalid_role",
+  "agree_to_terms": false
+}

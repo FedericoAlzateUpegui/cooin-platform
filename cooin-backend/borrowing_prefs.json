@@ -1,0 +1,6 @@
+{
+  "loan_purpose": "home_improvement",
+  "requested_loan_amount": 25000.0,
+  "preferred_loan_term": 60,
+  "max_acceptable_rate": 8.5
+}

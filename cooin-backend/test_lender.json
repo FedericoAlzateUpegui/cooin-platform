@@ -1,0 +1,8 @@
+{
+  "email": "lender@example.com",
+  "username": "lenderuser",
+  "password": "TestPass123!",
+  "confirm_password": "TestPass123!",
+  "role": "lender",
+  "agree_to_terms": true
+}

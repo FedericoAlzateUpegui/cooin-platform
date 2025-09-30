@@ -1,0 +1,59 @@
+# Development Dockerfile for Cooin Backend API
+# Optimized for fast development with hot reload
+
+FROM python:3.11-slim
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    libpq-dev \
+    curl \
+    vim \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create non-root user
+RUN useradd --create-home --shell /bin/bash cooin
+
+# Set work directory
+WORKDIR /app
+
+# Install Python dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Install development dependencies
+RUN pip install --no-cache-dir \
+    watchfiles \
+    ipdb \
+    pytest-xdist \
+    black \
+    isort \
+    flake8
+
+# Create necessary directories
+RUN mkdir -p /app/uploads /app/logs && \
+    chown -R cooin:cooin /app
+
+# Switch to non-root user
+USER cooin
+
+# Copy application code (will be overridden by volume mount)
+COPY --chown=cooin:cooin . .
+
+# Expose port
+EXPOSE 8000
+
+# Development command with auto-reload
+CMD ["uvicorn", "app.main:app", \
+     "--host", "0.0.0.0", \
+     "--port", "8000", \
+     "--reload", \
+     "--log-level", "debug"]

@@ -1,0 +1,13 @@
+{
+  "connection_id": 1,
+  "rating_type": "lender_rating",
+  "overall_rating": 4.5,
+  "communication_rating": 5.0,
+  "reliability_rating": 4.0,
+  "professionalism_rating": 5.0,
+  "timeliness_rating": 4.0,
+  "transparency_rating": 4.5,
+  "review_title": "Great lender experience!",
+  "review_text": "The lender was very professional and responsive. They accepted my loan request quickly and the terms were fair. Communication was excellent throughout the process.",
+  "is_anonymous": false
+}
