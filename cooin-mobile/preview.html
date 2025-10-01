@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cooin - Luxury Fintech App Preview</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #2E86AB 0%, #4A9BC7 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 60px 20px 120px;
+            box-sizing: border-box;
+        }
+
+        .phone-mockup {
+            width: 375px;
+            height: 812px;
+            background: #F8F9FA;
+            border-radius: 40px;
+            padding: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .screen {
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* All screens hidden by default */
+        .screen-content {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .screen-content.active {
+            display: block;
+        }
+
+        /* Welcome Screen */
+        .welcome-screen {
+            background: linear-gradient(135deg, #2E86AB 0%, #4A9BC7 100%);
+            height: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            padding: 20px;
+        }
+
+        .logo-circle {
+            width: 80px;
+            height: 80px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 36px;
+            font-weight: bold;
+            color: #2E86AB;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .brand-text {
+            font-size: 24px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin-bottom: 24px;
+        }
+
+        .hero-title {
+            font-size: 28px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 12px;
+            line-height: 1.2;
+        }
+
+        .hero-subtitle {
+            font-size: 16px;
+            text-align: center;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+
+        /* Content Section */
+        .content-section {
+            padding: 32px;
+            height: 50%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .trust-indicators {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 32px;
+        }
+
+        .trust-item {
+            text-align: center;
+            flex: 1;
+        }
+
+        .trust-icon {
+            width: 56px;
+            height: 56px;
+            background: #10B981;
+            border-radius: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            margin: 0 auto 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .trust-icon:nth-child(1) { background: #10B981; }
+        .trust-icon:nth-child(2) { background: #059669; }
+        .trust-icon:nth-child(3) { background: #F18F01; }
+
+        .trust-text {
+            font-size: 14px;
+            font-weight: 500;
+            color: #212529;
+        }
+
+        .primary-button {
+            background: linear-gradient(90deg, #2E86AB 0%, #1E5F7B 100%);
+            height: 56px;
+            border-radius: 8px;
+            border: none;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .primary-button:hover {
+            transform: translateY(-1px);
+        }
+
+        .secondary-text {
+            text-align: center;
+            color: #6C757D;
+            font-size: 14px;
+        }
+
+        .secondary-text .link {
+            color: #2E86AB;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .security-badge {
+            text-align: center;
+            margin-top: auto;
+            color: #6C757D;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        /* Login Screen */
+        .login-container {
+            padding: 32px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .login-logo {
+            width: 64px;
+            height: 64px;
+            background: #2E86AB;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 28px;
+            font-weight: bold;
+            color: white;
+            margin: 0 auto 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .login-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #212529;
+            margin-bottom: 8px;
+        }
+
+        .login-subtitle {
+            font-size: 14px;
+            color: #6C757D;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #212529;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .input-field {
+            width: 100%;
+            height: 52px;
+            border: 2px solid #E9ECEF;
+            border-radius: 8px;
+            padding: 0 16px;
+            font-size: 16px;
+            transition: border-color 0.2s;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #2E86AB;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #2E86AB;
+            border-radius: 4px;
+            margin-right: 8px;
+        }
+
+        /* Register Screen */
+        .register-container {
+            padding: 32px;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .role-cards {
+            margin: 24px 0;
+        }
+
+        .role-card {
+            background: white;
+            border: 2px solid #E9ECEF;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .role-card:hover {
+            border-color: #2E86AB;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .role-card.selected {
+            border-color: #2E86AB;
+            background: linear-gradient(135deg, rgba(46,134,171,0.1) 0%, rgba(46,134,171,0.05) 100%);
+        }
+
+        .role-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            margin-right: 16px;
+        }
+
+        .role-icon.lender { background: #059669; }
+        .role-icon.borrower { background: #DC2626; }
+        .role-icon.both { background: #7C3AED; }
+
+        .role-info h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #212529;
+            margin-bottom: 4px;
+        }
+
+        .role-info p {
+            font-size: 14px;
+            color: #6C757D;
+            margin-bottom: 4px;
+        }
+
+        .role-benefit {
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .role-benefit.lender { color: #059669; }
+        .role-benefit.borrower { color: #DC2626; }
+        .role-benefit.both { color: #7C3AED; }
+
+        /* Demo Controls */
+        .demo-controls {
+            position: absolute;
+            bottom: -80px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+        }
+
+        .demo-btn {
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.9);
+            border: none;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .demo-btn:hover {
+            background: white;
+            transform: translateY(-2px);
+        }
+
+        .demo-btn.active {
+            background: #2E86AB;
+            color: white;
+        }
+
+        /* Language Controls */
+        .language-controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 8px;
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            padding: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 100;
+        }
+
+        .lang-btn {
+            padding: 6px 16px;
+            background: transparent;
+            border: none;
+            border-radius: 15px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 600;
+            color: #2E86AB;
+        }
+
+        .lang-btn:hover {
+            background: rgba(46,134,171,0.1);
+        }
+
+        .lang-btn.active {
+            background: #2E86AB;
+            color: white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-mockup">
+        <div class="screen">
+            <!-- Welcome Screen -->
+            <div class="screen-content active" id="welcome">
+                <div class="welcome-screen">
+                    <div class="logo-circle">₡</div>
+                    <div class="brand-text">Cooin</div>
+                    <div class="hero-title" data-en="Connect with Trusted<br>Financial Partners" data-es="Conecta con Socios<br>Financieros Confiables">Connect with Trusted<br>Financial Partners</div>
+                    <div class="hero-subtitle" data-en="Join a premium community where lenders and borrowers create meaningful financial connections" data-es="Únete a una comunidad premium donde prestamistas y prestatarios crean conexiones financieras significativas">Join a premium community where lenders and borrowers create meaningful financial connections</div>
+                </div>
+
+                <div class="content-section">
+                    <div class="trust-indicators">
+                        <div class="trust-item">
+                            <div class="trust-icon">🛡️</div>
+                            <div class="trust-text" data-en="Bank-Level Security" data-es="Seguridad Bancaria">Bank-Level Security</div>
+                        </div>
+                        <div class="trust-item">
+                            <div class="trust-icon">🤝</div>
+                            <div class="trust-text" data-en="Trusted Community" data-es="Comunidad Confiable">Trusted Community</div>
+                        </div>
+                        <div class="trust-item">
+                            <div class="trust-icon">💰</div>
+                            <div class="trust-text" data-en="Fair Rates" data-es="Tarifas Justas">Fair Rates</div>
+                        </div>
+                    </div>
+
+                    <button class="primary-button" onclick="showScreen('login')" data-en="Get Started" data-es="Comenzar">Get Started</button>
+                    <div class="secondary-text">
+                        <span data-en="Already have an account?" data-es="¿Ya tienes una cuenta?">Already have an account?</span> <span class="link" onclick="showScreen('login')" data-en="Sign In" data-es="Iniciar Sesión">Sign In</span>
+                    </div>
+                    <div class="security-badge" data-en="🔒 256-bit encryption • FDIC insured" data-es="🔒 Cifrado de 256 bits • Asegurado por FDIC">🔒 256-bit encryption • FDIC insured</div>
+                </div>
+            </div>
+
+            <!-- Login Screen -->
+            <div class="screen-content" id="login">
+                <div class="login-container">
+                    <div class="login-header">
+                        <div class="login-logo">₡</div>
+                        <div class="login-title" data-en="Welcome Back" data-es="Bienvenido de Nuevo">Welcome Back</div>
+                        <div class="login-subtitle" data-en="Sign in to access your premium financial network" data-es="Inicia sesión para acceder a tu red financiera premium">Sign in to access your premium financial network</div>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label" data-en="Email Address" data-es="Dirección de Correo">Email Address</label>
+                        <input class="input-field" type="email" data-placeholder-en="Enter your email" data-placeholder-es="Ingresa tu correo" placeholder="Enter your email" />
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label" data-en="Password" data-es="Contraseña">Password</label>
+                        <input class="input-field" type="password" data-placeholder-en="Enter your password" data-placeholder-es="Ingresa tu contraseña" placeholder="Enter your password" />
+                    </div>
+
+                    <div class="checkbox-container">
+                        <div class="checkbox"></div>
+                        <span data-en="Remember me" data-es="Recordarme">Remember me</span>
+                        <div style="margin-left: auto; font-size: 12px; color: #10B981;" data-en="🔐 Biometric available" data-es="🔐 Biométrico disponible">🔐 Biometric available</div>
+                    </div>
+
+                    <button class="primary-button" onclick="showScreen('register')" data-en="Sign In" data-es="Iniciar Sesión">Sign In</button>
+
+                    <div class="secondary-text">
+                        <span data-en="Forgot your password?" data-es="¿Olvidaste tu contraseña?">Forgot your password?</span><br><br>
+                        <span data-en="Don't have an account?" data-es="¿No tienes cuenta?">Don't have an account?</span> <span class="link" onclick="showScreen('register')" data-en="Join Cooin" data-es="Únete a Cooin">Join Cooin</span>
+                    </div>
+
+                    <div class="security-badge" style="margin-top: 20px;" data-en="🔒 Secured with 256-bit encryption" data-es="🔒 Protegido con cifrado de 256 bits">🔒 Secured with 256-bit encryption</div>
+                </div>
+            </div>
+
+            <!-- Register Screen -->
+            <div class="screen-content" id="register">
+                <div class="register-container">
+                    <div class="login-header">
+                        <div class="login-logo">₡</div>
+                        <div class="login-title" data-en="Join Cooin" data-es="Únete a Cooin">Join Cooin</div>
+                        <div class="login-subtitle" data-en="Create your premium financial network account" data-es="Crea tu cuenta de red financiera premium">Create your premium financial network account</div>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label" data-en="Email Address" data-es="Dirección de Correo">Email Address</label>
+                        <input class="input-field" type="email" data-placeholder-en="Enter your email" data-placeholder-es="Ingresa tu correo" placeholder="Enter your email" />
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label" data-en="Username" data-es="Nombre de Usuario">Username</label>
+                        <input class="input-field" type="text" data-placeholder-en="Choose a username (min 3 characters)" data-placeholder-es="Elige un usuario (mín 3 caracteres)" placeholder="Choose a username (min 3 characters)" />
+                    </div>
+
+                    <div style="margin: 24px 0;">
+                        <h3 style="font-size: 20px; font-weight: bold; color: #212529; margin-bottom: 8px;" data-en="What brings you to Cooin?" data-es="¿Qué te trae a Cooin?">What brings you to Cooin?</h3>
+                        <p style="font-size: 14px; color: #6C757D; margin-bottom: 16px;" data-en="Choose your primary financial goal" data-es="Elige tu objetivo financiero principal">Choose your primary financial goal</p>
+
+                        <div class="role-cards">
+                            <div class="role-card" onclick="selectRole(this, 'lender')">
+                                <div class="role-icon lender">💰</div>
+                                <div class="role-info">
+                                    <h3 data-en="Lend Money" data-es="Prestar Dinero">Lend Money</h3>
+                                    <p data-en="Earn competitive returns by lending to trusted borrowers" data-es="Obtén rendimientos competitivos prestando a prestatarios confiables">Earn competitive returns by lending to trusted borrowers</p>
+                                    <div class="role-benefit lender" data-en="✓ Competitive Returns" data-es="✓ Rendimientos Competitivos">✓ Competitive Returns</div>
+                                </div>
+                            </div>
+
+                            <div class="role-card" onclick="selectRole(this, 'borrower')">
+                                <div class="role-icon borrower">🏠</div>
+                                <div class="role-info">
+                                    <h3 data-en="Borrow Money" data-es="Pedir Prestado">Borrow Money</h3>
+                                    <p data-en="Access fair-rate loans from trusted community lenders" data-es="Accede a préstamos con tarifas justas de prestamistas confiables">Access fair-rate loans from trusted community lenders</p>
+                                    <div class="role-benefit borrower" data-en="✓ Fair Rate Loans" data-es="✓ Préstamos con Tarifas Justas">✓ Fair Rate Loans</div>
+                                </div>
+                            </div>
+
+                            <div class="role-card" onclick="selectRole(this, 'both')">
+                                <div class="role-icon both">⚖️</div>
+                                <div class="role-info">
+                                    <h3 data-en="Both" data-es="Ambos">Both</h3>
+                                    <p data-en="Maximum flexibility to both lend and borrow as needed" data-es="Máxima flexibilidad para prestar y pedir prestado según necesites">Maximum flexibility to both lend and borrow as needed</p>
+                                    <div class="role-benefit both" data-en="✓ Complete Flexibility" data-es="✓ Flexibilidad Completa">✓ Complete Flexibility</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="primary-button" data-en="Create Account" data-es="Crear Cuenta">Create Account</button>
+
+                    <div class="secondary-text">
+                        <span data-en="Already have an account?" data-es="¿Ya tienes cuenta?">Already have an account?</span> <span class="link" onclick="showScreen('login')" data-en="Sign In" data-es="Iniciar Sesión">Sign In</span>
+                    </div>
+
+                    <div class="security-badge" data-en="🔒 Your data is encrypted and secure" data-es="🔒 Tus datos están cifrados y seguros">🔒 Your data is encrypted and secure</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="language-controls">
+            <button class="lang-btn active" onclick="setLanguage('en', this)" data-en="EN" data-es="EN">EN</button>
+            <button class="lang-btn" onclick="setLanguage('es', this)" data-en="ES" data-es="ES">ES</button>
+        </div>
+
+        <div class="demo-controls">
+            <button class="demo-btn active" onclick="showScreen('welcome', this)" data-en="Welcome" data-es="Bienvenida">Welcome</button>
+            <button class="demo-btn" onclick="showScreen('login', this)" data-en="Login" data-es="Iniciar Sesión">Login</button>
+            <button class="demo-btn" onclick="showScreen('register', this)" data-en="Register" data-es="Registro">Register</button>
+        </div>
+    </div>
+
+    <script>
+        function showScreen(screenName, buttonElement) {
+            console.log('Switching to screen:', screenName);
+
+            // Hide all screens
+            document.querySelectorAll('.screen-content').forEach(screen => {
+                screen.classList.remove('active');
+            });
+
+            // Show selected screen
+            const targetScreen = document.getElementById(screenName);
+            if (targetScreen) {
+                targetScreen.classList.add('active');
+                console.log('Screen', screenName, 'is now active');
+            } else {
+                console.error('Screen not found:', screenName);
+            }
+
+            // Update button states
+            document.querySelectorAll('.demo-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Add active to the clicked button
+            if (buttonElement) {
+                buttonElement.classList.add('active');
+            } else {
+                // Fallback: find button by screen name
+                document.querySelectorAll('.demo-btn').forEach(btn => {
+                    if (btn.textContent.toLowerCase() === screenName.toLowerCase()) {
+                        btn.classList.add('active');
+                    }
+                });
+            }
+        }
+
+        function selectRole(card, role) {
+            console.log('Role selected:', role);
+            // Remove selected from all cards
+            document.querySelectorAll('.role-card').forEach(c => {
+                c.classList.remove('selected');
+            });
+            // Add selected to clicked card
+            card.classList.add('selected');
+        }
+
+        // Language switching functionality
+        let currentLanguage = 'en';
+
+        function setLanguage(lang, buttonElement) {
+            console.log('Switching to language:', lang);
+            currentLanguage = lang;
+
+            // Update all elements with data attributes
+            document.querySelectorAll('[data-en][data-es]').forEach(element => {
+                const newText = element.getAttribute('data-' + lang);
+                if (newText) {
+                    if (element.innerHTML.includes('<br>')) {
+                        element.innerHTML = newText;
+                    } else {
+                        element.textContent = newText;
+                    }
+                }
+            });
+
+            // Update input placeholders
+            document.querySelectorAll('input[data-placeholder-en][data-placeholder-es]').forEach(input => {
+                const newPlaceholder = input.getAttribute('data-placeholder-' + lang);
+                if (newPlaceholder) {
+                    input.placeholder = newPlaceholder;
+                }
+            });
+
+            // Update language button states
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            if (buttonElement) {
+                buttonElement.classList.add('active');
+            }
+        }
+
+        // Initialize the welcome screen as active
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page loaded, initializing welcome screen');
+            showScreen('welcome');
+            setLanguage('en'); // Initialize with English
+        });
+    </script>
+</body>
+</html>
