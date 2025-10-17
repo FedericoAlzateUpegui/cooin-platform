@@ -6,10 +6,12 @@
 //
 
 import SwiftUI
+import Combine
 
 struct AnalyticsView: View {
     @EnvironmentObject var authManager: AuthenticationManager
     @EnvironmentObject var apiClient: APIClient
+    @ObservedObject var languageManager = LanguageManager.shared
     @State private var analytics: MobileAnalytics?
     @State private var isLoading = true
 
@@ -17,23 +19,26 @@ struct AnalyticsView: View {
         NavigationView {
             ScrollView {
                 VStack(spacing: 20) {
+                    // Hidden view to trigger refresh on language change
+                    Text("").hidden().id(languageManager.refreshTrigger)
+
                     if isLoading {
                         VStack {
-                            ProgressView("Loading analytics...")
+                            ProgressView("analytics.loading".localized)
                                 .progressViewStyle(CircularProgressViewStyle())
                         }
                         .frame(height: 200)
                     } else if let analytics = analytics {
                         // Platform Stats Section
                         VStack(spacing: 15) {
-                            SectionHeader(title: "Platform Statistics", icon: "chart.bar.fill")
+                            SectionHeader(title: "analytics.platform_statistics".localized, icon: "chart.bar.fill")
 
                             LazyVGrid(columns: [
                                 GridItem(.flexible()),
                                 GridItem(.flexible())
                             ], spacing: 15) {
                                 AnalyticsCard(
-                                    title: "Total Users",
+                                    title: "analytics.total_users".localized,
                                     value: "\(analytics.platformStats.totalUsers)",
                                     change: "+\(String(format: "%.1f", analytics.growthTrends.userGrowth))%",
                                     isPositive: analytics.growthTrends.userGrowth > 0,
@@ -42,7 +47,7 @@ struct AnalyticsView: View {
                                 )
 
                                 AnalyticsCard(
-                                    title: "Active Users",
+                                    title: "analytics.active_users".localized,
                                     value: "\(analytics.platformStats.activeUsers)",
                                     change: "+\(String(format: "%.1f", analytics.growthTrends.activityGrowth))%",
                                     isPositive: analytics.growthTrends.activityGrowth > 0,
@@ -51,18 +56,18 @@ struct AnalyticsView: View {
                                 )
 
                                 AnalyticsCard(
-                                    title: "Loan Requests",
+                                    title: "analytics.loan_requests".localized,
                                     value: "\(analytics.platformStats.loanRequests)",
-                                    change: "This month",
+                                    change: "analytics.this_month".localized,
                                     isPositive: true,
                                     icon: "doc.text.fill",
                                     color: .orange
                                 )
 
                                 AnalyticsCard(
-                                    title: "Lending Offers",
+                                    title: "analytics.lending_offers".localized,
                                     value: "\(analytics.platformStats.lendingOffers)",
-                                    change: "Available",
+                                    change: "analytics.available".localized,
                                     isPositive: true,
                                     icon: "dollarsign.circle.fill",
                                     color: .purple
@@ -72,20 +77,20 @@ struct AnalyticsView: View {
 
                         // Financial Overview Section
                         VStack(spacing: 15) {
-                            SectionHeader(title: "Financial Overview", icon: "chart.line.uptrend.xyaxis")
+                            SectionHeader(title: "analytics.financial_overview".localized, icon: "chart.line.uptrend.xyaxis")
 
                             HStack(spacing: 15) {
                                 FinancialOverviewCard(
-                                    title: "Average Loan Amount",
+                                    title: "analytics.avg_loan_amount".localized,
                                     value: analytics.financialOverview.avgLoanAmount,
-                                    subtitle: "Typical loan size",
+                                    subtitle: "analytics.typical_loan_size".localized,
                                     color: .blue
                                 )
 
                                 FinancialOverviewCard(
-                                    title: "Total Volume",
+                                    title: "analytics.total_volume".localized,
                                     value: analytics.financialOverview.totalVolume,
-                                    subtitle: "Platform volume",
+                                    subtitle: "analytics.platform_volume".localized,
                                     color: .green
                                 )
                             }
@@ -93,26 +98,26 @@ struct AnalyticsView: View {
 
                         // Insights Section
                         VStack(spacing: 15) {
-                            SectionHeader(title: "Insights", icon: "lightbulb.fill")
+                            SectionHeader(title: "analytics.insights".localized, icon: "lightbulb.fill")
 
                             VStack(spacing: 10) {
                                 InsightCard(
-                                    title: "Growing Community",
-                                    description: "User growth is up \(String(format: "%.1f", analytics.growthTrends.userGrowth))% this month",
+                                    title: "analytics.growing_community".localized,
+                                    description: String(format: "analytics.user_growth_description".localized, String(format: "%.1f", analytics.growthTrends.userGrowth)),
                                     icon: "arrow.up.circle.fill",
                                     color: .green
                                 )
 
                                 InsightCard(
-                                    title: "Active Marketplace",
-                                    description: "High activity with \(analytics.platformStats.activeUsers) active users",
+                                    title: "analytics.active_marketplace".localized,
+                                    description: String(format: "analytics.active_marketplace_description".localized, "\(analytics.platformStats.activeUsers)"),
                                     icon: "chart.bar.fill",
                                     color: .blue
                                 )
 
                                 InsightCard(
-                                    title: "Balanced Platform",
-                                    description: "Good balance between borrowers and lenders",
+                                    title: "analytics.balanced_platform".localized,
+                                    description: "analytics.balanced_platform_description".localized,
                                     icon: "scale.3d",
                                     color: .purple
                                 )
@@ -124,15 +129,15 @@ struct AnalyticsView: View {
                                 .font(.system(size: 50))
                                 .foregroundColor(.gray)
 
-                            Text("Analytics Unavailable")
+                            Text("analytics.unavailable".localized)
                                 .font(.title2)
                                 .fontWeight(.bold)
 
-                            Text("Unable to load analytics data")
+                            Text("analytics.unable_to_load".localized)
                                 .font(.body)
                                 .foregroundColor(.secondary)
 
-                            Button("Retry") {
+                            Button("analytics.retry".localized) {
                                 loadAnalytics()
                             }
                             .buttonStyle(.borderedProminent)
@@ -143,7 +148,7 @@ struct AnalyticsView: View {
                 }
                 .padding()
             }
-            .navigationTitle("Analytics")
+            .navigationTitle("analytics.title".localized)
             .refreshable {
                 loadAnalytics()
             }

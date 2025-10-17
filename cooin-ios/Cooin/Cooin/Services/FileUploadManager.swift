@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import PhotosUI
 import Combine
 
 class FileUploadManager: ObservableObject {
@@ -17,6 +16,7 @@ class FileUploadManager: ObservableObject {
 
     private let apiClient: APIClient
     private var cancellables = Set<AnyCancellable>()
+    private var progressTimer: Timer?
 
     init(apiClient: APIClient) {
         self.apiClient = apiClient
@@ -24,19 +24,19 @@ class FileUploadManager: ObservableObject {
 
     func uploadImage(_ image: UIImage, documentType: DocumentType, authToken: String) {
         guard let imageData = image.jpegData(compressionQuality: 0.8) else {
-            errorMessage = "Failed to process image"
+            errorMessage = NSLocalizedString("upload.error.failed_to_process", comment: "")
             return
         }
 
         uploadFile(data: imageData, fileName: "\(documentType.rawValue)_\(Date().timeIntervalSince1970).jpg",
-                  mimeType: "image/jpeg", documentType: documentType, authToken: authToken)
+                  mimeType: "image/jpeg", documentType: documentType, authToken: authToken, image: image)
     }
 
     func uploadDocument(data: Data, fileName: String, mimeType: String, documentType: DocumentType, authToken: String) {
-        uploadFile(data: data, fileName: fileName, mimeType: mimeType, documentType: documentType, authToken: authToken)
+        uploadFile(data: data, fileName: fileName, mimeType: mimeType, documentType: documentType, authToken: authToken, image: nil)
     }
 
-    private func uploadFile(data: Data, fileName: String, mimeType: String, documentType: DocumentType, authToken: String) {
+    private func uploadFile(data: Data, fileName: String, mimeType: String, documentType: DocumentType, authToken: String, image: UIImage? = nil) {
         isUploading = true
         uploadProgress = 0.0
         errorMessage = nil
@@ -59,8 +59,14 @@ class FileUploadManager: ObservableObject {
         body.append("--\(boundary)--\r\n".data(using: .utf8)!)
 
         // Create request
-        guard let url = URL(string: "http://192.168.40.34:8000/api/v1/documents/upload") else {
-            errorMessage = "Invalid URL"
+        #if targetEnvironment(simulator)
+        let baseURL = "http://127.0.0.1:8000"
+        #else
+        let baseURL = "http://192.168.1.9:8000"
+        #endif
+
+        guard let url = URL(string: "\(baseURL)/api/v1/mobile/uploads/document") else {
+            errorMessage = NSLocalizedString("upload.error.invalid_url", comment: "")
             isUploading = false
             return
         }
@@ -71,28 +77,52 @@ class FileUploadManager: ObservableObject {
         request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
         request.httpBody = body
 
-        // Simulate upload progress
+        // Upload with proper response handling
         URLSession.shared.dataTaskPublisher(for: request)
-            .map { data, response in
-                // Parse response
+            .tryMap { data, response -> Data in
+                // Check HTTP status code
+                guard let httpResponse = response as? HTTPURLResponse else {
+                    throw URLError(.badServerResponse)
+                }
+
+                // Log response for debugging
+                print("📤 Upload response status: \(httpResponse.statusCode)")
+                if let responseString = String(data: data, encoding: .utf8) {
+                    print("📤 Upload response: \(responseString)")
+                }
+
+                // Check for success
+                guard (200...299).contains(httpResponse.statusCode) else {
+                    throw URLError(.badServerResponse)
+                }
+
                 return data
             }
             .receive(on: DispatchQueue.main)
             .sink(
                 receiveCompletion: { [weak self] completion in
+                    self?.progressTimer?.invalidate()
+                    self?.progressTimer = nil
                     self?.isUploading = false
                     if case .failure(let error) = completion {
-                        self?.errorMessage = error.localizedDescription
+                        print("❌ Upload failed: \(error)")
+                        if (error as? URLError)?.code == .timedOut {
+                            self?.errorMessage = NSLocalizedString("upload.error.timeout", comment: "")
+                        } else {
+                            self?.errorMessage = error.localizedDescription
+                        }
                     }
                 },
                 receiveValue: { [weak self] data in
-                    // Simulate successful upload
+                    print("✅ Upload successful")
+                    // Create document from successful upload
                     let document = UploadedDocument(
                         id: UUID().uuidString,
                         fileName: fileName,
                         documentType: documentType,
                         uploadDate: Date(),
-                        status: .verified
+                        status: .pending,
+                        image: image
                     )
                     self?.uploadedDocuments.append(document)
                     self?.uploadProgress = 1.0
@@ -100,13 +130,19 @@ class FileUploadManager: ObservableObject {
             )
             .store(in: &cancellables)
 
-        // Simulate progress
-        Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { timer in
+        // Simulate progress with proper cleanup
+        progressTimer?.invalidate()
+        progressTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] timer in
+            guard let self = self else {
+                timer.invalidate()
+                return
+            }
             DispatchQueue.main.async {
                 if self.uploadProgress < 0.9 && self.isUploading {
                     self.uploadProgress += 0.1
                 } else {
                     timer.invalidate()
+                    self.progressTimer = nil
                 }
             }
         }
@@ -125,6 +161,7 @@ struct UploadedDocument: Identifiable {
     let documentType: DocumentType
     let uploadDate: Date
     let status: DocumentStatus
+    let image: UIImage?
 }
 
 enum DocumentType: String, CaseIterable {
@@ -179,91 +216,6 @@ enum DocumentStatus {
         case .pending: return "Pending"
         case .verified: return "Verified"
         case .rejected: return "Rejected"
-        }
-    }
-}
-
-// MARK: - Photo Picker Integration
-
-struct PhotoPickerView: UIViewControllerRepresentable {
-    @Binding var selectedImage: UIImage?
-    @Environment(\.dismiss) private var dismiss
-
-    func makeUIViewController(context: Context) -> PHPickerViewController {
-        var config = PHPickerConfiguration()
-        config.filter = .images
-        config.selectionLimit = 1
-
-        let picker = PHPickerViewController(configuration: config)
-        picker.delegate = context.coordinator
-        return picker
-    }
-
-    func updateUIViewController(_ uiViewController: PHPickerViewController, context: Context) {}
-
-    func makeCoordinator() -> Coordinator {
-        Coordinator(self)
-    }
-
-    class Coordinator: NSObject, PHPickerViewControllerDelegate {
-        let parent: PhotoPickerView
-
-        init(_ parent: PhotoPickerView) {
-            self.parent = parent
-        }
-
-        func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
-            picker.dismiss(animated: true)
-
-            guard let provider = results.first?.itemProvider,
-                  provider.canLoadObject(ofClass: UIImage.self) else {
-                return
-            }
-
-            provider.loadObject(ofClass: UIImage.self) { image, error in
-                DispatchQueue.main.async {
-                    self.parent.selectedImage = image as? UIImage
-                }
-            }
-        }
-    }
-}
-
-// MARK: - Camera Integration
-
-struct CameraView: UIViewControllerRepresentable {
-    @Binding var selectedImage: UIImage?
-    @Environment(\.dismiss) private var dismiss
-
-    func makeUIViewController(context: Context) -> UIImagePickerController {
-        let picker = UIImagePickerController()
-        picker.sourceType = .camera
-        picker.delegate = context.coordinator
-        return picker
-    }
-
-    func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {}
-
-    func makeCoordinator() -> Coordinator {
-        Coordinator(self)
-    }
-
-    class Coordinator: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-        let parent: CameraView
-
-        init(_ parent: CameraView) {
-            self.parent = parent
-        }
-
-        func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-            if let image = info[.originalImage] as? UIImage {
-                parent.selectedImage = image
-            }
-            picker.dismiss(animated: true)
-        }
-
-        func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-            picker.dismiss(animated: true)
         }
     }
 }

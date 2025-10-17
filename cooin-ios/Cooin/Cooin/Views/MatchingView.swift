@@ -9,11 +9,15 @@ import SwiftUI
 
 struct MatchingView: View {
     @EnvironmentObject var authManager: AuthenticationManager
+    @ObservedObject var languageManager = LanguageManager.shared
 
     var body: some View {
         NavigationView {
             ScrollView {
                 VStack(spacing: 20) {
+                    // Hidden view to trigger refresh on language change
+                    Text("").hidden().id(languageManager.refreshTrigger)
+
                     if let user = authManager.currentUser {
                         if user.role == "borrower" {
                             BorrowerMatchingView()
@@ -24,7 +28,7 @@ struct MatchingView: View {
                 }
                 .padding()
             }
-            .navigationTitle("Matches")
+            .navigationTitle("matching.title".localized)
         }
     }
 }
@@ -32,24 +36,28 @@ struct MatchingView: View {
 struct BorrowerMatchingView: View {
     @EnvironmentObject var authManager: AuthenticationManager
     @EnvironmentObject var apiClient: APIClient
+    @ObservedObject var languageManager = LanguageManager.shared
     @State private var showingLoanRequestForm = false
     @State private var showingBrowseLenders = false
     @State private var showingMatches = false
 
     var body: some View {
         VStack(spacing: 20) {
+            // Hidden view to trigger refresh on language change
+            Text("").hidden().id(languageManager.refreshTrigger)
+
             // Header
             VStack(spacing: 10) {
                 Image(systemName: "heart.circle.fill")
                     .font(.system(size: 50))
                     .foregroundColor(.pink)
 
-                Text("Find Your Perfect Lender")
+                Text("matching.find_perfect_lender".localized)
                     .font(.title2)
                     .fontWeight(.bold)
                     .multilineTextAlignment(.center)
 
-                Text("Connect with lenders who match your needs")
+                Text("matching.connect_lenders".localized)
                     .font(.body)
                     .foregroundColor(.secondary)
                     .multilineTextAlignment(.center)
@@ -57,13 +65,13 @@ struct BorrowerMatchingView: View {
 
             // Action card
             VStack(spacing: 15) {
-                Text("Get Started")
+                Text("matching.get_started".localized)
                     .font(.headline)
 
                 VStack(spacing: 10) {
                     MatchingActionCard(
-                        title: "Create Loan Request",
-                        subtitle: "Tell us what you need to borrow",
+                        title: "matching.create_loan_request".localized,
+                        subtitle: "matching.create_loan_request_subtitle".localized,
                         icon: "doc.text.badge.plus",
                         color: .blue
                     ) {
@@ -71,8 +79,8 @@ struct BorrowerMatchingView: View {
                     }
 
                     MatchingActionCard(
-                        title: "Browse Lenders",
-                        subtitle: "Explore available lending offers",
+                        title: "matching.browse_lenders".localized,
+                        subtitle: "matching.browse_lenders_subtitle".localized,
                         icon: "person.2.fill",
                         color: .green
                     ) {
@@ -80,8 +88,8 @@ struct BorrowerMatchingView: View {
                     }
 
                     MatchingActionCard(
-                        title: "View My Matches",
-                        subtitle: "See lenders interested in you",
+                        title: "matching.view_matches".localized,
+                        subtitle: "matching.view_matches_lenders_subtitle".localized,
                         icon: "heart.fill",
                         color: .pink
                     ) {
@@ -107,24 +115,28 @@ struct BorrowerMatchingView: View {
 struct LenderMatchingView: View {
     @EnvironmentObject var authManager: AuthenticationManager
     @EnvironmentObject var apiClient: APIClient
+    @ObservedObject var languageManager = LanguageManager.shared
     @State private var showingLendingOfferForm = false
     @State private var showingBrowseBorrowers = false
     @State private var showingMatches = false
 
     var body: some View {
         VStack(spacing: 20) {
+            // Hidden view to trigger refresh on language change
+            Text("").hidden().id(languageManager.refreshTrigger)
+
             // Header
             VStack(spacing: 10) {
                 Image(systemName: "dollarsign.circle.fill")
                     .font(.system(size: 50))
                     .foregroundColor(.green)
 
-                Text("Find Investment Opportunities")
+                Text("matching.find_investment_opportunities".localized)
                     .font(.title2)
                     .fontWeight(.bold)
                     .multilineTextAlignment(.center)
 
-                Text("Connect with borrowers who need your support")
+                Text("matching.connect_borrowers".localized)
                     .font(.body)
                     .foregroundColor(.secondary)
                     .multilineTextAlignment(.center)
@@ -132,13 +144,13 @@ struct LenderMatchingView: View {
 
             // Action card
             VStack(spacing: 15) {
-                Text("Get Started")
+                Text("matching.get_started".localized)
                     .font(.headline)
 
                 VStack(spacing: 10) {
                     MatchingActionCard(
-                        title: "Create Lending Offer",
-                        subtitle: "Set your lending preferences",
+                        title: "matching.create_lending_offer".localized,
+                        subtitle: "matching.create_lending_offer_subtitle".localized,
                         icon: "plus.circle.fill",
                         color: .blue
                     ) {
@@ -146,8 +158,8 @@ struct LenderMatchingView: View {
                     }
 
                     MatchingActionCard(
-                        title: "Browse Borrowers",
-                        subtitle: "Explore loan requests",
+                        title: "matching.browse_borrowers".localized,
+                        subtitle: "matching.browse_borrowers_subtitle".localized,
                         icon: "person.2.fill",
                         color: .green
                     ) {
@@ -155,8 +167,8 @@ struct LenderMatchingView: View {
                     }
 
                     MatchingActionCard(
-                        title: "View My Matches",
-                        subtitle: "See borrowers matched to you",
+                        title: "matching.view_matches".localized,
+                        subtitle: "matching.view_matches_borrowers_subtitle".localized,
                         icon: "heart.fill",
                         color: .pink
                     ) {
@@ -222,268 +234,13 @@ struct MatchingActionCard: View {
     }
 }
 
-struct LoanRequestFormView: View {
-    @Environment(\.dismiss) private var dismiss
-    @EnvironmentObject var authManager: AuthenticationManager
-    @EnvironmentObject var apiClient: APIClient
-    @State private var loanAmount = ""
-    @State private var purpose = "home_improvement"
-    @State private var termMonths = "36"
-    @State private var maxRate = ""
-    @State private var description = ""
-    @State private var isLoading = false
-    @State private var errorMessage: String?
-
-    let purposes = [
-        ("home_improvement", "Home Improvement"),
-        ("debt_consolidation", "Debt Consolidation"),
-        ("education", "Education"),
-        ("business", "Business"),
-        ("medical", "Medical"),
-        ("other", "Other")
-    ]
-
-    var body: some View {
-        NavigationView {
-            Form {
-                Section(header: Text("Loan Details")) {
-                    HStack {
-                        Text("Amount")
-                        Spacer()
-                        TextField("25000", text: $loanAmount)
-                            .keyboardType(.numberPad)
-                            .multilineTextAlignment(.trailing)
-                    }
-
-                    Picker("Purpose", selection: $purpose) {
-                        ForEach(purposes, id: \.0) { value, label in
-                            Text(label).tag(value)
-                        }
-                    }
-
-                    HStack {
-                        Text("Term (months)")
-                        Spacer()
-                        TextField("36", text: $termMonths)
-                            .keyboardType(.numberPad)
-                            .multilineTextAlignment(.trailing)
-                    }
-
-                    HStack {
-                        Text("Max Interest Rate (%)")
-                        Spacer()
-                        TextField("8.5", text: $maxRate)
-                            .keyboardType(.decimalPad)
-                            .multilineTextAlignment(.trailing)
-                    }
-                }
-
-                Section(header: Text("Description")) {
-                    TextEditor(text: $description)
-                        .frame(height: 100)
-                }
-            }
-            .navigationTitle("Loan Request")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancel") {
-                        dismiss()
-                    }
-                }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Create") {
-                        createLoanRequest()
-                    }
-                    .disabled(loanAmount.isEmpty || maxRate.isEmpty || isLoading)
-                }
-            }
-        }
-    }
-
-    private func createLoanRequest() {
-        guard let token = authManager.getAccessToken(),
-              let amount = Double(loanAmount),
-              let termMonthsInt = Int(termMonths),
-              let maxRateDouble = Double(maxRate) else { return }
-
-        isLoading = true
-        errorMessage = nil
-
-        // In a real implementation, this would call apiClient.createLoanRequest
-        // For now, we'll simulate success
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            self.isLoading = false
-            self.dismiss()
-        }
-    }
-}
-
-struct LendingOfferFormView: View {
-    @Environment(\.dismiss) private var dismiss
-    @EnvironmentObject var authManager: AuthenticationManager
-    @EnvironmentObject var apiClient: APIClient
-    @State private var availableAmount = ""
-    @State private var minAmount = ""
-    @State private var maxAmount = ""
-    @State private var interestRate = ""
-    @State private var preferredTerms = "36"
-    @State private var isLoading = false
-    @State private var errorMessage: String?
-
-    var body: some View {
-        NavigationView {
-            Form {
-                Section(header: Text("Lending Terms")) {
-                    HStack {
-                        Text("Available Amount")
-                        Spacer()
-                        TextField("100000", text: $availableAmount)
-                            .keyboardType(.numberPad)
-                            .multilineTextAlignment(.trailing)
-                    }
-
-                    HStack {
-                        Text("Min Loan Amount")
-                        Spacer()
-                        TextField("10000", text: $minAmount)
-                            .keyboardType(.numberPad)
-                            .multilineTextAlignment(.trailing)
-                    }
-
-                    HStack {
-                        Text("Max Loan Amount")
-                        Spacer()
-                        TextField("50000", text: $maxAmount)
-                            .keyboardType(.numberPad)
-                            .multilineTextAlignment(.trailing)
-                    }
-
-                    HStack {
-                        Text("Interest Rate (%)")
-                        Spacer()
-                        TextField("7.5", text: $interestRate)
-                            .keyboardType(.decimalPad)
-                            .multilineTextAlignment(.trailing)
-                    }
-
-                    HStack {
-                        Text("Preferred Term (months)")
-                        Spacer()
-                        TextField("36", text: $preferredTerms)
-                            .keyboardType(.numberPad)
-                            .multilineTextAlignment(.trailing)
-                    }
-                }
-            }
-            .navigationTitle("Lending Offer")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancel") {
-                        dismiss()
-                    }
-                }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Create") {
-                        createLendingOffer()
-                    }
-                    .disabled(availableAmount.isEmpty || interestRate.isEmpty || isLoading)
-                }
-            }
-        }
-    }
-
-    private func createLendingOffer() {
-        guard let token = authManager.getAccessToken(),
-              let availableAmountDouble = Double(availableAmount),
-              let minAmountDouble = Double(minAmount),
-              let maxAmountDouble = Double(maxAmount),
-              let interestRateDouble = Double(interestRate),
-              let preferredTermsInt = Int(preferredTerms) else { return }
-
-        isLoading = true
-        errorMessage = nil
-
-        // In a real implementation, this would call apiClient.createLendingOffer
-        // For now, we'll simulate success
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            self.isLoading = false
-            self.dismiss()
-        }
-    }
-}
-
-struct BrowseLendersView: View {
-    @Environment(\.dismiss) private var dismiss
-    @EnvironmentObject var authManager: AuthenticationManager
-    @EnvironmentObject var apiClient: APIClient
-    @State private var lenders: [LenderProfile] = []
-    @State private var isLoading = true
-
-    var body: some View {
-        NavigationView {
-            ScrollView {
-                LazyVStack(spacing: 15) {
-                    if isLoading {
-                        ProgressView("Loading lenders...")
-                            .frame(height: 200)
-                    } else if lenders.isEmpty {
-                        VStack(spacing: 20) {
-                            Image(systemName: "person.2.slash")
-                                .font(.system(size: 50))
-                                .foregroundColor(.gray)
-
-                            Text("No Lenders Available")
-                                .font(.title2)
-                                .fontWeight(.bold)
-
-                            Text("Check back later for new lending opportunities")
-                                .font(.body)
-                                .foregroundColor(.secondary)
-                                .multilineTextAlignment(.center)
-                        }
-                        .frame(height: 200)
-                    } else {
-                        ForEach(lenders, id: \.id) { lender in
-                            LenderCard(lender: lender)
-                        }
-                    }
-                }
-                .padding()
-            }
-            .navigationTitle("Browse Lenders")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") {
-                        dismiss()
-                    }
-                }
-            }
-        }
-        .onAppear {
-            loadLenders()
-        }
-    }
-
-    private func loadLenders() {
-        // Simulate loading lenders
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            self.lenders = [
-                LenderProfile(id: 1, username: "investor_pro", availableAmount: "$50,000", interestRate: "6.5%", minLoan: "$5,000", maxLoan: "$25,000"),
-                LenderProfile(id: 2, username: "capital_builder", availableAmount: "$100,000", interestRate: "7.2%", minLoan: "$10,000", maxLoan: "$50,000"),
-                LenderProfile(id: 3, username: "loan_helper", availableAmount: "$25,000", interestRate: "8.0%", minLoan: "$2,500", maxLoan: "$15,000")
-            ]
-            self.isLoading = false
-        }
-    }
-}
+// Note: LoanRequestFormView and BrowseLendersView are defined in separate files
 
 struct BrowseBorrowersView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var authManager: AuthenticationManager
     @EnvironmentObject var apiClient: APIClient
+    @ObservedObject var languageManager = LanguageManager.shared
     @State private var borrowers: [BorrowerRequest] = []
     @State private var isLoading = true
 
@@ -491,8 +248,11 @@ struct BrowseBorrowersView: View {
         NavigationView {
             ScrollView {
                 LazyVStack(spacing: 15) {
+                    // Hidden view to trigger refresh on language change
+                    Text("").hidden().id(languageManager.refreshTrigger)
+
                     if isLoading {
-                        ProgressView("Loading loan requests...")
+                        ProgressView("matching.loading_loan_requests".localized)
                             .frame(height: 200)
                     } else if borrowers.isEmpty {
                         VStack(spacing: 20) {
@@ -500,11 +260,11 @@ struct BrowseBorrowersView: View {
                                 .font(.system(size: 50))
                                 .foregroundColor(.gray)
 
-                            Text("No Loan Requests")
+                            Text("matching.no_loan_requests".localized)
                                 .font(.title2)
                                 .fontWeight(.bold)
 
-                            Text("Check back later for new borrower requests")
+                            Text("matching.check_back_later_borrowers".localized)
                                 .font(.body)
                                 .foregroundColor(.secondary)
                                 .multilineTextAlignment(.center)
@@ -518,11 +278,11 @@ struct BrowseBorrowersView: View {
                 }
                 .padding()
             }
-            .navigationTitle("Browse Borrowers")
+            .navigationTitle("matching.browse_borrowers".localized)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") {
+                    Button("common.done".localized) {
                         dismiss()
                     }
                 }
@@ -548,6 +308,7 @@ struct BrowseBorrowersView: View {
 
 struct MatchesView: View {
     @Environment(\.dismiss) private var dismiss
+    @ObservedObject var languageManager = LanguageManager.shared
     let userRole: String
     @State private var matches: [MatchProfile] = []
     @State private var isLoading = true
@@ -556,8 +317,11 @@ struct MatchesView: View {
         NavigationView {
             ScrollView {
                 LazyVStack(spacing: 15) {
+                    // Hidden view to trigger refresh on language change
+                    Text("").hidden().id(languageManager.refreshTrigger)
+
                     if isLoading {
-                        ProgressView("Loading matches...")
+                        ProgressView("matching.loading_matches".localized)
                             .frame(height: 200)
                     } else if matches.isEmpty {
                         VStack(spacing: 20) {
@@ -565,11 +329,11 @@ struct MatchesView: View {
                                 .font(.system(size: 50))
                                 .foregroundColor(.gray)
 
-                            Text("No Matches Yet")
+                            Text("matching.no_matches_yet".localized)
                                 .font(.title2)
                                 .fontWeight(.bold)
 
-                            Text("Complete your profile to get better matches")
+                            Text("matching.complete_profile".localized)
                                 .font(.body)
                                 .foregroundColor(.secondary)
                                 .multilineTextAlignment(.center)
@@ -583,11 +347,11 @@ struct MatchesView: View {
                 }
                 .padding()
             }
-            .navigationTitle("My Matches")
+            .navigationTitle("matching.my_matches".localized)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") {
+                    Button("common.done".localized) {
                         dismiss()
                     }
                 }
@@ -648,16 +412,20 @@ struct MatchProfile {
 
 struct LenderCard: View {
     let lender: LenderProfile
+    @ObservedObject var languageManager = LanguageManager.shared
 
     var body: some View {
         VStack(spacing: 12) {
+            // Hidden view to trigger refresh on language change
+            Text("").hidden().id(languageManager.refreshTrigger)
+
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("@\(lender.username)")
                         .font(.headline)
                         .fontWeight(.semibold)
 
-                    Text("Available: \(lender.availableAmount)")
+                    Text("matching.available".localized + ": \(lender.availableAmount)")
                         .font(.subheadline)
                         .foregroundColor(.green)
                 }
@@ -670,20 +438,20 @@ struct LenderCard: View {
                         .fontWeight(.bold)
                         .foregroundColor(.blue)
 
-                    Text("Interest Rate")
+                    Text("matching.interest_rate".localized)
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
             }
 
             HStack {
-                Text("Range: \(lender.minLoan) - \(lender.maxLoan)")
+                Text("matching.range".localized + ": \(lender.minLoan) - \(lender.maxLoan)")
                     .font(.caption)
                     .foregroundColor(.secondary)
 
                 Spacer()
 
-                Button("Contact") {
+                Button("matching.contact".localized) {
                     // Contact action
                 }
                 .buttonStyle(.borderedProminent)
@@ -702,16 +470,20 @@ struct LenderCard: View {
 
 struct BorrowerCard: View {
     let borrower: BorrowerRequest
+    @ObservedObject var languageManager = LanguageManager.shared
 
     var body: some View {
         VStack(spacing: 12) {
+            // Hidden view to trigger refresh on language change
+            Text("").hidden().id(languageManager.refreshTrigger)
+
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("@\(borrower.username)")
                         .font(.headline)
                         .fontWeight(.semibold)
 
-                    Text("Seeking: \(borrower.amount)")
+                    Text("matching.seeking".localized + ": \(borrower.amount)")
                         .font(.subheadline)
                         .foregroundColor(.orange)
                 }
@@ -724,7 +496,7 @@ struct BorrowerCard: View {
                         .fontWeight(.bold)
                         .foregroundColor(.green)
 
-                    Text("Max Rate")
+                    Text("matching.max_rate".localized)
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
@@ -737,7 +509,7 @@ struct BorrowerCard: View {
 
                 Spacer()
 
-                Button("Make Offer") {
+                Button("matching.make_offer".localized) {
                     // Make offer action
                 }
                 .buttonStyle(.borderedProminent)
@@ -757,9 +529,13 @@ struct BorrowerCard: View {
 struct MatchCard: View {
     let match: MatchProfile
     let userRole: String
+    @ObservedObject var languageManager = LanguageManager.shared
 
     var body: some View {
         VStack(spacing: 12) {
+            // Hidden view to trigger refresh on language change
+            Text("").hidden().id(languageManager.refreshTrigger)
+
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("@\(match.username)")
@@ -779,7 +555,7 @@ struct MatchCard: View {
                         .fontWeight(.bold)
                         .foregroundColor(.pink)
 
-                    Text("Match")
+                    Text("matching.match".localized)
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
@@ -791,7 +567,7 @@ struct MatchCard: View {
 
                 Spacer()
 
-                Button("Connect") {
+                Button("matching.connect".localized) {
                     // Connect action
                 }
                 .buttonStyle(.borderedProminent)

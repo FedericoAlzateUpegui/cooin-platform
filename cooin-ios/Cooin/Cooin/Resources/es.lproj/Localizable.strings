@@ -1,0 +1,329 @@
+/*
+  Localizable.strings (Spanish)
+  CooinNew
+*/
+
+// MARK: - Common
+"common.ok" = "Aceptar";
+"common.cancel" = "Cancelar";
+"common.save" = "Guardar";
+"common.delete" = "Eliminar";
+"common.edit" = "Editar";
+"common.done" = "Listo";
+"common.back" = "Atrás";
+"common.next" = "Siguiente";
+"common.email" = "Correo electrónico";
+"common.password" = "Contraseña";
+"common.username" = "Nombre de usuario";
+
+// MARK: - Authentication
+"auth.login" = "Iniciar sesión";
+"auth.register" = "Registrarse";
+"auth.logout" = "Cerrar sesión";
+"auth.create_account" = "Crear cuenta";
+"auth.sign_in" = "Inicia sesión en tu cuenta";
+"auth.join_community" = "Únete a la comunidad Cooin";
+
+// MARK: - Registration
+"register.title" = "Crear cuenta";
+"register.email_placeholder" = "Ingresa tu correo electrónico";
+"register.username_placeholder" = "Elige un nombre de usuario";
+"register.password_placeholder" = "Crea una contraseña";
+"register.confirm_password" = "Confirmar contraseña";
+"register.confirm_password_placeholder" = "Confirma tu contraseña";
+"register.role_label" = "Quiero";
+"register.role_borrower" = "Pedir dinero prestado";
+"register.role_lender" = "Prestar dinero";
+"register.password_requirements" = "Debe tener al menos 8 caracteres con mayúsculas, minúsculas, números y un carácter especial";
+"register.passwords_not_match" = "Las contraseñas no coinciden";
+"register.agree_terms" = "Acepto los Términos de Servicio y la Política de Privacidad";
+"register.success_title" = "¡Éxito!";
+"register.success_message" = "¡Tu cuenta ha sido creada exitosamente! Bienvenido a Cooin.";
+"register.creating_account" = "Creando cuenta...";
+
+// MARK: - Login
+"login.title" = "Iniciar sesión";
+"login.welcome_back" = "¡Bienvenido de nuevo!";
+"login.email_placeholder" = "Ingresa tu correo electrónico";
+"login.password_placeholder" = "Ingresa tu contraseña";
+"login.forgot_password" = "¿Olvidaste tu contraseña?";
+"login.success_title" = "¡Bienvenido de nuevo!";
+"login.success_message" = "Has iniciado sesión exitosamente.";
+"login.logging_in" = "Iniciando sesión...";
+
+// MARK: - Error Messages
+"error.network" = "Error de red. Por favor verifica tu conexión e intenta de nuevo.";
+"error.email_exists" = "Ya existe una cuenta con este correo electrónico";
+"error.username_exists" = "Este nombre de usuario ya está en uso";
+"error.invalid_credentials" = "Correo electrónico o contraseña incorrectos. Por favor intenta de nuevo.";
+"error.something_wrong" = "Algo salió mal. Por favor intenta de nuevo.";
+"error.registration_failed" = "El registro falló. Por favor intenta de nuevo.";
+"error.login_failed" = "El inicio de sesión falló. Por favor intenta de nuevo.";
+
+// MARK: - Dashboard
+"dashboard.title" = "Panel";
+"dashboard.welcome" = "Bienvenido de nuevo";
+"dashboard.loans" = "Préstamos";
+"dashboard.connections" = "Conexiones";
+"dashboard.profile" = "Perfil";
+"dashboard.analytics" = "Analíticas";
+"dashboard.matching" = "Coincidencias";
+"dashboard.platform_overview" = "Vista General de la Plataforma";
+"dashboard.total_users" = "Usuarios Totales";
+"dashboard.active_users" = "Usuarios Activos";
+"dashboard.loan_requests" = "Solicitudes de Préstamos";
+"dashboard.lending_offers" = "Ofertas de Préstamo";
+"dashboard.financial_overview" = "Resumen Financiero";
+"dashboard.avg_loan" = "Préstamo Promedio";
+"dashboard.total_volume" = "Volumen Total";
+"dashboard.quick_actions" = "Acciones Rápidas";
+"dashboard.find_lenders" = "Encontrar Prestamistas";
+"dashboard.find_lenders_subtitle" = "Descubre oportunidades de préstamo";
+"dashboard.create_loan_request" = "Crear Solicitud de Préstamo";
+"dashboard.create_loan_request_subtitle" = "Dinos qué necesitas";
+"dashboard.browse_borrowers" = "Explorar Prestatarios";
+"dashboard.browse_borrowers_subtitle" = "Encuentra oportunidades de inversión";
+"dashboard.create_lending_offer" = "Crear Oferta de Préstamo";
+"dashboard.create_lending_offer_subtitle" = "Establece tus términos de préstamo";
+
+// MARK: - Profile
+"profile.title" = "Perfil";
+"profile.edit" = "Editar perfil";
+"profile.settings" = "Configuración";
+"profile.language" = "Idioma";
+"profile.notifications" = "Notificaciones";
+"profile.privacy" = "Privacidad";
+"profile.terms" = "Términos de servicio";
+"profile.about" = "Acerca de";
+"profile.version" = "Versión";
+"profile.account" = "Cuenta";
+"profile.update_information" = "Actualiza tu información";
+"profile.verification_status" = "Estado de Verificación";
+"profile.complete_verification" = "Completa tu verificación";
+"profile.security" = "Seguridad";
+"profile.security_settings" = "Contraseña y configuración de seguridad";
+"profile.my_borrowing" = "Mis Préstamos";
+"profile.my_lending" = "Mis Inversiones";
+"profile.loan_requests" = "Solicitudes de Préstamo";
+"profile.view_loan_applications" = "Ver tus solicitudes de préstamo";
+"profile.active_loans" = "Préstamos Activos";
+"profile.manage_current_loans" = "Gestionar préstamos actuales";
+"profile.lending_offers" = "Ofertas de Préstamo";
+"profile.manage_offers" = "Gestionar tus ofertas";
+"profile.active_investments" = "Inversiones Activas";
+"profile.track_investments" = "Seguir tus inversiones";
+"profile.transaction_history" = "Historial de Transacciones";
+"profile.view_transactions" = "Ver todas las transacciones";
+"profile.help_support" = "Ayuda y Soporte";
+"profile.help_support_subtitle" = "Obtén ayuda y contáctanos";
+"profile.role_borrower" = "Prestatario";
+"profile.role_lender" = "Prestamista";
+"profile.update_profile_picture" = "Actualizar Foto de Perfil";
+"profile.take_photo" = "Tomar Foto";
+"profile.choose_from_library" = "Elegir de la Biblioteca";
+"profile.profile_picture" = "Foto de Perfil";
+"profile.camera_unavailable" = "Cámara No Disponible";
+"profile.camera_unavailable_simulator" = "La cámara no está disponible en el simulador. Por favor, prueba esta función en un dispositivo físico.";
+"profile.camera_coming_soon" = "¡Esta función estará disponible pronto! Podrás tomar fotos para tu perfil.";
+"profile.photo_library" = "Biblioteca de Fotos";
+"profile.photo_library_coming_soon" = "¡Esta función estará disponible pronto! Podrás elegir fotos de tu biblioteca.";
+"profile.basic_information" = "Información Básica";
+"profile.phone" = "Teléfono";
+"profile.phone_number" = "Número de teléfono";
+"profile.bio" = "Biografía";
+"profile.select_language" = "Seleccionar Idioma";
+
+// MARK: - Settings
+"settings.title" = "Configuración";
+"settings.language" = "Idioma";
+"settings.language_description" = "Elige tu idioma preferido";
+"settings.english" = "Inglés";
+"settings.spanish" = "Español";
+"settings.notifications" = "Notificaciones";
+"settings.account" = "Configuración de cuenta";
+"settings.appearance" = "Apariencia";
+"settings.dark_mode" = "Modo oscuro";
+
+// MARK: - Validation
+"validation.required_field" = "Este campo es obligatorio";
+"validation.invalid_email" = "Por favor ingresa un correo electrónico válido";
+"validation.password_too_short" = "La contraseña debe tener al menos 8 caracteres";
+"validation.passwords_must_match" = "Las contraseñas deben coincidir";
+
+// MARK: - Loading States
+"loading.please_wait" = "Por favor espera...";
+"loading.processing" = "Procesando...";
+"loading.submitting" = "Enviando...";
+
+// MARK: - Welcome Screen
+"welcome.peer_to_peer_lending" = "Préstamos entre pares";
+"welcome.title" = "Bienvenido a Cooin";
+"welcome.subtitle" = "Conéctate con prestamistas y prestatarios\nen tu comunidad";
+"welcome.login_button" = "Iniciar sesión";
+"welcome.register_button" = "Registrarse";
+
+// MARK: - Upload Errors
+"upload.error.invalid_url" = "URL inválida";
+"upload.error.failed_to_process" = "No se pudo procesar la imagen";
+"upload.error.timeout" = "Se ha agotado el tiempo de espera. Por favor, inténtalo de nuevo.";
+
+// MARK: - Matching
+"matching.title" = "Coincidencias";
+"matching.find_perfect_lender" = "Encuentra Tu Prestamista Perfecto";
+"matching.connect_lenders" = "Conéctate con prestamistas que se ajusten a tus necesidades";
+"matching.find_investment_opportunities" = "Encuentra Oportunidades de Inversión";
+"matching.connect_borrowers" = "Conéctate con prestatarios que necesitan tu apoyo";
+"matching.get_started" = "Comenzar";
+"matching.create_loan_request" = "Crear Solicitud de Préstamo";
+"matching.create_loan_request_subtitle" = "Dinos lo que necesitas pedir prestado";
+"matching.browse_lenders" = "Explorar Prestamistas";
+"matching.browse_lenders_subtitle" = "Explora ofertas de préstamo disponibles";
+"matching.view_matches" = "Ver Mis Coincidencias";
+"matching.view_matches_lenders_subtitle" = "Ve los prestamistas interesados en ti";
+"matching.view_matches_borrowers_subtitle" = "Ve los prestatarios que coinciden contigo";
+"matching.create_lending_offer" = "Crear Oferta de Préstamo";
+"matching.create_lending_offer_subtitle" = "Establece tus preferencias de préstamo";
+"matching.browse_borrowers" = "Explorar Prestatarios";
+"matching.browse_borrowers_subtitle" = "Explora solicitudes de préstamo";
+"matching.loading_loan_requests" = "Cargando solicitudes de préstamo...";
+"matching.no_loan_requests" = "Sin Solicitudes de Préstamo";
+"matching.check_back_later_borrowers" = "Vuelve más tarde para ver nuevas solicitudes de prestatarios";
+"matching.loading_matches" = "Cargando coincidencias...";
+"matching.no_matches_yet" = "Aún Sin Coincidencias";
+"matching.complete_profile" = "Completa tu perfil para obtener mejores coincidencias";
+"matching.my_matches" = "Mis Coincidencias";
+"matching.available" = "Disponible";
+"matching.interest_rate" = "Tasa de Interés";
+"matching.range" = "Rango";
+"matching.contact" = "Contactar";
+"matching.seeking" = "Buscando";
+"matching.max_rate" = "Tasa Máxima";
+"matching.make_offer" = "Hacer Oferta";
+"matching.match" = "Coincidencia";
+"matching.connect" = "Conectar";
+
+// MARK: - Analytics
+"analytics.title" = "Analíticas";
+"analytics.loading" = "Cargando analíticas...";
+"analytics.platform_statistics" = "Estadísticas de la Plataforma";
+"analytics.total_users" = "Usuarios Totales";
+"analytics.active_users" = "Usuarios Activos";
+"analytics.loan_requests" = "Solicitudes de Préstamos";
+"analytics.lending_offers" = "Ofertas de Préstamo";
+"analytics.this_month" = "Este mes";
+"analytics.available" = "Disponible";
+"analytics.financial_overview" = "Resumen Financiero";
+"analytics.avg_loan_amount" = "Monto Promedio de Préstamo";
+"analytics.typical_loan_size" = "Tamaño típico de préstamo";
+"analytics.total_volume" = "Volumen Total";
+"analytics.platform_volume" = "Volumen de la plataforma";
+"analytics.insights" = "Perspectivas";
+"analytics.growing_community" = "Comunidad en Crecimiento";
+"analytics.user_growth_description" = "El crecimiento de usuarios ha aumentado un %@%% este mes";
+"analytics.active_marketplace" = "Mercado Activo";
+"analytics.active_marketplace_description" = "Alta actividad con %@ usuarios activos";
+"analytics.balanced_platform" = "Plataforma Equilibrada";
+"analytics.balanced_platform_description" = "Buen equilibrio entre prestatarios y prestamistas";
+"analytics.unavailable" = "Analíticas No Disponibles";
+"analytics.unable_to_load" = "No se pudieron cargar los datos de analíticas";
+"analytics.retry" = "Reintentar";
+
+// MARK: - App Info
+"app_info.app_name" = "Cooin";
+"app_info.tagline" = "Plataforma de Préstamos entre Pares";
+"app_info.version" = "Versión 1.0.0 (Build 1)";
+"app_info.about_title" = "Acerca de Cooin";
+"app_info.about_description1" = "Cooin conecta a prestatarios y prestamistas en un entorno de préstamos entre pares seguro y transparente.";
+"app_info.about_description2" = "Nuestra plataforma facilita relaciones de préstamo directas mientras garantiza la verificación y seguridad adecuadas para todos los usuarios.";
+"app_info.about_description3" = "Ya sea que busques pedir dinero prestado para necesidades personales o prestar dinero para obtener retornos de inversión, Cooin proporciona las herramientas y la comunidad para hacerlo de manera segura.";
+"app_info.features_title" = "Características";
+"app_info.feature_secure_title" = "Seguro";
+"app_info.feature_secure_desc" = "Seguridad de nivel bancario";
+"app_info.feature_p2p_title" = "Entre Pares";
+"app_info.feature_p2p_desc" = "Conexiones directas";
+"app_info.feature_analytics_title" = "Analíticas";
+"app_info.feature_analytics_desc" = "Información en tiempo real";
+"app_info.feature_verification_title" = "Verificación";
+"app_info.feature_verification_desc" = "Verificación de identidad y documentos";
+"app_info.support_title" = "Soporte y Legal";
+"app_info.terms_of_service" = "Términos de Servicio";
+"app_info.privacy_policy" = "Política de Privacidad";
+"app_info.help_center" = "Centro de Ayuda";
+"app_info.contact_support" = "Contactar Soporte";
+"app_info.rate_app" = "Calificar Aplicación";
+"app_info.technical_info_title" = "Información Técnica";
+"app_info.backend_api" = "API Backend:";
+"app_info.framework" = "Framework:";
+"app_info.platform" = "Plataforma:";
+"app_info.navigation_title" = "Acerca de";
+
+// MARK: - Loan Request Form
+"loan_form.details_header" = "Detalles del Préstamo";
+"loan_form.amount_placeholder" = "Monto del Préstamo";
+"loan_form.purpose_placeholder" = "Propósito";
+"loan_form.repayment_period" = "Período de Pago";
+"loan_form.months" = "meses";
+"loan_form.submit_request" = "Enviar Solicitud";
+"loan_form.navigation_title" = "Crear Solicitud de Préstamo";
+
+// MARK: - Browse Lenders
+"browse_lenders.title" = "Encontrar Prestamistas";
+"browse_lenders.description" = "Explora prestamistas disponibles y sus ofertas";
+"browse_lenders.no_lenders" = "No hay prestamistas disponibles en este momento";
+"browse_lenders.navigation_title" = "Explorar Prestamistas";
+
+// MARK: - Lending Offer Form
+"lending_offer.details_header" = "Detalles de Préstamo";
+"lending_offer.available_amount_placeholder" = "Monto Disponible";
+"lending_offer.min_amount_placeholder" = "Monto Mínimo de Préstamo";
+"lending_offer.max_amount_placeholder" = "Monto Máximo de Préstamo";
+"lending_offer.interest_rate_placeholder" = "Tasa de Interés (%)";
+"lending_offer.preferred_term" = "Plazo Preferido";
+"lending_offer.months" = "meses";
+"lending_offer.submit_offer" = "Enviar Oferta";
+"lending_offer.navigation_title" = "Crear Oferta de Préstamo";
+
+// MARK: - Document Verification
+"verification.title" = "Verificación de Documentos";
+"verification.description" = "Carga documentos para verificar tu identidad y estado financiero";
+"verification.select_document_type" = "Seleccionar Tipo de Documento";
+"verification.upload_method" = "Método de Carga";
+"verification.take_photo" = "Tomar Foto";
+"verification.take_photo_subtitle" = "Usar la cámara para capturar el documento";
+"verification.choose_photos" = "Elegir de Fotos";
+"verification.choose_photos_subtitle" = "Seleccionar de la biblioteca de fotos";
+"verification.browse_files" = "Explorar Archivos";
+"verification.browse_files_subtitle" = "Cargar PDF u otros documentos";
+"verification.uploading" = "Cargando...";
+"verification.uploaded_documents" = "Documentos Cargados";
+"verification.requirements_title" = "Requisitos del Documento";
+"verification.requirement_clear" = "Los documentos deben ser claros y legibles";
+"verification.requirement_corners" = "Las cuatro esquinas deben ser visibles";
+"verification.requirement_no_glare" = "Sin reflejos o sombras";
+"verification.requirement_file_size" = "Tamaño del archivo menor a 10MB";
+"verification.navigation_title" = "Verificación";
+"verification.camera_unavailable" = "Cámara No Disponible";
+"verification.camera_unavailable_simulator" = "La cámara no está disponible en el simulador. Por favor, prueba esta función en un dispositivo físico.";
+"verification.camera_unavailable_device" = "La cámara no está disponible en este dispositivo.";
+"verification.document_picker" = "Selector de Documentos";
+"verification.document_picker_coming_soon" = "¡Esta función estará disponible pronto! Podrás cargar archivos PDF y otros documentos.";
+"verification.tap_to_view" = "Tocar para ver";
+
+// MARK: - Register Password Requirements
+"register.password_requirement_length" = "Al menos 8 caracteres";
+"register.password_requirement_uppercase" = "Una letra mayúscula";
+"register.password_requirement_lowercase" = "Una letra minúscula";
+"register.password_requirement_number" = "Un número";
+"register.password_requirements_text" = "Debe contener: 8+ caracteres, mayúsculas, minúsculas y número";
+"register.creating_account_loading" = "Creando cuenta...";
+
+// MARK: - Register Password Strength
+"register.password_strength_label" = "Fortaleza de Contraseña:";
+"register.password_strength_weak" = "Débil";
+"register.password_strength_good" = "Buena";
+"register.password_strength_strong" = "Fuerte";
+
+// MARK: - Register Error Recovery
+"register.error_recovery_password" = "La contraseña debe contener al menos 8 caracteres con mayúsculas, minúsculas y números.";
+"register.error_recovery_email" = "Intenta iniciar sesión o usa una dirección de correo electrónico diferente.";
+"register.error_recovery_rate_limit" = "Por seguridad, por favor espera antes de intentar nuevamente.";

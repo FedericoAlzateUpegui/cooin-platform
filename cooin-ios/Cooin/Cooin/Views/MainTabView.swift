@@ -6,35 +6,41 @@
 //
 
 import SwiftUI
+import Combine
 
 struct MainTabView: View {
     @EnvironmentObject var authManager: AuthenticationManager
+    @ObservedObject var languageManager = LanguageManager.shared
 
     var body: some View {
         TabView {
             DashboardView()
                 .tabItem {
                     Image(systemName: "house.fill")
-                    Text("Dashboard")
+                    Text("dashboard.title".localized)
                 }
+                .id(languageManager.refreshTrigger)
 
             MatchingView()
                 .tabItem {
                     Image(systemName: "heart.fill")
-                    Text("Matches")
+                    Text("dashboard.matching".localized)
                 }
+                .id(languageManager.refreshTrigger)
 
             AnalyticsView()
                 .tabItem {
                     Image(systemName: "chart.bar.fill")
-                    Text("Analytics")
+                    Text("dashboard.analytics".localized)
                 }
+                .id(languageManager.refreshTrigger)
 
             ProfileView()
                 .tabItem {
                     Image(systemName: "person.fill")
-                    Text("Profile")
+                    Text("dashboard.profile".localized)
                 }
+                .id(languageManager.refreshTrigger)
         }
         .accentColor(.blue)
     }
@@ -43,17 +49,25 @@ struct MainTabView: View {
 struct DashboardView: View {
     @EnvironmentObject var authManager: AuthenticationManager
     @EnvironmentObject var apiClient: APIClient
+    @ObservedObject var languageManager = LanguageManager.shared
     @State private var analytics: MobileAnalytics?
     @State private var isLoading = true
+    @State private var showingBrowseBorrowers = false
+    @State private var showingFindLenders = false
+    @State private var showingCreateLoanRequest = false
+    @State private var showingCreateLendingOffer = false
 
     var body: some View {
         NavigationView {
             ScrollView {
                 VStack(spacing: 20) {
+                    // Hidden view to trigger refresh on language change
+                    Text("").hidden().id(languageManager.refreshTrigger)
+
                     // Welcome section
                     if let user = authManager.currentUser {
                         VStack(alignment: .leading, spacing: 10) {
-                            Text("Welcome back,")
+                            Text("dashboard.welcome".localized)
                                 .font(.title2)
                                 .foregroundColor(.secondary)
 
@@ -69,13 +83,13 @@ struct DashboardView: View {
                     // Quick stats
                     if isLoading {
                         VStack {
-                            ProgressView("Loading dashboard...")
+                            ProgressView("loading.please_wait".localized)
                                 .progressViewStyle(CircularProgressViewStyle())
                         }
                         .frame(height: 200)
                     } else if let analytics = analytics {
                         VStack(spacing: 15) {
-                            Text("Platform Overview")
+                            Text("dashboard.platform_overview".localized)
                                 .font(.headline)
                                 .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -84,28 +98,28 @@ struct DashboardView: View {
                                 GridItem(.flexible())
                             ], spacing: 15) {
                                 StatCard(
-                                    title: "Total Users",
+                                    title: "dashboard.total_users".localized,
                                     value: "\(analytics.platformStats.totalUsers)",
                                     icon: "person.3.fill",
                                     color: .blue
                                 )
 
                                 StatCard(
-                                    title: "Active Users",
+                                    title: "dashboard.active_users".localized,
                                     value: "\(analytics.platformStats.activeUsers)",
                                     icon: "person.fill.checkmark",
                                     color: .green
                                 )
 
                                 StatCard(
-                                    title: "Loan Requests",
+                                    title: "dashboard.loan_requests".localized,
                                     value: "\(analytics.platformStats.loanRequests)",
                                     icon: "doc.text.fill",
                                     color: .orange
                                 )
 
                                 StatCard(
-                                    title: "Lending Offers",
+                                    title: "dashboard.lending_offers".localized,
                                     value: "\(analytics.platformStats.lendingOffers)",
                                     icon: "dollarsign.circle.fill",
                                     color: .purple
@@ -114,18 +128,18 @@ struct DashboardView: View {
 
                             // Financial overview
                             VStack(spacing: 10) {
-                                Text("Financial Overview")
+                                Text("dashboard.financial_overview".localized)
                                     .font(.headline)
                                     .frame(maxWidth: .infinity, alignment: .leading)
 
                                 HStack {
                                     FinancialCard(
-                                        title: "Avg Loan",
+                                        title: "dashboard.avg_loan".localized,
                                         value: analytics.financialOverview.avgLoanAmount
                                     )
 
                                     FinancialCard(
-                                        title: "Total Volume",
+                                        title: "dashboard.total_volume".localized,
                                         value: analytics.financialOverview.totalVolume
                                     )
                                 }
@@ -136,46 +150,46 @@ struct DashboardView: View {
 
                     // Quick actions
                     VStack(spacing: 15) {
-                        Text("Quick Actions")
+                        Text("dashboard.quick_actions".localized)
                             .font(.headline)
                             .frame(maxWidth: .infinity, alignment: .leading)
 
                         if let user = authManager.currentUser {
                             if user.role == "borrower" {
                                 ActionButton(
-                                    title: "Find Lenders",
-                                    subtitle: "Discover lending opportunities",
+                                    title: "dashboard.find_lenders".localized,
+                                    subtitle: "dashboard.find_lenders_subtitle".localized,
                                     icon: "magnifyingglass",
                                     color: .blue
                                 ) {
-                                    // Action
+                                    showingFindLenders = true
                                 }
 
                                 ActionButton(
-                                    title: "Create Loan Request",
-                                    subtitle: "Tell us what you need",
+                                    title: "dashboard.create_loan_request".localized,
+                                    subtitle: "dashboard.create_loan_request_subtitle".localized,
                                     icon: "plus.circle.fill",
                                     color: .green
                                 ) {
-                                    // Action
+                                    showingCreateLoanRequest = true
                                 }
                             } else {
                                 ActionButton(
-                                    title: "Browse Borrowers",
-                                    subtitle: "Find investment opportunities",
+                                    title: "dashboard.browse_borrowers".localized,
+                                    subtitle: "dashboard.browse_borrowers_subtitle".localized,
                                     icon: "person.2.fill",
                                     color: .blue
                                 ) {
-                                    // Action
+                                    showingBrowseBorrowers = true
                                 }
 
                                 ActionButton(
-                                    title: "Create Lending Offer",
-                                    subtitle: "Set your lending terms",
+                                    title: "dashboard.create_lending_offer".localized,
+                                    subtitle: "dashboard.create_lending_offer_subtitle".localized,
                                     icon: "dollarsign.circle.fill",
                                     color: .green
                                 ) {
-                                    // Action
+                                    showingCreateLendingOffer = true
                                 }
                             }
                         }
@@ -186,9 +200,29 @@ struct DashboardView: View {
                 }
                 .padding(.top)
             }
-            .navigationTitle("Dashboard")
+            .navigationTitle("dashboard.title".localized)
             .refreshable {
                 loadAnalytics()
+            }
+            .alert("Browse Borrowers", isPresented: $showingBrowseBorrowers) {
+                Button("OK") { }
+            } message: {
+                Text("This feature is coming soon! You'll be able to browse and connect with borrowers looking for loans.")
+            }
+            .alert("Find Lenders", isPresented: $showingFindLenders) {
+                Button("OK") { }
+            } message: {
+                Text("This feature is coming soon! You'll be able to search and connect with lenders offering loans.")
+            }
+            .alert("Create Loan Request", isPresented: $showingCreateLoanRequest) {
+                Button("OK") { }
+            } message: {
+                Text("This feature is coming soon! You'll be able to create and submit loan requests.")
+            }
+            .alert("Create Lending Offer", isPresented: $showingCreateLendingOffer) {
+                Button("OK") { }
+            } message: {
+                Text("This feature is coming soon! You'll be able to create and publish lending offers.")
             }
         }
         .onAppear {

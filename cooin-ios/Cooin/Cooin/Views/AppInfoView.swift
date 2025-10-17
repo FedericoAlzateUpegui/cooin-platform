@@ -9,8 +9,10 @@ import SwiftUI
 
 struct AppInfoView: View {
     @Environment(\.dismiss) private var dismiss
+    @ObservedObject var languageManager = LanguageManager.shared
 
     var body: some View {
+        Text("").hidden().id(languageManager.refreshTrigger)
         NavigationView {
             ScrollView {
                 VStack(spacing: 30) {
@@ -20,29 +22,29 @@ struct AppInfoView: View {
                             .font(.system(size: 80))
                             .foregroundColor(.blue)
 
-                        Text("Cooin")
+                        Text("app_info.app_name".localized)
                             .font(.largeTitle)
                             .fontWeight(.bold)
 
-                        Text("Peer-to-Peer Lending Platform")
+                        Text("app_info.tagline".localized)
                             .font(.subheadline)
                             .foregroundColor(.secondary)
 
-                        Text("Version 1.0.0 (Build 1)")
+                        Text("app_info.version".localized)
                             .font(.caption)
                             .foregroundColor(.secondary)
                     }
 
                     // About Section
                     VStack(spacing: 15) {
-                        Text("About Cooin")
+                        Text("app_info.about_title".localized)
                             .font(.headline)
                             .frame(maxWidth: .infinity, alignment: .leading)
 
                         VStack(alignment: .leading, spacing: 12) {
-                            Text("Cooin connects borrowers and lenders in a secure, transparent peer-to-peer lending environment.")
-                            Text("Our platform facilitates direct lending relationships while ensuring proper verification and security for all users.")
-                            Text("Whether you're looking to borrow money for personal needs or lend money for investment returns, Cooin provides the tools and community to make it happen safely.")
+                            Text("app_info.about_description1".localized)
+                            Text("app_info.about_description2".localized)
+                            Text("app_info.about_description3".localized)
                         }
                         .font(.body)
                         .foregroundColor(.secondary)
@@ -50,7 +52,7 @@ struct AppInfoView: View {
 
                     // Features Section
                     VStack(spacing: 15) {
-                        Text("Features")
+                        Text("app_info.features_title".localized)
                             .font(.headline)
                             .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -60,54 +62,54 @@ struct AppInfoView: View {
                         ], spacing: 15) {
                             FeatureCard(
                                 icon: "shield.checkered",
-                                title: "Secure",
-                                description: "Bank-level security"
+                                title: "app_info.feature_secure_title".localized,
+                                description: "app_info.feature_secure_desc".localized
                             )
 
                             FeatureCard(
                                 icon: "person.2.fill",
-                                title: "Peer-to-Peer",
-                                description: "Direct connections"
+                                title: "app_info.feature_p2p_title".localized,
+                                description: "app_info.feature_p2p_desc".localized
                             )
 
                             FeatureCard(
                                 icon: "chart.line.uptrend.xyaxis",
-                                title: "Analytics",
-                                description: "Real-time insights"
+                                title: "app_info.feature_analytics_title".localized,
+                                description: "app_info.feature_analytics_desc".localized
                             )
 
                             FeatureCard(
                                 icon: "doc.text.magnifyingglass",
-                                title: "Verification",
-                                description: "Identity & document checks"
+                                title: "app_info.feature_verification_title".localized,
+                                description: "app_info.feature_verification_desc".localized
                             )
                         }
                     }
 
                     // Support Section
                     VStack(spacing: 15) {
-                        Text("Support & Legal")
+                        Text("app_info.support_title".localized)
                             .font(.headline)
                             .frame(maxWidth: .infinity, alignment: .leading)
 
                         VStack(spacing: 12) {
-                            SupportRow(title: "Terms of Service", icon: "doc.text")
-                            SupportRow(title: "Privacy Policy", icon: "hand.raised")
-                            SupportRow(title: "Help Center", icon: "questionmark.circle")
-                            SupportRow(title: "Contact Support", icon: "envelope")
-                            SupportRow(title: "Rate App", icon: "star")
+                            SupportRow(title: "app_info.terms_of_service".localized, icon: "doc.text")
+                            SupportRow(title: "app_info.privacy_policy".localized, icon: "hand.raised")
+                            SupportRow(title: "app_info.help_center".localized, icon: "questionmark.circle")
+                            SupportRow(title: "app_info.contact_support".localized, icon: "envelope")
+                            SupportRow(title: "app_info.rate_app".localized, icon: "star")
                         }
                     }
 
                     // Technical Info
                     VStack(spacing: 10) {
-                        Text("Technical Information")
+                        Text("app_info.technical_info_title".localized)
                             .font(.headline)
                             .frame(maxWidth: .infinity, alignment: .leading)
 
                         VStack(alignment: .leading, spacing: 8) {
                             HStack {
-                                Text("Backend API:")
+                                Text("app_info.backend_api".localized)
                                 Spacer()
                                 Text("http://192.168.40.34:8000")
                                     .font(.caption)
@@ -115,7 +117,7 @@ struct AppInfoView: View {
                             }
 
                             HStack {
-                                Text("Framework:")
+                                Text("app_info.framework".localized)
                                 Spacer()
                                 Text("SwiftUI")
                                     .font(.caption)
@@ -123,7 +125,7 @@ struct AppInfoView: View {
                             }
 
                             HStack {
-                                Text("Platform:")
+                                Text("app_info.platform".localized)
                                 Spacer()
                                 Text("iOS 14.0+")
                                     .font(.caption)
@@ -137,11 +139,11 @@ struct AppInfoView: View {
                 }
                 .padding()
             }
-            .navigationTitle("About")
+            .navigationTitle("app_info.navigation_title".localized)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") {
+                    Button("common.done".localized) {
                         dismiss()
                     }
                 }
@@ -154,8 +156,10 @@ struct FeatureCard: View {
     let icon: String
     let title: String
     let description: String
+    @ObservedObject var languageManager = LanguageManager.shared
 
     var body: some View {
+        Text("").hidden().id(languageManager.refreshTrigger)
         VStack(spacing: 8) {
             Image(systemName: icon)
                 .font(.title2)
@@ -181,8 +185,10 @@ struct FeatureCard: View {
 struct SupportRow: View {
     let title: String
     let icon: String
+    @ObservedObject var languageManager = LanguageManager.shared
 
     var body: some View {
+        Text("").hidden().id(languageManager.refreshTrigger)
         HStack(spacing: 15) {
             Image(systemName: icon)
                 .font(.title3)

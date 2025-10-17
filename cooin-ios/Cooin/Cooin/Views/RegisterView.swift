@@ -19,6 +19,7 @@ struct RegisterView: View {
     @State private var agreeToTerms = false
     @State private var showingPassword = false
     @State private var showingConfirmPassword = false
+    @State private var showSuccessAlert = false
 
     let roles = ["borrower", "lender"]
 
@@ -32,11 +33,11 @@ struct RegisterView: View {
                             .font(.system(size: 50))
                             .foregroundColor(.blue)
 
-                        Text("Create Account")
+                        Text("register.title".localized)
                             .font(.largeTitle)
                             .fontWeight(.bold)
 
-                        Text("Join the Cooin community")
+                        Text("auth.join_community".localized)
                             .font(.body)
                             .foregroundColor(.secondary)
                     }
@@ -46,11 +47,11 @@ struct RegisterView: View {
                     VStack(spacing: 20) {
                         // Email field
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Email")
+                            Text("common.email".localized)
                                 .font(.headline)
                                 .foregroundColor(.primary)
 
-                            TextField("Enter your email", text: $email)
+                            TextField("register.email_placeholder".localized, text: $email)
                                 .textFieldStyle(RoundedBorderTextFieldStyle())
                                 .keyboardType(.emailAddress)
                                 .autocapitalization(.none)
@@ -59,11 +60,11 @@ struct RegisterView: View {
 
                         // Username field
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Username")
+                            Text("common.username".localized)
                                 .font(.headline)
                                 .foregroundColor(.primary)
 
-                            TextField("Choose a username", text: $username)
+                            TextField("register.username_placeholder".localized, text: $username)
                                 .textFieldStyle(RoundedBorderTextFieldStyle())
                                 .autocapitalization(.none)
                                 .disableAutocorrection(true)
@@ -71,28 +72,34 @@ struct RegisterView: View {
 
                         // Role selection
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("I want to")
+                            Text("register.role_label".localized)
                                 .font(.headline)
                                 .foregroundColor(.primary)
 
                             Picker("Role", selection: $selectedRole) {
-                                Text("Borrow money").tag("borrower")
-                                Text("Lend money").tag("lender")
+                                Text("register.role_borrower".localized).tag("borrower")
+                                Text("register.role_lender".localized).tag("lender")
                             }
                             .pickerStyle(SegmentedPickerStyle())
                         }
 
                         // Password field
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Password")
+                            Text("common.password".localized)
                                 .font(.headline)
                                 .foregroundColor(.primary)
 
                             HStack {
                                 if showingPassword {
-                                    TextField("Create a password", text: $password)
+                                    TextField("register.password_placeholder".localized, text: $password)
+                                        .textContentType(.none)
+                                        .autocapitalization(.none)
+                                        .disableAutocorrection(true)
                                 } else {
-                                    SecureField("Create a password", text: $password)
+                                    SecureField("register.password_placeholder".localized, text: $password)
+                                        .textContentType(.none)
+                                        .autocapitalization(.none)
+                                        .disableAutocorrection(true)
                                 }
 
                                 Button(action: {
@@ -104,22 +111,44 @@ struct RegisterView: View {
                             }
                             .textFieldStyle(RoundedBorderTextFieldStyle())
 
-                            Text("Must be at least 8 characters with uppercase, lowercase, number, and special character")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
+                            // Password requirements with validation indicators
+                            if !password.isEmpty {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    PasswordRequirementRow(text: "register.password_requirement_length".localized, isMet: password.count >= 8)
+                                    PasswordRequirementRow(text: "register.password_requirement_uppercase".localized, isMet: password.contains(where: { $0.isUppercase }))
+                                    PasswordRequirementRow(text: "register.password_requirement_lowercase".localized, isMet: password.contains(where: { $0.isLowercase }))
+                                    PasswordRequirementRow(text: "register.password_requirement_number".localized, isMet: password.contains(where: { $0.isNumber }))
+                                }
+                                .padding(.vertical, 4)
+                            } else {
+                                Text("register.password_requirements_text".localized)
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+
+                            // Password strength indicator
+                            if !password.isEmpty {
+                                PasswordStrengthIndicator(password: password)
+                            }
                         }
 
                         // Confirm password field
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Confirm Password")
+                            Text("register.confirm_password".localized)
                                 .font(.headline)
                                 .foregroundColor(.primary)
 
                             HStack {
                                 if showingConfirmPassword {
-                                    TextField("Confirm your password", text: $confirmPassword)
+                                    TextField("register.confirm_password_placeholder".localized, text: $confirmPassword)
+                                        .textContentType(.none)
+                                        .autocapitalization(.none)
+                                        .disableAutocorrection(true)
                                 } else {
-                                    SecureField("Confirm your password", text: $confirmPassword)
+                                    SecureField("register.confirm_password_placeholder".localized, text: $confirmPassword)
+                                        .textContentType(.none)
+                                        .autocapitalization(.none)
+                                        .disableAutocorrection(true)
                                 }
 
                                 Button(action: {
@@ -132,7 +161,7 @@ struct RegisterView: View {
                             .textFieldStyle(RoundedBorderTextFieldStyle())
 
                             if !confirmPassword.isEmpty && password != confirmPassword {
-                                Text("Passwords do not match")
+                                Text("register.passwords_not_match".localized)
                                     .font(.caption)
                                     .foregroundColor(.red)
                             }
@@ -148,7 +177,7 @@ struct RegisterView: View {
                                     .font(.title3)
                             }
 
-                            Text("I agree to the Terms of Service and Privacy Policy")
+                            Text("register.agree_terms".localized)
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                                 .multilineTextAlignment(.leading)
@@ -156,16 +185,43 @@ struct RegisterView: View {
                             Spacer()
                         }
 
-                        // Error message
+                        // Error message with recovery suggestion
                         if let errorMessage = authManager.errorMessage {
-                            Text(errorMessage)
-                                .foregroundColor(.red)
-                                .font(.caption)
-                                .multilineTextAlignment(.center)
+                            VStack(spacing: 4) {
+                                Text(errorMessage)
+                                    .foregroundColor(.red)
+                                    .font(.callout)
+                                    .fontWeight(.semibold)
+                                    .multilineTextAlignment(.center)
+
+                                // Show helpful recovery suggestion if available
+                                if errorMessage.lowercased().contains("password") {
+                                    Text("register.error_recovery_password".localized)
+                                        .foregroundColor(.orange)
+                                        .font(.caption)
+                                        .multilineTextAlignment(.center)
+                                } else if errorMessage.lowercased().contains("email") && errorMessage.lowercased().contains("exists") {
+                                    Text("register.error_recovery_email".localized)
+                                        .foregroundColor(.orange)
+                                        .font(.caption)
+                                        .multilineTextAlignment(.center)
+                                } else if errorMessage.lowercased().contains("rate limit") || errorMessage.lowercased().contains("too many") {
+                                    Text("register.error_recovery_rate_limit".localized)
+                                        .foregroundColor(.orange)
+                                        .font(.caption)
+                                        .multilineTextAlignment(.center)
+                                }
+                            }
+                            .padding(.vertical, 8)
+                            .padding(.horizontal, 12)
+                            .background(Color.red.opacity(0.1))
+                            .cornerRadius(8)
                         }
 
-                        // Register button
+                        // Register button with improved loading state
                         Button(action: {
+                            // Clear any previous errors
+                            authManager.errorMessage = nil
                             authManager.register(
                                 email: email,
                                 username: username,
@@ -174,37 +230,52 @@ struct RegisterView: View {
                                 role: selectedRole
                             )
                         }) {
-                            HStack {
+                            HStack(spacing: 12) {
                                 if authManager.isLoading {
                                     ProgressView()
                                         .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                                        .scaleEffect(0.8)
+                                        .scaleEffect(0.9)
+                                    Text("register.creating_account_loading".localized)
+                                        .font(.headline)
+                                        .fontWeight(.semibold)
                                 } else {
-                                    Text("Create Account")
+                                    Image(systemName: "person.badge.plus")
+                                        .font(.title3)
+                                    Text("auth.create_account".localized)
                                         .font(.headline)
                                         .fontWeight(.semibold)
                                 }
                             }
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
-                            .frame(height: 50)
+                            .frame(height: 52)
                             .background(
-                                isFormValid ? Color.blue : Color.gray
+                                Group {
+                                    if authManager.isLoading {
+                                        Color.blue.opacity(0.7)
+                                    } else if isFormValid {
+                                        Color.blue
+                                    } else {
+                                        Color.gray
+                                    }
+                                }
                             )
                             .cornerRadius(12)
+                            .shadow(color: isFormValid && !authManager.isLoading ? Color.blue.opacity(0.3) : Color.clear, radius: 8, x: 0, y: 4)
                         }
                         .disabled(!isFormValid || authManager.isLoading)
+                        .animation(.easeInOut(duration: 0.2), value: authManager.isLoading)
                     }
                     .padding(.horizontal, 20)
 
                     Spacer()
                 }
             }
-            .navigationTitle("Register")
+            .navigationTitle("auth.register".localized)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancel") {
+                    Button("common.cancel".localized) {
                         dismiss()
                     }
                 }
@@ -212,8 +283,16 @@ struct RegisterView: View {
         }
         .onChange(of: authManager.isAuthenticated) { isAuthenticated in
             if isAuthenticated {
+                showSuccessAlert = true
+                // Don't auto-dismiss - let user tap OK when ready
+            }
+        }
+        .alert("register.success_title".localized, isPresented: $showSuccessAlert) {
+            Button("common.ok".localized) {
                 dismiss()
             }
+        } message: {
+            Text("register.success_message".localized)
         }
     }
 
@@ -226,6 +305,99 @@ struct RegisterView: View {
         password == confirmPassword &&
         password.count >= 8 &&
         agreeToTerms
+    }
+}
+
+// MARK: - Password Requirement Row Component
+struct PasswordRequirementRow: View {
+    let text: String
+    let isMet: Bool
+
+    var body: some View {
+        HStack(spacing: 6) {
+            Image(systemName: isMet ? "checkmark.circle.fill" : "circle")
+                .foregroundColor(isMet ? .green : .gray)
+                .font(.caption)
+            Text(text)
+                .font(.caption)
+                .foregroundColor(isMet ? .green : .secondary)
+        }
+    }
+}
+
+// MARK: - Password Strength Indicator Component
+struct PasswordStrengthIndicator: View {
+    let password: String
+
+    private var strength: PasswordStrength {
+        let hasMinLength = password.count >= 8
+        let hasUppercase = password.contains(where: { $0.isUppercase })
+        let hasLowercase = password.contains(where: { $0.isLowercase })
+        let hasNumber = password.contains(where: { $0.isNumber })
+        let hasSpecialChar = password.contains(where: { "!@#$%^&*(),.?\":{}|<>".contains($0) })
+
+        let metRequirements = [hasMinLength, hasUppercase, hasLowercase, hasNumber].filter { $0 }.count
+
+        if metRequirements == 4 && hasSpecialChar {
+            return .strong
+        } else if metRequirements >= 3 {
+            return .medium
+        } else {
+            return .weak
+        }
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text("register.password_strength_label".localized + " \(strength.text)")
+                .font(.caption)
+                .fontWeight(.semibold)
+                .foregroundColor(strength.color)
+
+            GeometryReader { geometry in
+                ZStack(alignment: .leading) {
+                    Rectangle()
+                        .fill(Color.gray.opacity(0.2))
+                        .frame(height: 4)
+                        .cornerRadius(2)
+
+                    Rectangle()
+                        .fill(strength.color)
+                        .frame(width: geometry.size.width * strength.percentage, height: 4)
+                        .cornerRadius(2)
+                        .animation(.easeInOut(duration: 0.3), value: strength)
+                }
+            }
+            .frame(height: 4)
+        }
+    }
+
+    enum PasswordStrength {
+        case weak, medium, strong
+
+        var text: String {
+            switch self {
+            case .weak: return "register.password_strength_weak".localized
+            case .medium: return "register.password_strength_good".localized
+            case .strong: return "register.password_strength_strong".localized
+            }
+        }
+
+        var color: Color {
+            switch self {
+            case .weak: return .red
+            case .medium: return .orange
+            case .strong: return .green
+            }
+        }
+
+        var percentage: CGFloat {
+            switch self {
+            case .weak: return 0.33
+            case .medium: return 0.66
+            case .strong: return 1.0
+            }
+        }
     }
 }
 

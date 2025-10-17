@@ -17,6 +17,7 @@ class AuthenticationManager: ObservableObject {
     private var accessToken: String?
     private var refreshToken: String?
     private let apiClient = APIClient.shared
+    private let keychainHelper = KeychainHelper.shared
     private var cancellables = Set<AnyCancellable>()
 
     init() {
@@ -132,18 +133,25 @@ class AuthenticationManager: ObservableObject {
     }
 
     private func storeTokens() {
-        UserDefaults.standard.set(accessToken, forKey: "access_token")
-        UserDefaults.standard.set(refreshToken, forKey: "refresh_token")
+        // Store in Keychain for better security
+        if let accessToken = accessToken {
+            _ = keychainHelper.save(key: KeychainHelper.accessTokenKey, value: accessToken)
+        }
+        if let refreshToken = refreshToken {
+            _ = keychainHelper.save(key: KeychainHelper.refreshTokenKey, value: refreshToken)
+        }
     }
 
     private func loadStoredTokens() {
-        accessToken = UserDefaults.standard.string(forKey: "access_token")
-        refreshToken = UserDefaults.standard.string(forKey: "refresh_token")
+        // Load from Keychain
+        accessToken = keychainHelper.load(key: KeychainHelper.accessTokenKey)
+        refreshToken = keychainHelper.load(key: KeychainHelper.refreshTokenKey)
     }
 
     private func clearStoredTokens() {
-        UserDefaults.standard.removeObject(forKey: "access_token")
-        UserDefaults.standard.removeObject(forKey: "refresh_token")
+        // Clear from Keychain
+        _ = keychainHelper.delete(key: KeychainHelper.accessTokenKey)
+        _ = keychainHelper.delete(key: KeychainHelper.refreshTokenKey)
     }
 
     // MARK: - Public Properties

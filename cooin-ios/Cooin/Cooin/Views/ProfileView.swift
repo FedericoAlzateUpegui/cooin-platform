@@ -10,16 +10,21 @@ import SwiftUI
 struct ProfileView: View {
     @EnvironmentObject var authManager: AuthenticationManager
     @EnvironmentObject var apiClient: APIClient
+    @ObservedObject var languageManager = LanguageManager.shared
     @State private var showingImagePicker = false
     @State private var showingEditProfile = false
     @State private var showingSettings = false
     @State private var showingDocumentVerification = false
     @State private var showingAppInfo = false
+    @State private var showingLanguagePicker = false
 
     var body: some View {
         NavigationView {
             ScrollView {
                 VStack(spacing: 20) {
+                    // Hidden view to trigger refresh on language change
+                    Text("").hidden().id(languageManager.refreshTrigger)
+
                     if let user = authManager.currentUser {
                         // Profile header
                         VStack(spacing: 15) {
@@ -71,10 +76,10 @@ struct ProfileView: View {
                         // Profile sections
                         VStack(spacing: 15) {
                             // Account section
-                            ProfileSection(title: "Account") {
+                            ProfileSection(title: "profile.account".localized) {
                                 ProfileMenuItem(
-                                    title: "Edit Profile",
-                                    subtitle: "Update your information",
+                                    title: "profile.edit".localized,
+                                    subtitle: "profile.update_information".localized,
                                     icon: "person.crop.circle",
                                     color: .blue
                                 ) {
@@ -82,8 +87,8 @@ struct ProfileView: View {
                                 }
 
                                 ProfileMenuItem(
-                                    title: "Verification Status",
-                                    subtitle: "Complete your verification",
+                                    title: "profile.verification_status".localized,
+                                    subtitle: "profile.complete_verification".localized,
                                     icon: "checkmark.shield",
                                     color: .green
                                 ) {
@@ -91,8 +96,8 @@ struct ProfileView: View {
                                 }
 
                                 ProfileMenuItem(
-                                    title: "Security",
-                                    subtitle: "Password and security settings",
+                                    title: "profile.security".localized,
+                                    subtitle: "profile.security_settings".localized,
                                     icon: "lock.shield",
                                     color: .orange
                                 ) {
@@ -101,11 +106,11 @@ struct ProfileView: View {
                             }
 
                             // Activity section
-                            ProfileSection(title: user.role == "borrower" ? "My Borrowing" : "My Lending") {
+                            ProfileSection(title: user.role == "borrower" ? "profile.my_borrowing".localized : "profile.my_lending".localized) {
                                 if user.role == "borrower" {
                                     ProfileMenuItem(
-                                        title: "Loan Requests",
-                                        subtitle: "View your loan applications",
+                                        title: "profile.loan_requests".localized,
+                                        subtitle: "profile.view_loan_applications".localized,
                                         icon: "doc.text",
                                         color: .blue
                                     ) {
@@ -113,8 +118,8 @@ struct ProfileView: View {
                                     }
 
                                     ProfileMenuItem(
-                                        title: "Active Loans",
-                                        subtitle: "Manage current loans",
+                                        title: "profile.active_loans".localized,
+                                        subtitle: "profile.manage_current_loans".localized,
                                         icon: "dollarsign.circle",
                                         color: .green
                                     ) {
@@ -122,8 +127,8 @@ struct ProfileView: View {
                                     }
                                 } else {
                                     ProfileMenuItem(
-                                        title: "Lending Offers",
-                                        subtitle: "Manage your offers",
+                                        title: "profile.lending_offers".localized,
+                                        subtitle: "profile.manage_offers".localized,
                                         icon: "plus.circle",
                                         color: .blue
                                     ) {
@@ -131,8 +136,8 @@ struct ProfileView: View {
                                     }
 
                                     ProfileMenuItem(
-                                        title: "Active Investments",
-                                        subtitle: "Track your investments",
+                                        title: "profile.active_investments".localized,
+                                        subtitle: "profile.track_investments".localized,
                                         icon: "chart.line.uptrend.xyaxis",
                                         color: .green
                                     ) {
@@ -141,8 +146,8 @@ struct ProfileView: View {
                                 }
 
                                 ProfileMenuItem(
-                                    title: "Transaction History",
-                                    subtitle: "View all transactions",
+                                    title: "profile.transaction_history".localized,
+                                    subtitle: "profile.view_transactions".localized,
                                     icon: "list.bullet.rectangle",
                                     color: .purple
                                 ) {
@@ -151,10 +156,19 @@ struct ProfileView: View {
                             }
 
                             // Settings section
-                            ProfileSection(title: "Settings") {
+                            ProfileSection(title: "settings.title".localized) {
                                 ProfileMenuItem(
-                                    title: "Notifications",
-                                    subtitle: "Manage notifications",
+                                    title: "profile.language".localized,
+                                    subtitle: languageManager.currentLanguage.displayName,
+                                    icon: "globe",
+                                    color: .blue
+                                ) {
+                                    showingLanguagePicker = true
+                                }
+
+                                ProfileMenuItem(
+                                    title: "profile.notifications".localized,
+                                    subtitle: "settings.notifications".localized,
                                     icon: "bell",
                                     color: .orange
                                 ) {
@@ -162,17 +176,17 @@ struct ProfileView: View {
                                 }
 
                                 ProfileMenuItem(
-                                    title: "Privacy",
-                                    subtitle: "Privacy preferences",
+                                    title: "profile.privacy".localized,
+                                    subtitle: "profile.privacy".localized,
                                     icon: "hand.raised",
-                                    color: .blue
+                                    color: .purple
                                 ) {
                                     // Navigate to privacy settings
                                 }
 
                                 ProfileMenuItem(
-                                    title: "Help & Support",
-                                    subtitle: "Get help and contact us",
+                                    title: "profile.help_support".localized,
+                                    subtitle: "profile.help_support_subtitle".localized,
                                     icon: "questionmark.circle",
                                     color: .green
                                 ) {
@@ -190,7 +204,7 @@ struct ProfileView: View {
                                             .font(.title3)
                                             .foregroundColor(.red)
 
-                                        Text("Logout")
+                                        Text("auth.logout".localized)
                                             .font(.headline)
                                             .foregroundColor(.red)
 
@@ -201,7 +215,7 @@ struct ProfileView: View {
                                     .cornerRadius(12)
                                 }
 
-                                Text("Version 1.0.0")
+                                Text("profile.version".localized + " 1.0.0")
                                     .font(.caption2)
                                     .foregroundColor(.secondary)
                             }
@@ -213,7 +227,7 @@ struct ProfileView: View {
                 }
                 .padding(.top)
             }
-            .navigationTitle("Profile")
+            .navigationTitle("profile.title".localized)
         }
         .sheet(isPresented: $showingImagePicker) {
             ImagePickerView()
@@ -224,6 +238,9 @@ struct ProfileView: View {
         .sheet(isPresented: $showingDocumentVerification) {
             DocumentVerificationView()
         }
+        .sheet(isPresented: $showingLanguagePicker) {
+            LanguagePickerView()
+        }
         .sheet(isPresented: $showingAppInfo) {
             AppInfoView()
         }
@@ -232,16 +249,20 @@ struct ProfileView: View {
 
 struct RoleBadge: View {
     let role: String
+    @ObservedObject var languageManager = LanguageManager.shared
 
     var roleColor: Color {
         role == "borrower" ? .blue : .green
     }
 
     var roleText: String {
-        role == "borrower" ? "Borrower" : "Lender"
+        role == "borrower" ? "profile.role_borrower".localized : "profile.role_lender".localized
     }
 
     var body: some View {
+        // Hidden view to trigger refresh on language change
+        Text("").hidden().id(languageManager.refreshTrigger)
+
         Text(roleText)
             .font(.caption)
             .fontWeight(.semibold)
@@ -324,25 +345,34 @@ struct ProfileMenuItem: View {
 
 struct ImagePickerView: View {
     @Environment(\.dismiss) private var dismiss
+    @ObservedObject var languageManager = LanguageManager.shared
+    @State private var showingCameraUnavailable = false
+    @State private var showingLibraryUnavailable = false
 
     var body: some View {
         NavigationView {
             VStack(spacing: 30) {
-                Text("Update Profile Picture")
+                // Hidden view to trigger refresh on language change
+                Text("").hidden().id(languageManager.refreshTrigger)
+
+                Text("profile.update_profile_picture".localized)
                     .font(.title2)
                     .fontWeight(.bold)
 
                 VStack(spacing: 20) {
                     Button(action: {
-                        // Take photo with camera
-                        dismiss()
+                        #if targetEnvironment(simulator)
+                        showingCameraUnavailable = true
+                        #else
+                        showingCameraUnavailable = true
+                        #endif
                     }) {
                         HStack(spacing: 15) {
                             Image(systemName: "camera")
                                 .font(.title2)
                                 .foregroundColor(.blue)
 
-                            Text("Take Photo")
+                            Text("profile.take_photo".localized)
                                 .font(.headline)
                         }
                         .frame(maxWidth: .infinity)
@@ -352,15 +382,14 @@ struct ImagePickerView: View {
                     }
 
                     Button(action: {
-                        // Choose from photo library
-                        dismiss()
+                        showingLibraryUnavailable = true
                     }) {
                         HStack(spacing: 15) {
                             Image(systemName: "photo.on.rectangle")
                                 .font(.title2)
                                 .foregroundColor(.green)
 
-                            Text("Choose from Library")
+                            Text("profile.choose_from_library".localized)
                                 .font(.headline)
                         }
                         .frame(maxWidth: .infinity)
@@ -374,14 +403,28 @@ struct ImagePickerView: View {
                 Spacer()
             }
             .padding()
-            .navigationTitle("Profile Picture")
+            .navigationTitle("profile.profile_picture".localized)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Cancel") {
+                    Button("common.cancel".localized) {
                         dismiss()
                     }
                 }
+            }
+            .alert("profile.camera_unavailable".localized, isPresented: $showingCameraUnavailable) {
+                Button("common.ok".localized) { }
+            } message: {
+                #if targetEnvironment(simulator)
+                Text("profile.camera_unavailable_simulator".localized)
+                #else
+                Text("profile.camera_coming_soon".localized)
+                #endif
+            }
+            .alert("profile.photo_library".localized, isPresented: $showingLibraryUnavailable) {
+                Button("common.ok".localized) { }
+            } message: {
+                Text("profile.photo_library_coming_soon".localized)
             }
         }
     }
@@ -390,6 +433,7 @@ struct ImagePickerView: View {
 struct EditProfileView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var authManager: AuthenticationManager
+    @ObservedObject var languageManager = LanguageManager.shared
     @State private var username = ""
     @State private var email = ""
     @State private var phone = ""
@@ -398,34 +442,37 @@ struct EditProfileView: View {
     var body: some View {
         NavigationView {
             Form {
-                Section(header: Text("Basic Information")) {
+                // Hidden view to trigger refresh on language change
+                Text("").hidden().id(languageManager.refreshTrigger)
+
+                Section(header: Text("profile.basic_information".localized)) {
                     HStack {
-                        Text("Username")
+                        Text("common.username".localized)
                         Spacer()
-                        TextField("Username", text: $username)
+                        TextField("common.username".localized, text: $username)
                             .multilineTextAlignment(.trailing)
                     }
 
                     HStack {
-                        Text("Email")
+                        Text("common.email".localized)
                         Spacer()
-                        TextField("Email", text: $email)
+                        TextField("common.email".localized, text: $email)
                             .multilineTextAlignment(.trailing)
                             .keyboardType(.emailAddress)
                     }
 
                     HStack {
-                        Text("Phone")
+                        Text("profile.phone".localized)
                         Spacer()
-                        TextField("Phone number", text: $phone)
+                        TextField("profile.phone_number".localized, text: $phone)
                             .multilineTextAlignment(.trailing)
                             .keyboardType(.phonePad)
                     }
                 }
 
-                Section(header: Text("About")) {
+                Section(header: Text("profile.about".localized)) {
                     VStack(alignment: .leading) {
-                        Text("Bio")
+                        Text("profile.bio".localized)
                             .font(.caption)
                             .foregroundColor(.secondary)
 
@@ -434,16 +481,16 @@ struct EditProfileView: View {
                     }
                 }
             }
-            .navigationTitle("Edit Profile")
+            .navigationTitle("profile.edit".localized)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancel") {
+                    Button("common.cancel".localized) {
                         dismiss()
                     }
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Save") {
+                    Button("common.save".localized) {
                         // Save profile changes
                         dismiss()
                     }
@@ -454,6 +501,50 @@ struct EditProfileView: View {
             if let user = authManager.currentUser {
                 username = user.username
                 email = user.email
+            }
+        }
+    }
+}
+
+struct LanguagePickerView: View {
+    @Environment(\.dismiss) private var dismiss
+    @ObservedObject var languageManager = LanguageManager.shared
+
+    var body: some View {
+        NavigationView {
+            List {
+                // Hidden view to trigger refresh on language change
+                Text("").hidden().id(languageManager.refreshTrigger)
+
+                ForEach(LanguageManager.Language.allCases, id: \.self) { language in
+                    Button(action: {
+                        languageManager.setLanguage(language)
+                        dismiss()
+                    }) {
+                        HStack {
+                            Text(language.displayName)
+                                .font(.headline)
+                                .foregroundColor(.primary)
+
+                            Spacer()
+
+                            if languageManager.currentLanguage == language {
+                                Image(systemName: "checkmark")
+                                    .foregroundColor(.blue)
+                                    .font(.headline)
+                            }
+                        }
+                    }
+                }
+            }
+            .navigationTitle("profile.select_language".localized)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("common.done".localized) {
+                        dismiss()
+                    }
+                }
             }
         }
     }

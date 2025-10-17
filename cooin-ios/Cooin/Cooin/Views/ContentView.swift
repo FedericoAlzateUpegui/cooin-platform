@@ -57,7 +57,7 @@ struct SplashView: View {
                     .fontWeight(.bold)
                     .foregroundColor(.white)
 
-                Text("Peer-to-Peer Lending")
+                Text("welcome.peer_to_peer_lending".localized)
                     .font(.title3)
                     .foregroundColor(.white.opacity(0.8))
 
@@ -98,12 +98,12 @@ struct WelcomeView: View {
                             .font(.system(size: 60))
                             .foregroundColor(.blue)
 
-                        Text("Welcome to Cooin")
+                        Text("welcome.title".localized)
                             .font(.largeTitle)
                             .fontWeight(.bold)
                             .foregroundColor(.primary)
 
-                        Text("Connect with lenders and borrowers\nin your community")
+                        Text("welcome.subtitle".localized)
                             .font(.body)
                             .multilineTextAlignment(.center)
                             .foregroundColor(.secondary)
@@ -116,7 +116,7 @@ struct WelcomeView: View {
                         Button(action: {
                             showingLogin = true
                         }) {
-                            Text("Login")
+                            Text("welcome.login_button".localized)
                                 .font(.headline)
                                 .foregroundColor(.white)
                                 .frame(maxWidth: .infinity)
@@ -128,7 +128,7 @@ struct WelcomeView: View {
                         Button(action: {
                             showingRegister = true
                         }) {
-                            Text("Create Account")
+                            Text("welcome.register_button".localized)
                                 .font(.headline)
                                 .foregroundColor(.blue)
                                 .frame(maxWidth: .infinity)
