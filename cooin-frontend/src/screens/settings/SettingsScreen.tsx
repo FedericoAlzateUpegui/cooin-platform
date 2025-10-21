@@ -22,18 +22,18 @@ interface SettingsScreenProps {
 
 export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
   const { user, logout } = useAuthStore();
-  const { currentLanguage, changeLanguage } = useLanguage();
+  const { currentLanguage, changeLanguage, t } = useLanguage();
   const [notifications, setNotifications] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
 
   const handleLogout = async () => {
     Alert.alert(
-      'Logout',
-      'Are you sure you want to logout?',
+      t('settings.logout_confirm_title'),
+      t('settings.logout_confirm_message'),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('settings.cancel'), style: 'cancel' },
         {
-          text: 'Logout',
+          text: t('settings.logout'),
           style: 'destructive',
           onPress: async () => {
             await logout();
@@ -45,22 +45,22 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
 
   const settingsSections = [
     {
-      title: 'Preferences',
+      title: t('settings.preferences'),
       items: [
         {
           id: 'language',
           icon: 'language' as const,
-          label: 'Language',
-          value: currentLanguage === 'en' ? 'English' : currentLanguage === 'es' ? 'Español' : currentLanguage,
+          label: t('settings.language'),
+          value: currentLanguage === 'en' ? t('settings.english') : currentLanguage === 'es' ? t('settings.spanish') : currentLanguage,
           type: 'select' as const,
           onPress: () => {
             Alert.alert(
-              'Select Language',
-              'Choose your preferred language',
+              t('settings.select_language'),
+              t('settings.choose_language'),
               [
-                { text: 'English', onPress: async () => await changeLanguage('en') },
-                { text: 'Español', onPress: async () => await changeLanguage('es') },
-                { text: 'Cancel', style: 'cancel' },
+                { text: t('settings.english'), onPress: async () => await changeLanguage('en') },
+                { text: t('settings.spanish'), onPress: async () => await changeLanguage('es') },
+                { text: t('settings.cancel'), style: 'cancel' },
               ]
             );
           },
@@ -68,7 +68,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
         {
           id: 'notifications',
           icon: 'notifications' as const,
-          label: 'Push Notifications',
+          label: t('settings.push_notifications'),
           type: 'toggle' as const,
           value: notifications,
           onToggle: setNotifications,
@@ -76,7 +76,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
         {
           id: 'darkMode',
           icon: 'moon' as const,
-          label: 'Dark Mode',
+          label: t('settings.dark_mode'),
           type: 'toggle' as const,
           value: darkMode,
           onToggle: setDarkMode,
@@ -84,70 +84,70 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
       ],
     },
     {
-      title: 'Account',
+      title: t('settings.account_section'),
       items: [
         {
           id: 'profile',
           icon: 'person' as const,
-          label: 'Edit Profile',
+          label: t('settings.edit_profile'),
           type: 'navigation' as const,
           onPress: () => navigation.navigate('Profile'),
         },
         {
           id: 'verification',
           icon: 'shield-checkmark' as const,
-          label: 'Verification Center',
+          label: t('settings.verification_center'),
           type: 'navigation' as const,
           onPress: () => navigation.navigate('Verification'),
         },
         {
           id: 'password',
           icon: 'lock-closed' as const,
-          label: 'Change Password',
+          label: t('settings.change_password'),
           type: 'navigation' as const,
           onPress: () => {
-            Alert.alert('Change Password', 'This feature is coming soon!');
+            Alert.alert(t('settings.coming_soon_title'), t('settings.coming_soon_message'));
           },
         },
         {
           id: 'privacy',
           icon: 'shield-checkmark' as const,
-          label: 'Privacy Settings',
+          label: t('settings.privacy_settings'),
           type: 'navigation' as const,
           onPress: () => {
-            Alert.alert('Privacy Settings', 'This feature is coming soon!');
+            Alert.alert(t('settings.coming_soon_title'), t('settings.coming_soon_message'));
           },
         },
       ],
     },
     {
-      title: 'Support',
+      title: t('settings.support_section'),
       items: [
         {
           id: 'help',
           icon: 'help-circle' as const,
-          label: 'Help Center',
+          label: t('settings.help_center'),
           type: 'navigation' as const,
           onPress: () => {
-            Alert.alert('Help Center', 'This feature is coming soon!');
+            Alert.alert(t('settings.coming_soon_title'), t('settings.coming_soon_message'));
           },
         },
         {
           id: 'terms',
           icon: 'document-text' as const,
-          label: 'Terms of Service',
+          label: t('settings.terms_of_service'),
           type: 'navigation' as const,
           onPress: () => {
-            Alert.alert('Terms of Service', 'This feature is coming soon!');
+            Alert.alert(t('settings.coming_soon_title'), t('settings.coming_soon_message'));
           },
         },
         {
           id: 'privacy-policy',
           icon: 'document' as const,
-          label: 'Privacy Policy',
+          label: t('settings.privacy_policy'),
           type: 'navigation' as const,
           onPress: () => {
-            Alert.alert('Privacy Policy', 'This feature is coming soon!');
+            Alert.alert(t('settings.coming_soon_title'), t('settings.coming_soon_message'));
           },
         },
       ],
@@ -221,13 +221,13 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
 
         {/* App Info */}
         <View style={styles.appInfo}>
-          <Text style={styles.appInfoText}>Cooin v1.0.0</Text>
-          <Text style={styles.appInfoText}>© 2025 Cooin. All rights reserved.</Text>
+          <Text style={styles.appInfoText}>{t('settings.app_version')}</Text>
+          <Text style={styles.appInfoText}>{t('settings.copyright')}</Text>
         </View>
 
         {/* Logout Button */}
         <Button
-          title="Logout"
+          title={t('settings.logout')}
           onPress={handleLogout}
           variant="outline"
           style={styles.logoutButton}
