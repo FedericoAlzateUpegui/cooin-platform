@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Alert,
   SafeAreaView,
+  useWindowDimensions,
 } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -14,6 +15,8 @@ import { z } from 'zod';
 import { useAuthStore } from '../../store/authStore';
 import { Input } from '../../components/Input';
 import { Button } from '../../components/Button';
+import { LanguageSwitcher } from '../../components/LanguageSwitcher';
+import { useLanguage } from '../../contexts/LanguageContext';
 import { COLORS, SPACING, FONTS } from '../../constants/config';
 
 const loginSchema = z.object({
@@ -30,6 +33,8 @@ interface LoginScreenProps {
 export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const [rememberMe, setRememberMe] = useState(false);
   const { login, isLoading, error, clearError } = useAuthStore();
+  const { width } = useWindowDimensions();
+  const { t } = useLanguage();
 
   const {
     control,
@@ -64,28 +69,49 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
     navigation.navigate('ForgotPassword');
   };
 
+  // Responsive width calculation
+  const getResponsiveWidth = () => {
+    if (width < 768) {
+      // Mobile: full width with padding
+      return '100%';
+    } else if (width < 1024) {
+      // Tablet: 80% width
+      return '80%';
+    } else {
+      // Desktop: fixed max width
+      return Math.min(600, width * 0.4);
+    }
+  };
+
+  const responsiveWidth = getResponsiveWidth();
+
   return (
     <SafeAreaView style={styles.container}>
+      <View style={styles.languageSwitcherContainer}>
+        <LanguageSwitcher variant="button" />
+      </View>
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={true}
       >
-        <View style={styles.header}>
-          <Text style={styles.title}>Welcome to Cooin</Text>
-          <Text style={styles.subtitle}>
-            Connect with lenders and borrowers in your community
-          </Text>
-        </View>
+        <View style={styles.contentWrapper}>
+          <View style={[styles.header, { width: responsiveWidth }]}>
+            <Text style={styles.title}>{t('welcome.title')}</Text>
+            <Text style={styles.subtitle}>
+              {t('welcome.subtitle')}
+            </Text>
+          </View>
 
-        <View style={styles.form}>
-          <Controller
+          <View style={[styles.form, { width: responsiveWidth }]}>
+            <Controller
             control={control}
             name="email"
             render={({ field: { onChange, onBlur, value } }) => (
               <Input
-                label="Email Address"
-                placeholder="Enter your email"
+                label={t('common.email')}
+                placeholder={t('login.email_placeholder')}
                 value={value}
                 onChangeText={onChange}
                 onBlur={onBlur}
@@ -103,8 +129,8 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
             name="password"
             render={({ field: { onChange, onBlur, value } }) => (
               <Input
-                label="Password"
-                placeholder="Enter your password"
+                label={t('common.password')}
+                placeholder={t('login.password_placeholder')}
                 value={value}
                 onChangeText={onChange}
                 onBlur={onBlur}
@@ -123,11 +149,11 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
               <View style={[styles.checkbox, rememberMe && styles.checkboxChecked]}>
                 {rememberMe && <Text style={styles.checkmark}>✓</Text>}
               </View>
-              <Text style={styles.checkboxLabel}>Remember me</Text>
+              <Text style={styles.checkboxLabel}>{t('login.remember_me')}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity onPress={handleForgotPasswordPress}>
-              <Text style={styles.forgotPassword}>Forgot Password?</Text>
+              <Text style={styles.forgotPassword}>{t('login.forgot_password')}</Text>
             </TouchableOpacity>
           </View>
 
@@ -138,7 +164,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
           )}
 
           <Button
-            title="Log In"
+            title={t('auth.login')}
             onPress={handleSubmit(onSubmit)}
             loading={isLoading}
             style={styles.loginButton}
@@ -146,15 +172,16 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
 
           <View style={styles.divider}>
             <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>Or</Text>
+            <Text style={styles.dividerText}>{t('login.or')}</Text>
             <View style={styles.dividerLine} />
           </View>
 
           <View style={styles.registerContainer}>
-            <Text style={styles.registerText}>Don't have an account? </Text>
+            <Text style={styles.registerText}>{t('login.no_account')} </Text>
             <TouchableOpacity onPress={handleRegisterPress}>
-              <Text style={styles.registerLink}>Sign up</Text>
+              <Text style={styles.registerLink}>{t('login.sign_up_link')}</Text>
             </TouchableOpacity>
+          </View>
           </View>
         </View>
       </ScrollView>
@@ -167,13 +194,27 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background,
   },
+  languageSwitcherContainer: {
+    position: 'absolute',
+    top: SPACING.md,
+    right: SPACING.md,
+    zIndex: 100,
+  },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
     flexGrow: 1,
     padding: SPACING.lg,
+    alignItems: 'center',
+    minHeight: '100%',
+    paddingBottom: SPACING.xxl,
+  },
+  contentWrapper: {
+    flex: 1,
     justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
   },
   header: {
     alignItems: 'center',
@@ -194,7 +235,7 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
   form: {
-    width: '100%',
+    // Width is set dynamically based on screen size
   },
   optionsRow: {
     flexDirection: 'row',

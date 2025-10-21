@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Alert,
   SafeAreaView,
+  useWindowDimensions,
 } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -14,6 +15,8 @@ import { z } from 'zod';
 import { useAuthStore } from '../../store/authStore';
 import { Input } from '../../components/Input';
 import { Button } from '../../components/Button';
+import { LanguageSwitcher } from '../../components/LanguageSwitcher';
+import { useLanguage } from '../../contexts/LanguageContext';
 import { COLORS, SPACING, FONTS } from '../../constants/config';
 
 const registerSchema = z.object({
@@ -35,6 +38,8 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) =>
   const [selectedRole, setSelectedRole] = useState<'lender' | 'borrower' | 'both'>('borrower');
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const { register, isLoading, error, clearError } = useAuthStore();
+  const { width } = useWindowDimensions();
+  const { t } = useLanguage();
 
   const {
     control,
@@ -57,7 +62,7 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) =>
 
     try {
       clearError();
-      await register(data.email, data.password, selectedRole);
+      await register(data.email, data.password, data.confirmPassword, selectedRole, agreedToTerms);
       // Navigation will be handled by the auth flow
     } catch (error: any) {
       Alert.alert(
@@ -71,46 +76,65 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) =>
     navigation.navigate('Login');
   };
 
+  // Responsive width calculation
+  const getResponsiveWidth = () => {
+    if (width < 768) {
+      // Mobile: full width with padding
+      return '100%';
+    } else if (width < 1024) {
+      // Tablet: 80% width
+      return '80%';
+    } else {
+      // Desktop: fixed max width
+      return Math.min(600, width * 0.4);
+    }
+  };
+
+  const responsiveWidth = getResponsiveWidth();
+
   const roleOptions = [
     {
       key: 'borrower' as const,
-      title: 'Borrower',
-      description: 'Looking for loans and funding',
+      title: t('register.role_borrower_title'),
+      description: t('register.role_borrower_description'),
     },
     {
       key: 'lender' as const,
-      title: 'Lender',
-      description: 'Providing loans and investments',
+      title: t('register.role_lender_title'),
+      description: t('register.role_lender_description'),
     },
     {
       key: 'both' as const,
-      title: 'Both',
-      description: 'Interested in lending and borrowing',
+      title: t('register.role_both_title'),
+      description: t('register.role_both_description'),
     },
   ];
 
   return (
     <SafeAreaView style={styles.container}>
+      <View style={styles.languageSwitcherContainer}>
+        <LanguageSwitcher variant="button" />
+      </View>
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={styles.header}>
-          <Text style={styles.title}>Join Cooin</Text>
+        <View style={[styles.header, { width: responsiveWidth }]}>
+          <Text style={styles.title}>{t('register.join_cooin')}</Text>
           <Text style={styles.subtitle}>
-            Create your account to start connecting with the community
+            {t('register.create_account_subtitle')}
           </Text>
         </View>
 
-        <View style={styles.form}>
+        <View style={[styles.form, { width: responsiveWidth }]}>
           <Controller
             control={control}
             name="email"
             render={({ field: { onChange, onBlur, value } }) => (
               <Input
-                label="Email Address"
-                placeholder="Enter your email"
+                label={t('common.email')}
+                placeholder={t('register.email_placeholder')}
                 value={value}
                 onChangeText={onChange}
                 onBlur={onBlur}
@@ -128,8 +152,8 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) =>
             name="password"
             render={({ field: { onChange, onBlur, value } }) => (
               <Input
-                label="Password"
-                placeholder="Create a password"
+                label={t('common.password')}
+                placeholder={t('register.password_placeholder')}
                 value={value}
                 onChangeText={onChange}
                 onBlur={onBlur}
@@ -145,8 +169,8 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) =>
             name="confirmPassword"
             render={({ field: { onChange, onBlur, value } }) => (
               <Input
-                label="Confirm Password"
-                placeholder="Confirm your password"
+                label={t('register.confirm_password')}
+                placeholder={t('register.confirm_password_placeholder')}
                 value={value}
                 onChangeText={onChange}
                 onBlur={onBlur}
@@ -158,7 +182,7 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) =>
           />
 
           <View style={styles.roleSection}>
-            <Text style={styles.roleLabel}>I'm interested in:</Text>
+            <Text style={styles.roleLabel}>{t('register.interested_in')}</Text>
             {roleOptions.map((option) => (
               <TouchableOpacity
                 key={option.key}
@@ -202,10 +226,10 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) =>
               {agreedToTerms && <Text style={styles.checkmark}>✓</Text>}
             </View>
             <Text style={styles.termsText}>
-              I agree to the{' '}
-              <Text style={styles.termsLink}>Terms of Service</Text>
-              {' '}and{' '}
-              <Text style={styles.termsLink}>Privacy Policy</Text>
+              {t('register.agree_terms_prefix')}{' '}
+              <Text style={styles.termsLink}>{t('register.terms_of_service')}</Text>
+              {' '}{t('register.agree_terms_and')}{' '}
+              <Text style={styles.termsLink}>{t('register.privacy_policy')}</Text>
             </Text>
           </TouchableOpacity>
 
@@ -216,16 +240,16 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) =>
           )}
 
           <Button
-            title="Create Account"
+            title={t('auth.create_account')}
             onPress={handleSubmit(onSubmit)}
             loading={isLoading}
             style={styles.registerButton}
           />
 
           <View style={styles.loginContainer}>
-            <Text style={styles.loginText}>Already have an account? </Text>
+            <Text style={styles.loginText}>{t('register.already_have_account')} </Text>
             <TouchableOpacity onPress={handleLoginPress}>
-              <Text style={styles.loginLink}>Log in</Text>
+              <Text style={styles.loginLink}>{t('register.log_in_link')}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -239,6 +263,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background,
   },
+  languageSwitcherContainer: {
+    position: 'absolute',
+    top: SPACING.md,
+    right: SPACING.md,
+    zIndex: 100,
+  },
   scrollView: {
     flex: 1,
   },
@@ -246,6 +276,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     padding: SPACING.lg,
     justifyContent: 'center',
+    alignItems: 'center',
   },
   header: {
     alignItems: 'center',
@@ -266,7 +297,7 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
   form: {
-    width: '100%',
+    // Width is set dynamically based on screen size
   },
   roleSection: {
     marginBottom: SPACING.lg,

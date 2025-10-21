@@ -1,6 +1,6 @@
 // App configuration constants
 export const API_CONFIG = {
-  BASE_URL: 'http://localhost:8003/api/v1',
+  BASE_URL: 'http://localhost:8000/api/v1',
   TIMEOUT: 10000,
   RETRY_ATTEMPTS: 3,
 } as const;

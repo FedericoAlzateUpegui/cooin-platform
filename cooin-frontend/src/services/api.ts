@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
-import * as SecureStore from 'expo-secure-store';
+import { secureStorage } from '../utils/secureStorage';
 import { API_CONFIG, STORAGE_KEYS } from '../constants/config';
 import { ApiError } from '../types/api';
 
@@ -39,7 +39,12 @@ class ApiClient {
       async (error: AxiosError) => {
         const originalRequest = error.config as any;
 
-        if (error.response?.status === 401 && !originalRequest._retry) {
+        // Don't try to refresh token for auth endpoints (login, register, refresh)
+        const isAuthEndpoint = originalRequest.url?.includes('/auth/login') ||
+                               originalRequest.url?.includes('/auth/register') ||
+                               originalRequest.url?.includes('/auth/refresh');
+
+        if (error.response?.status === 401 && !originalRequest._retry && !isAuthEndpoint) {
           if (this.isRefreshing) {
             // If already refreshing, queue the request
             return new Promise((resolve) => {
@@ -78,7 +83,7 @@ class ApiClient {
 
   private async getAccessToken(): Promise<string | null> {
     try {
-      return await SecureStore.getItemAsync(STORAGE_KEYS.ACCESS_TOKEN);
+      return await secureStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     } catch (error) {
       console.error('Error getting access token:', error);
       return null;
@@ -87,7 +92,7 @@ class ApiClient {
 
   private async getRefreshToken(): Promise<string | null> {
     try {
-      return await SecureStore.getItemAsync(STORAGE_KEYS.REFRESH_TOKEN);
+      return await secureStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN);
     } catch (error) {
       console.error('Error getting refresh token:', error);
       return null;
@@ -112,8 +117,8 @@ class ApiClient {
 
   async storeTokens(accessToken: string, refreshToken: string): Promise<void> {
     try {
-      await SecureStore.setItemAsync(STORAGE_KEYS.ACCESS_TOKEN, accessToken);
-      await SecureStore.setItemAsync(STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
+      await secureStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, accessToken);
+      await secureStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
     } catch (error) {
       console.error('Error storing tokens:', error);
       throw error;
@@ -122,9 +127,9 @@ class ApiClient {
 
   async clearTokens(): Promise<void> {
     try {
-      await SecureStore.deleteItemAsync(STORAGE_KEYS.ACCESS_TOKEN);
-      await SecureStore.deleteItemAsync(STORAGE_KEYS.REFRESH_TOKEN);
-      await SecureStore.deleteItemAsync(STORAGE_KEYS.USER_DATA);
+      await secureStorage.deleteItem(STORAGE_KEYS.ACCESS_TOKEN);
+      await secureStorage.deleteItem(STORAGE_KEYS.REFRESH_TOKEN);
+      await secureStorage.deleteItem(STORAGE_KEYS.USER_DATA);
     } catch (error) {
       console.error('Error clearing tokens:', error);
     }
@@ -138,9 +143,36 @@ class ApiClient {
 
     if (error.response?.data) {
       const responseData = error.response.data as any;
-      apiError.detail = responseData.detail || responseData.message || apiError.detail;
+
+      // Extract error message from various possible formats
+      if (responseData.detail) {
+        // FastAPI standard error format
+        apiError.detail = responseData.detail;
+      } else if (responseData.message) {
+        // Alternative message field
+        apiError.detail = responseData.message;
+      } else if (responseData.field_errors) {
+        // Validation errors (422)
+        const fieldErrors = responseData.field_errors as any[];
+        if (fieldErrors.length > 0) {
+          // Show first field error
+          apiError.detail = fieldErrors[0].message || fieldErrors[0].msg || 'Validation error';
+        }
+      } else if (responseData.error) {
+        // Another possible error format
+        if (typeof responseData.error === 'string') {
+          apiError.detail = responseData.error;
+        } else if (responseData.error.message) {
+          apiError.detail = responseData.error.message;
+        }
+      }
     } else if (error.message) {
-      apiError.detail = error.message;
+      // Network or request setup error
+      if (error.message === 'Network Error') {
+        apiError.detail = 'Cannot connect to server. Please check your internet connection.';
+      } else {
+        apiError.detail = error.message;
+      }
     }
 
     return apiError;
