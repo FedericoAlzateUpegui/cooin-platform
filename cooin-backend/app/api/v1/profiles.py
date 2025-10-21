@@ -285,3 +285,33 @@ async def update_borrowing_preferences(
     profile = ProfileService.update_borrowing_preferences(db, current_user.id, borrowing_data)
     logger.info(f"Borrowing preferences updated for user {current_user.id}")
     return profile
+
+
+@router.patch("/{user_id}", response_model=UserProfileResponse)
+async def update_user_profile(
+    user_id: int,
+    profile_data: UserProfileUpdate,
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_database)
+):
+    """
+    Update a user's profile by ID.
+
+    Only allows users to update their own profile.
+    """
+    # Check if user is updating their own profile
+    if current_user.id != user_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You can only update your own profile"
+        )
+
+    cache_service = get_app_cache_service()
+
+    profile = ProfileService.update_profile(db, user_id, profile_data)
+
+    # Invalidate user-related cache entries
+    await cache_service.clear_user_related_cache(user_id)
+    logger.info(f"Profile updated and cache invalidated for user {user_id}")
+
+    return profile

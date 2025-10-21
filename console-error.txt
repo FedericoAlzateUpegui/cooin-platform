@@ -1,0 +1,15 @@
+Paste the Chrome console error below this line:
+=====================================
+
+C:\Windows\System32\cooin-app\cooin-frontend\node_modules\react-dom\cjs\react-dom-client.development.js:24868 Download the React DevTools for a better development experience: https://react.dev/link/react-devtools
+C:\Windows\System32\cooin-app\cooin-frontend\node_modules\react-native-web\dist\modules\warnOnce\index.js:24 "shadow*" style props are deprecated. Use "boxShadow".
+warnOnce @ C:\Windows\System32\cooin-app\cooin-frontend\node_modules\react-native-web\dist\modules\warnOnce\index.js:24Understand this warning
+C:\Windows\System32\cooin-app\cooin-frontend\node_modules\react-native-web\dist\exports\AppRegistry\index.js:71 Running application "main" with appParams:
+ Object 
+Development-level warnings: ON.
+Performance optimizations: OFF.
+C:\Windows\System32\cooin-app\cooin-frontend\src\contexts\LanguageContext.tsx:68 Waiting for i18n initialization...
+C:\Windows\System32\cooin-app\cooin-frontend\node_modules\react-native-web\dist\modules\warnOnce\index.js:24 props.pointerEvents is deprecated. Use style.pointerEvents
+warnOnce @ C:\Windows\System32\cooin-app\cooin-frontend\node_modules\react-native-web\dist\modules\warnOnce\index.js:24Understand this warning
+(index):1 Access to XMLHttpRequest at 'http://localhost:8000/api/v1/profiles/me' from origin 'http://localhost:8082' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.Understand this error
+:8000/api/v1/profiles/me:1 

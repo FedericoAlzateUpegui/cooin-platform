@@ -351,3 +351,60 @@ The entire app immediately changes language, and the choice persists when the ap
 5. Select "Español" - all UI text should change to Spanish
 6. Tap "Language" again and select "English" - all UI text should change back to English
 7. Reload the browser - last selected language should persist
+
+---
+
+## 2025-10-21 - Git Push Strategy (IMPORTANT - READ EVERY SESSION)
+
+**User Preference**: ALWAYS use GitHub Desktop for pushing commits
+
+**Reason**: Git Credential Manager has issues when running from command line due to directory/authentication conflicts
+
+**Workflow for Future Sessions**:
+1. Create commits using git command line (git add, git commit)
+2. Document the commit in history.md
+3. Remind user to open GitHub Desktop to push the changes
+4. NEVER attempt `git push` from command line
+
+**Current Commit Ready to Push**:
+- Commit: `0b4417d - Add web app internationalization and Settings screen`
+- 11 files changed, 2246 insertions(+)
+- **ACTION REQUIRED**: Open GitHub Desktop and push this commit
+
+**Repository**: https://github.com/FedericoAlzateUpegui/cooin-platform.git
+
+---
+
+## Git Commits Created This Session
+
+### Commit 0b4417d - Add web app internationalization and Settings screen
+
+**Date**: 2025-10-21
+
+**Status**: ⏳ Committed locally, needs push via GitHub Desktop
+
+**Summary**: Implemented comprehensive i18n support for web app with English/Spanish translations and connected Settings screen language switcher to LanguageContext.
+
+**Files Changed** (11 files, +2246/-59 lines):
+- ✅ `history.md` - Created comprehensive change history
+- ✅ `cooin-frontend/App.tsx` - Added LanguageProvider wrapper
+- ✅ `cooin-frontend/src/components/LanguageSwitcher.tsx` - New reusable language switcher component
+- ✅ `cooin-frontend/src/constants/config.ts` - Fixed backend port configuration
+- ✅ `cooin-frontend/src/contexts/LanguageContext.tsx` - Added async i18n initialization
+- ✅ `cooin-frontend/src/screens/auth/LoginScreen.tsx` - Added translations and language switcher
+- ✅ `cooin-frontend/src/screens/auth/RegisterScreen.tsx` - Added translations
+- ✅ `cooin-frontend/src/screens/home/HomeScreen.tsx` - New screen
+- ✅ `cooin-frontend/src/screens/settings/SettingsScreen.tsx` - Connected language switcher to LanguageContext
+- ✅ `cooin-frontend/src/screens/verification/VerificationScreen.tsx` - New screen
+- ✅ `cooin-frontend/src/services/api.ts` - Fixed auth endpoint token refresh logic
+
+**Key Changes**:
+- i18n initialization with AsyncStorage persistence
+- Settings screen language selector now functional
+- Login page scroll fixes
+- API connection fixes (port 8000)
+- CORS configuration for port 8082
+
+**Next Step**: Open GitHub Desktop and push this commit to origin/main
+
+7. Reload the browser - last selected language should persist

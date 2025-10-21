@@ -5,7 +5,7 @@ Main entry point for iOS app integration.
 
 from fastapi import APIRouter
 
-from app.api.v1 import mobile_uploads, websocket, matching, analytics, search
+from app.api.v1 import mobile_uploads, matching, analytics, search  # websocket temporarily disabled
 from app.core.mobile_docs import MOBILE_API_TAGS
 
 # Create mobile API router
@@ -18,12 +18,12 @@ mobile_router.include_router(
     tags=["Mobile File Upload"]
 )
 
-# Include WebSocket and notification routes
-mobile_router.include_router(
-    websocket.router,
-    prefix="/websocket",
-    tags=["Real-time Communication"]
-)
+# Include WebSocket and notification routes - TEMPORARILY DISABLED
+# mobile_router.include_router(
+#     websocket.router,
+#     prefix="/websocket",
+#     tags=["Real-time Communication"]
+# )
 
 # Include mobile matching routes
 mobile_router.include_router(

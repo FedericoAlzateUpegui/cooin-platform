@@ -37,8 +37,8 @@ class RatingService:
         if not connection:
             return None
 
-        # Determine ratee_id (the other person in the connection)
-        ratee_id = connection.receiver_id if connection.requester_id == rater_id else connection.requester_id
+        # Determine rated_user_id (the other person in the connection)
+        rated_user_id = connection.receiver_id if connection.requester_id == rater_id else connection.requester_id
 
         # Check if rating already exists
         existing_rating = db.query(Rating).filter(
@@ -53,7 +53,7 @@ class RatingService:
         rating = Rating(
             connection_id=rating_data.connection_id,
             rater_id=rater_id,
-            ratee_id=ratee_id,
+            rated_user_id=rated_user_id,
             rating_type=rating_data.rating_type.value,
             overall_rating=rating_data.overall_rating,
             communication_rating=rating_data.communication_rating,
@@ -79,7 +79,7 @@ class RatingService:
         db.refresh(rating)
 
         # Update user rating statistics
-        RatingService._update_user_stats(db, ratee_id)
+        RatingService._update_user_stats(db, rated_user_id)
 
         return rating
 
@@ -97,7 +97,7 @@ class RatingService:
             query = query.filter(
                 or_(
                     Rating.rater_id == user_id,
-                    Rating.ratee_id == user_id
+                    Rating.rated_user_id == user_id
                 )
             )
 
@@ -118,7 +118,7 @@ class RatingService:
         if as_rater:
             query = db.query(Rating).filter(Rating.rater_id == user_id)
         else:
-            query = db.query(Rating).filter(Rating.ratee_id == user_id)
+            query = db.query(Rating).filter(Rating.rated_user_id == user_id)
 
         # Filter by rating type if specified
         if rating_type:
@@ -187,7 +187,7 @@ class RatingService:
         db.refresh(rating)
 
         # Update user statistics
-        RatingService._update_user_stats(db, rating.ratee_id)
+        RatingService._update_user_stats(db, rating.rated_user_id)
 
         return rating
 
@@ -207,12 +207,12 @@ class RatingService:
         if not rating:
             return False
 
-        ratee_id = rating.ratee_id
+        rated_user_id = rating.rated_user_id
         db.delete(rating)
         db.commit()
 
         # Update user statistics
-        RatingService._update_user_stats(db, ratee_id)
+        RatingService._update_user_stats(db, rated_user_id)
 
         return True
 
@@ -228,7 +228,7 @@ class RatingService:
             return None
 
         # Get all ratings received by this user
-        ratings = db.query(Rating).filter(Rating.ratee_id == user_id).all()
+        ratings = db.query(Rating).filter(Rating.rated_user_id == user_id).all()
 
         # Calculate overall stats
         total_ratings = len(ratings)
@@ -342,7 +342,7 @@ class RatingService:
         """Update cached rating statistics for a user."""
 
         # Calculate new stats
-        ratings = db.query(Rating).filter(Rating.ratee_id == user_id).all()
+        ratings = db.query(Rating).filter(Rating.rated_user_id == user_id).all()
 
         total_ratings = len(ratings)
         average_rating = sum(r.overall_rating for r in ratings) / total_ratings if total_ratings > 0 else 0.0

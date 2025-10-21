@@ -93,6 +93,10 @@ async def get_current_active_user(
     return current_user
 
 
+# Alias for backwards compatibility
+get_current_user = get_current_user_from_token
+
+
 async def get_current_verified_user(
     current_user: User = Depends(get_current_active_user)
 ) -> User:
@@ -261,3 +265,34 @@ def require_user_permission(
             detail="Not enough permissions to access this resource"
         )
     return current_user
+
+
+async def get_current_user_websocket(
+    token: str,
+    db: Session
+) -> Optional[User]:
+    """
+    Get current user from WebSocket token.
+    Used for WebSocket authentication.
+    """
+    if not token:
+        return None
+
+    try:
+        payload = jwt_handler.decode_token(token)
+
+        if not jwt_handler.verify_token_type(payload, "access"):
+            return None
+
+        user_id = payload.get("sub")
+        if user_id is None:
+            return None
+
+        user = db.query(User).filter(User.id == int(user_id)).first()
+        if user and user.is_active and not user.is_account_locked:
+            return user
+
+    except Exception as e:
+        logger.warning(f"WebSocket token validation failed: {e}")
+
+    return None

@@ -39,7 +39,7 @@ def get_device_info(request: Request) -> str:
     return user_agent[:500]  # Limit length
 
 
-@router.post("/register", response_model=RegisterResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/register", response_model=LoginResponse, status_code=status.HTTP_201_CREATED)
 async def register(
     request: Request,
     user_data: RegisterRequest,
@@ -50,7 +50,7 @@ async def register(
 
     - Creates a new user with the provided information
     - Sends email verification (in production)
-    - Returns user data without sensitive information
+    - Auto-login: Returns user data and tokens for immediate authentication
     """
     # Create user schema
     user_create = UserCreate(
@@ -64,14 +64,36 @@ async def register(
     # Create user - let custom exceptions bubble up to global handlers
     user = UserService.create_user(db, user_create)
 
+    # Get client information for token creation
+    ip_address = get_client_ip(request)
+    device_info = get_device_info(request)
+
+    # Create tokens for auto-login
+    access_token = jwt_handler.create_access_token(subject=str(user.id))
+    refresh_token_record = UserService.create_refresh_token(
+        db=db,
+        user=user,
+        device_info=device_info,
+        ip_address=ip_address,
+        remember_me=False  # Default to session-based for registration
+    )
+
+    # Create token response
+    tokens = Token(
+        access_token=access_token,
+        refresh_token=refresh_token_record.token,
+        token_type="bearer",
+        expires_in=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60
+    )
+
     # Convert to response schema
     user_response = UserResponse.from_orm(user)
 
-    # TODO: Send verification email here
     logger.info(f"New user registered: {user.email}")
 
-    return RegisterResponse(
+    return LoginResponse(
         user=user_response.dict(),
+        tokens=tokens,
         message="Registration successful. Please check your email for verification."
     )
 

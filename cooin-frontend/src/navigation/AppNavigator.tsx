@@ -7,38 +7,14 @@ import { View, ActivityIndicator } from 'react-native';
 
 import { useAuthStore } from '../store/authStore';
 import { AuthNavigator } from './AuthNavigator';
+import { MatchingScreen } from '../screens/matching/MatchingScreen';
+import { ConnectionsScreen } from '../screens/connections/ConnectionsScreen';
+import { MessagesScreen } from '../screens/messages/MessagesScreen';
+import { ProfileSetupScreen } from '../screens/profile/ProfileSetupScreen';
+import { HomeScreen } from '../screens/home/HomeScreen';
+import { SettingsScreen } from '../screens/settings/SettingsScreen';
+import { VerificationScreen } from '../screens/verification/VerificationScreen';
 import { COLORS } from '../constants/config';
-
-// Placeholder screens for now
-const HomeScreen = () => (
-  <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-    <Ionicons name="home" size={48} color={COLORS.primary} />
-  </View>
-);
-
-const MatchingScreen = () => (
-  <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-    <Ionicons name="people" size={48} color={COLORS.primary} />
-  </View>
-);
-
-const ConnectionsScreen = () => (
-  <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-    <Ionicons name="link" size={48} color={COLORS.primary} />
-  </View>
-);
-
-const MessagesScreen = () => (
-  <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-    <Ionicons name="chatbubbles" size={48} color={COLORS.primary} />
-  </View>
-);
-
-const ProfileScreen = () => (
-  <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-    <Ionicons name="person" size={48} color={COLORS.primary} />
-  </View>
-);
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -63,8 +39,8 @@ const MainTabNavigator = () => {
             case 'Messages':
               iconName = focused ? 'chatbubbles' : 'chatbubbles-outline';
               break;
-            case 'Profile':
-              iconName = focused ? 'person' : 'person-outline';
+            case 'Settings':
+              iconName = focused ? 'settings' : 'settings-outline';
               break;
             default:
               iconName = 'home-outline';
@@ -91,7 +67,7 @@ const MainTabNavigator = () => {
       <Tab.Screen name="Matching" component={MatchingScreen} />
       <Tab.Screen name="Connections" component={ConnectionsScreen} />
       <Tab.Screen name="Messages" component={MessagesScreen} />
-      <Tab.Screen name="Profile" component={ProfileScreen} />
+      <Tab.Screen name="Settings" component={SettingsScreen} />
     </Tab.Navigator>
   );
 };
@@ -122,7 +98,11 @@ export const AppNavigator: React.FC = () => {
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {isAuthenticated ? (
-          <Stack.Screen name="Main" component={MainTabNavigator} />
+          <>
+            <Stack.Screen name="Main" component={MainTabNavigator} />
+            <Stack.Screen name="Profile" component={ProfileSetupScreen} />
+            <Stack.Screen name="Verification" component={VerificationScreen} />
+          </>
         ) : (
           <Stack.Screen name="Auth" component={AuthNavigator} />
         )}

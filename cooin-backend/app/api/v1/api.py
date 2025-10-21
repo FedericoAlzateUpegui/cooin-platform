@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 
-from app.api.v1 import auth, profiles, connections, ratings, email, uploads, cache, security, mobile, matching, analytics, search
+from app.api.v1 import auth, profiles, connections, ratings, email, uploads, cache, security
+# mobile, matching, analytics, search temporarily disabled due to missing models
 
 # Create main API router
 api_router = APIRouter()
@@ -61,33 +62,27 @@ api_router.include_router(
     tags=["security-management"]
 )
 
-# Include mobile-optimized routes
-api_router.include_router(
-    mobile.mobile_router,
-    prefix="/mobile",
-    tags=["mobile-api"]
-)
-
-# Include intelligent matching routes
-api_router.include_router(
-    matching.router,
-    prefix="/matching",
-    tags=["intelligent-matching"]
-)
-
-# Include analytics and reporting routes
-api_router.include_router(
-    analytics.router,
-    prefix="/analytics",
-    tags=["analytics-reporting"]
-)
-
-# Include advanced search routes
-api_router.include_router(
-    search.router,
-    prefix="/search",
-    tags=["advanced-search"]
-)
+# Temporarily disabled due to missing LoanRequest and LendingOffer models
+# api_router.include_router(
+#     mobile.mobile_router,
+#     prefix="/mobile",
+#     tags=["mobile-api"]
+# )
+# api_router.include_router(
+#     matching.router,
+#     prefix="/matching",
+#     tags=["intelligent-matching"]
+# )
+# api_router.include_router(
+#     analytics.router,
+#     prefix="/analytics",
+#     tags=["analytics-reporting"]
+# )
+# api_router.include_router(
+#     search.router,
+#     prefix="/search",
+#     tags=["advanced-search"]
+# )
 
 # Health check endpoint for this API version
 @api_router.get("/health")

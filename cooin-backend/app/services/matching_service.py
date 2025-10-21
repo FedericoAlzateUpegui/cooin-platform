@@ -12,11 +12,20 @@ from enum import Enum
 from sqlalchemy.orm import Session
 from sqlalchemy import and_, or_, func
 
-from app.models import User, UserProfile, LoanRequest, LendingOffer, UserRating, Connection
+from app.models import User, UserProfile, Rating, Connection
 from app.core.config import settings
 from app.services.cache_service import get_app_cache_service
 
 logger = logging.getLogger(__name__)
+
+# Placeholder types for models not yet implemented
+class LoanRequest:
+    """Placeholder for LoanRequest model - not yet implemented"""
+    pass
+
+class LendingOffer:
+    """Placeholder for LendingOffer model - not yet implemented"""
+    pass
 
 
 class MatchingCriteria(Enum):

@@ -84,9 +84,6 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
             if value is not None:
                 response.headers[header] = value
 
-        # Remove potentially sensitive headers
-        response.headers.pop("Server", None)
-
         return response
 
 
@@ -159,12 +156,14 @@ class RequestValidationMiddleware(BaseHTTPMiddleware):
             if pattern.search(query_string):
                 return True, f"Suspicious query parameter: {pattern.pattern}"
 
-        # Check headers for injection attempts
-        suspicious_headers = ["User-Agent", "Referer", "X-Forwarded-For"]
+        # Check headers for injection attempts (excluding User-Agent which may contain special chars)
+        # Only check for SQL injection, XSS, and path traversal in headers (first 9 patterns)
+        header_patterns = self.compiled_patterns[:9]  # Exclude command injection patterns (last 2)
+        suspicious_headers = ["Referer", "X-Forwarded-For"]
         for header_name in suspicious_headers:
             if header_name in request.headers:
                 header_value = request.headers[header_name]
-                for pattern in self.compiled_patterns:
+                for pattern in header_patterns:
                     if pattern.search(header_value):
                         return True, f"Suspicious header {header_name}: {pattern.pattern}"
 

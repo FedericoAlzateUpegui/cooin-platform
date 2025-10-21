@@ -10,7 +10,7 @@ interface AuthState {
 
   // Actions
   login: (email: string, password: string, rememberMe?: boolean) => Promise<void>;
-  register: (email: string, password: string, role: 'lender' | 'borrower' | 'both') => Promise<void>;
+  register: (email: string, password: string, confirmPassword: string, role: 'lender' | 'borrower' | 'both', agreeToTerms: boolean) => Promise<void>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
   clearError: () => void;
@@ -49,13 +49,15 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
 
-  register: async (email: string, password: string, role: 'lender' | 'borrower' | 'both') => {
+  register: async (email: string, password: string, confirmPassword: string, role: 'lender' | 'borrower' | 'both', agreeToTerms: boolean) => {
     set({ isLoading: true, error: null });
     try {
       const response = await authService.register({
         email,
         password,
+        confirm_password: confirmPassword,
         role,
+        agree_to_terms: agreeToTerms,
       });
 
       set({
