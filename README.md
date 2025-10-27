@@ -60,6 +60,13 @@ alembic upgrade head
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
+**⚠️ Windows Users:** If you get `ModuleNotFoundError`, you may have multiple Python installations. Use the full path:
+```bash
+"C:\Users\YOUR_USERNAME\AppData\Local\Microsoft\WindowsApps\python.exe" -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+See [Common Issues](#common-issues--solutions) below for details.
+
 Backend will be available at: `http://localhost:8000`
 - API docs: `http://localhost:8000/api/v1/docs`
 - Health check: `http://localhost:8000/health`
@@ -274,6 +281,35 @@ brew install redis
 brew services start redis
 ```
 
+**Problem**: `ModuleNotFoundError` - Backend can't find installed packages (Windows)
+**Solution**: You likely have multiple Python installations. The packages are installed in one Python, but you're running another.
+
+**Diagnosis:**
+```bash
+where python
+# Shows all Python installations
+
+pip --version
+# Shows where packages are installed
+```
+
+**Fix Option 1 - Use Full Python Path** (Quick):
+```bash
+"C:\Users\YOUR_USERNAME\AppData\Local\Microsoft\WindowsApps\python.exe" -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+**Fix Option 2 - Virtual Environment** (Recommended):
+```bash
+cd cooin-backend
+python -m venv venv
+venv\Scripts\activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+**Fix Option 3 - Fix PATH Order**:
+Move Microsoft Store Python higher in Windows PATH environment variable.
+
 ### Frontend Issues
 
 **Problem**: Module not found errors
@@ -298,6 +334,17 @@ npx expo start --clear
 # Or via command line:
 rm -rf ~/Library/Developer/Xcode/DerivedData
 ```
+
+### Permission Issues (Windows)
+
+**Problem**: Cannot edit files, "Access denied" errors
+**Solution**: If project is in `C:\Windows\System32\cooin-app`:
+
+**Option 1 - Quick Fix**: Run `fix-permissions.bat` as administrator
+**Option 2 - Alternative**: Run VS Code as administrator
+**Option 3 - Recommended**: Move project to user folder (e.g., `C:\Users\USERNAME\Documents\cooin-app`)
+
+See [PERMISSION-FIX.md](./PERMISSION-FIX.md) for detailed instructions.
 
 ## 🤝 Development Workflow
 
@@ -338,6 +385,48 @@ redis-server
 postgres -D /usr/local/var/postgres
 ```
 
+## 🌐 Exposing Your App Publicly (Ngrok)
+
+Want to share your local app with others or access it from the internet? Use ngrok to create secure tunnels.
+
+### Quick Setup
+
+1. **Install ngrok**: Download from [ngrok.com/download](https://ngrok.com/download)
+2. **Configure auth token**: Edit `ngrok.yml` with your token from [dashboard.ngrok.com](https://dashboard.ngrok.com)
+3. **Start your services**:
+   ```bash
+   # Backend (port 8000)
+   cd cooin-backend && python start_dev.py
+
+   # Frontend (port 8083)
+   cd cooin-frontend && npx expo start --web --port 8083
+   ```
+4. **Start ngrok**: Run `start-ngrok.bat`
+5. **Get URLs**: Run `get-ngrok-urls.ps1` and follow prompts
+
+### Features
+
+- ✅ Automated tunnel setup for frontend and backend
+- ✅ Auto-updates frontend config with ngrok backend URL
+- ✅ Creates config backups before changes
+- ✅ Interactive PowerShell script with color output
+- ✅ Comprehensive documentation and troubleshooting
+
+### Documentation
+
+- **[NGROK-QUICKSTART.md](./NGROK-QUICKSTART.md)** - One-page quick reference
+- **[NGROK-SETUP.md](./NGROK-SETUP.md)** - Complete setup guide with troubleshooting
+
+### Example URLs
+
+After running ngrok, you'll get public URLs like:
+- Frontend: `https://abc123.ngrok.io`
+- Backend: `https://xyz789.ngrok.io`
+
+**Note**: Free plan URLs change every session (2-hour limit). Consider paid plan for persistent URLs.
+
+---
+
 ## 📊 Project Status
 
 - ✅ Backend API - Complete
@@ -346,13 +435,29 @@ postgres -D /usr/local/var/postgres
 - ✅ Authentication System - Complete
 - ✅ Matching Algorithm - Complete
 - ✅ Real-time Messaging - Complete
+- ✅ Ngrok Integration - Complete (Session 5)
 - 🚧 Payment Integration - In Progress
 - 🚧 Admin Dashboard - In Progress
 
 ## 📖 Additional Documentation
 
+### Setup & Configuration
+- [HOW-TO-LAUNCH-WEB-APP.md](./HOW-TO-LAUNCH-WEB-APP.md) - Detailed launch instructions for VS Code
 - [TECH_STACK.md](./TECH_STACK.md) - Comprehensive technology documentation with code examples
-- [Backend API Documentation](http://localhost:8000/api/v1/docs) - Interactive API docs (when running)
+
+### Ngrok Public Access
+- [NGROK-QUICKSTART.md](./NGROK-QUICKSTART.md) - Quick reference for ngrok setup
+- [NGROK-SETUP.md](./NGROK-SETUP.md) - Complete ngrok guide with troubleshooting
+
+### Troubleshooting
+- [PERMISSION-FIX.md](./PERMISSION-FIX.md) - Solutions for file permission issues
+
+### Change History
+- [HISTORY.md](./HISTORY.md) - Complete changelog with all sessions and fixes
+- [TODO.md](./TODO.md) - Current tasks and future enhancements
+
+### API Documentation
+- [Backend API Documentation](http://localhost:8000/api/v1/docs) - Interactive Swagger UI (when running)
 
 ## 📄 License
 

@@ -21,6 +21,7 @@ import { COLORS, SPACING, FONTS } from '../../constants/config';
 
 const registerSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
+  username: z.string().min(3, 'Username must be at least 3 characters').max(30, 'Username must be at most 30 characters'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
   confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
@@ -49,6 +50,7 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) =>
     resolver: zodResolver(registerSchema),
     defaultValues: {
       email: '',
+      username: '',
       password: '',
       confirmPassword: '',
     },
@@ -62,7 +64,7 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) =>
 
     try {
       clearError();
-      await register(data.email, data.password, data.confirmPassword, selectedRole, agreedToTerms);
+      await register(data.email, data.username, data.password, data.confirmPassword, selectedRole, agreedToTerms);
       // Navigation will be handled by the auth flow
     } catch (error: any) {
       Alert.alert(
@@ -143,6 +145,24 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) =>
                 autoCapitalize="none"
                 autoComplete="email"
                 leftIcon="mail"
+              />
+            )}
+          />
+
+          <Controller
+            control={control}
+            name="username"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <Input
+                label={t('register.username')}
+                placeholder={t('register.username_placeholder')}
+                value={value}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                error={errors.username?.message}
+                autoCapitalize="none"
+                autoComplete="username"
+                leftIcon="person"
               />
             )}
           />

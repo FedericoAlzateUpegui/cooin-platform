@@ -15,15 +15,24 @@ class PasswordHandler:
         self.pwd_context = CryptContext(
             schemes=["bcrypt"],
             deprecated="auto",
-            bcrypt__rounds=settings.BCRYPT_ROUNDS
+            bcrypt__rounds=settings.BCRYPT_ROUNDS,
+            bcrypt__truncate_error=True  # Fix for bcrypt 5.x compatibility
         )
 
     def hash_password(self, password: str) -> str:
         """Hash a password using bcrypt."""
+        # Bcrypt has a 72 byte password limit, truncate if needed
+        password_bytes = password.encode('utf-8')
+        if len(password_bytes) > 72:
+            password = password[:72]
         return self.pwd_context.hash(password)
 
     def verify_password(self, plain_password: str, hashed_password: str) -> bool:
         """Verify a password against its hash."""
+        # Bcrypt has a 72 byte password limit, truncate if needed
+        password_bytes = plain_password.encode('utf-8')
+        if len(password_bytes) > 72:
+            plain_password = plain_password[:72]
         return self.pwd_context.verify(plain_password, hashed_password)
 
 

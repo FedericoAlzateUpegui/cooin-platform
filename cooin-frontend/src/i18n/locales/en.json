@@ -10,7 +10,8 @@
     "next": "Next",
     "email": "Email",
     "password": "Password",
-    "username": "Username"
+    "username": "Username",
+    "error": "Error"
   },
   "auth": {
     "login": "Login",
@@ -25,6 +26,7 @@
     "join_cooin": "Join Cooin",
     "create_account_subtitle": "Create your account to start connecting with the community",
     "email_placeholder": "Enter your email",
+    "username": "Username",
     "username_placeholder": "Choose a username",
     "password_placeholder": "Create a password",
     "confirm_password": "Confirm Password",
@@ -288,8 +290,11 @@
     "discover_matches": "Discover Matches",
     "connection_accepted_title": "Connection Accepted",
     "connection_accepted_message": "You have successfully accepted this connection request. You can now message each other.",
+    "accept_response_message": "Connection accepted! Looking forward to connecting with you.",
     "reject_connection_title": "Reject Connection",
     "reject_connection_message": "Are you sure you want to reject this connection request?",
+    "reject_button": "Reject",
+    "reject_response_message": "Thank you for your interest, but I am not able to connect at this time.",
     "error_loading": "Failed to load connections",
     "error_accept": "Failed to accept connection",
     "error_reject": "Failed to reject connection"
@@ -304,7 +309,8 @@
     "yesterday": "Yesterday",
     "days_ago": "{count} days ago",
     "pending_status": "Pending",
-    "inactive_status": "Inactive"
+    "inactive_status": "Inactive",
+    "discover_matches": "Discover Matches"
   },
   "matching_screen": {
     "title": "Discover Matches",
@@ -324,8 +330,11 @@
     "refresh": "Refresh",
     "connection_sent_title": "Connection Sent!",
     "connection_sent_message": "Your connection request has been sent to {name}. They will be notified and can accept or decline your request.",
+    "connection_message": "Hi {name}! I'm interested in connecting with you based on our compatibility.",
     "connection_failed_title": "Connection Failed",
+    "connection_failed_message": "Failed to send connection request",
     "search_error_title": "Search Error",
+    "search_error_message": "Failed to load matches",
     "min_amount_placeholder": "$0",
     "max_amount_placeholder": "$1,000,000"
   },
@@ -389,5 +398,50 @@
     "weak": "Weak",
     "good": "Good",
     "strong": "Strong"
+  },
+  "navigation": {
+    "home": "Home",
+    "matching": "Matching",
+    "connections": "Connections",
+    "messages": "Messages",
+    "settings": "Settings",
+    "profile": "Profile",
+    "verification": "Verification"
+  },
+  "home": {
+    "good_morning": "Good Morning",
+    "good_afternoon": "Good Afternoon",
+    "good_evening": "Good Evening",
+    "discover_matches": "Discover Matches",
+    "my_connections": "My Connections",
+    "messages": "Messages",
+    "complete_profile": "Complete Profile",
+    "complete_your_profile": "Complete Your Profile",
+    "profile_completion_description": "Your profile is {{percentage}}% complete. Complete it to get better matches!",
+    "complete_now": "Complete Now",
+    "welcome_title": "Welcome to Cooin",
+    "welcome_description": "Connect with {{role}} who match your criteria. Build trust, negotiate terms, and create successful lending relationships.",
+    "borrowers": "borrowers",
+    "lenders": "lenders",
+    "quick_actions": "Quick Actions",
+    "getting_started": "Getting Started",
+    "step1_title": "Complete Your Profile",
+    "step1_description": "Add your information to build trust with potential matches",
+    "step2_title": "Discover Matches",
+    "step2_description": "Browse and filter to find the perfect lending partners",
+    "step3_title": "Connect & Message",
+    "step3_description": "Send connection requests and start conversations",
+    "step4_title": "Negotiate Terms",
+    "step4_description": "Discuss and agree on loan terms that work for both parties",
+    "lender_tips": "Lender Tips",
+    "borrower_tips": "Borrower Tips",
+    "lender_tip1": "• Review borrower profiles carefully before connecting",
+    "lender_tip2": "• Set clear interest rates and repayment terms",
+    "lender_tip3": "• Use the messaging feature to ask questions",
+    "lender_tip4": "• Start with smaller amounts to build trust",
+    "borrower_tip1": "• Complete your profile to increase trust",
+    "borrower_tip2": "• Be clear about your borrowing needs",
+    "borrower_tip3": "• Respond promptly to connection requests",
+    "borrower_tip4": "• Be honest about your repayment ability"
   }
 }

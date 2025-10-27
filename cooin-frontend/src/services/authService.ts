@@ -31,8 +31,10 @@ class AuthService {
       // Store tokens securely
       await apiClient.storeTokens(access_token, refresh_token);
 
-      // Store user data
-      await secureStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(response.user));
+      // Store user data (only if user object exists and is valid)
+      if (response.user && typeof response.user === 'object') {
+        await secureStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(response.user));
+      }
 
       // Return in expected format
       return {
@@ -64,8 +66,10 @@ class AuthService {
     // Store tokens securely
     await apiClient.storeTokens(access_token, refresh_token);
 
-    // Store user data
-    await secureStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(response.user));
+    // Store user data (only if user object exists and is valid)
+    if (response.user && typeof response.user === 'object') {
+      await secureStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(response.user));
+    }
 
     // Return in expected format
     return {
@@ -94,12 +98,19 @@ class AuthService {
     try {
       const userData = await secureStorage.getItem(STORAGE_KEYS.USER_DATA);
       if (userData) {
-        return JSON.parse(userData);
+        try {
+          return JSON.parse(userData);
+        } catch (parseError) {
+          console.error('Failed to parse user data, clearing corrupted data:', parseError);
+          await secureStorage.deleteItem(STORAGE_KEYS.USER_DATA);
+        }
       }
 
       // If no cached user data, fetch from server
       const user = await apiClient.get<User>('/auth/me');
-      await secureStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(user));
+      if (user && typeof user === 'object') {
+        await secureStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(user));
+      }
       return user;
     } catch (error) {
       console.error('Error getting current user:', error);

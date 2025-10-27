@@ -3,6 +3,7 @@
 ## Prerequisites
 
 Before starting, make sure you have installed:
+
 - **Visual Studio Code** (VS Code)
 - **Node.js** (version 18 or higher)
 - **Python** (version 3.11 or higher)
@@ -13,12 +14,14 @@ Before starting, make sure you have installed:
 ## Step 1: Open the Project in Visual Studio Code
 
 ### Option A: Using VS Code File Menu
+
 1. Open **Visual Studio Code**
 2. Click **File** → **Open Folder**
 3. Navigate to: `C:\Windows\System32\cooin-app`
 4. Click **Select Folder**
 
 ### Option B: Using Command Line
+
 1. Open **Command Prompt** or **PowerShell**
 2. Run these commands:
    ```bash
@@ -41,16 +44,25 @@ Before starting, make sure you have installed:
 ### Terminal 1: Backend (FastAPI)
 
 1. In the integrated terminal, navigate to backend folder:
+
    ```bash
    cd cooin-backend
    ```
 
 2. Start the backend server:
+
+   **⚠️ Important:** Use the full Python path (Windows has multiple Python installations):
+   ```bash
+   "C:\Users\Usuario\AppData\Local\Microsoft\WindowsApps\python.exe" -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+   ```
+
+   **Alternative (if above doesn't work):**
    ```bash
    python start_dev.py
    ```
 
 3. **Wait for the success message**:
+
    ```
    INFO:     Application startup complete.
    INFO:     Uvicorn running on http://0.0.0.0:8000
@@ -58,7 +70,10 @@ Before starting, make sure you have installed:
 
 4. **Do NOT close this terminal** - keep it running
 
+   **Troubleshooting:** If you get `ModuleNotFoundError: No module named 'fastapi'`, use the full Python path above
+
 ### What's Happening?
+
 - Backend API server starts on **port 8000**
 - Handles all database operations, authentication, and API endpoints
 - Must be running for the frontend to work
@@ -70,20 +85,24 @@ Before starting, make sure you have installed:
 ### Terminal 2: Frontend (React Native Web)
 
 1. Open a **NEW terminal** in VS Code:
+
    - Click the **+** button in the terminal panel, OR
    - Press **Ctrl + Shift + `**
 
 2. Navigate to frontend folder:
+
    ```bash
    cd cooin-frontend
    ```
 
 3. Start the Metro bundler for web:
+
    ```bash
-   npx expo start --web --port 8082
+   npx expo start --web --port 8083
    ```
 
 4. **Wait for the success message**:
+
    ```
    Web Bundled 9754ms index.ts (834 modules)
    Logs will appear in the browser console
@@ -92,6 +111,7 @@ Before starting, make sure you have installed:
 5. **Do NOT close this terminal** - keep it running
 
 ### What's Happening?
+
 - Metro bundler compiles React Native code for web
 - Serves the frontend on **port 8082**
 - Watches for file changes and hot-reloads automatically
@@ -101,12 +121,14 @@ Before starting, make sure you have installed:
 ## Step 5: Open the App in Your Browser
 
 ### Automatic Opening
+
 - Metro bundler should **automatically open** your browser to:
   ```
   http://localhost:8082
   ```
 
 ### Manual Opening
+
 If the browser doesn't open automatically:
 
 1. Open your web browser (Chrome, Firefox, Edge, etc.)
@@ -190,18 +212,21 @@ For the best development experience:
 ## Quick Reference: Commands
 
 ### Start Backend
+
 ```bash
 cd C:\Windows\System32\cooin-app\cooin-backend
 python start_dev.py
 ```
 
 ### Start Frontend
+
 ```bash
 cd C:\Windows\System32\cooin-app\cooin-frontend
 npx expo start --web --port 8082
 ```
 
 ### Stop Servers
+
 - Press **Ctrl + C** in each terminal to stop the servers
 
 ---
@@ -213,6 +238,7 @@ npx expo start --web --port 8082
 **Cause**: Another process is using port 8082 or 8000
 
 **Solution**:
+
 1. Close any other running instances
 2. In VS Code terminal:
    ```bash
@@ -226,6 +252,7 @@ npx expo start --web --port 8082
 **Cause**: Backend not running or CORS issue
 
 **Solution**:
+
 1. Make sure backend terminal shows:
    ```
    INFO: Uvicorn running on http://0.0.0.0:8000
@@ -241,6 +268,7 @@ npx expo start --web --port 8082
 **Cause**: Metro bundler cache issues
 
 **Solution**:
+
 1. Stop frontend server (Ctrl + C)
 2. Clear cache and restart:
    ```bash
@@ -253,6 +281,7 @@ npx expo start --web --port 8082
 **Cause**: Old cached version
 
 **Solution**:
+
 1. **Hard refresh** browser: **Ctrl + Shift + R** (Windows) or **Cmd + Shift + R** (Mac)
 2. If still not working, clear cache:
    ```bash
@@ -265,6 +294,7 @@ npx expo start --web --port 8082
 **Cause**: Missing dependencies
 
 **Solution**:
+
 ```bash
 cd C:\Windows\System32\cooin-app\cooin-frontend
 npm install
@@ -302,48 +332,127 @@ pip install -r requirements.txt
 For better development experience, install these extensions in VS Code:
 
 1. **ES7+ React/Redux/React-Native snippets**
+
    - ID: `dsznajder.es7-react-js-snippets`
 
 2. **Python**
+
    - ID: `ms-python.python`
 
 3. **Prettier - Code formatter**
+
    - ID: `esbenp.prettier-vscode`
 
 4. **GitLens**
    - ID: `eamodio.gitlens`
 
 To install:
+
 1. Press **Ctrl + Shift + X** (Extensions panel)
 2. Search for extension name
 3. Click **Install**
 
 ---
 
+## Step 7: Expose to Public (Optional - Using Ngrok)
+
+Want to share your app with others or access it from your phone? Use ngrok!
+
+### Quick Ngrok Setup
+
+**Prerequisites:**
+- Backend running on port 8000 ✅
+- Frontend running on port 8083 ✅
+- Ngrok installed ([download here](https://ngrok.com/download))
+
+### Option A: Frontend Only (Simple - For PC Testing)
+
+**Terminal 3:**
+```bash
+cd C:\Windows\System32\cooin-app
+ngrok http 8083
+```
+
+You'll get a URL like: `https://abc-123-def.ngrok-free.app`
+
+**Share this URL** with anyone - they can access your app!
+
+**Note:** For mobile devices (iPhone/Android), you need Option B below.
+
+---
+
+### Option B: Frontend + Backend (For Mobile Devices)
+
+Mobile devices can't access `localhost`, so you need to expose both services:
+
+**Terminal 3 - Frontend Tunnel:**
+```bash
+ngrok http 8083
+```
+Get URL like: `https://abc-frontend.ngrok-free.app`
+
+**Terminal 4 - Backend Tunnel:**
+```bash
+ngrok http 8000
+```
+Get URL like: `https://xyz-backend.ngrok-free.app`
+
+**Then update configs:**
+
+1. **Update Frontend** (`cooin-frontend/src/constants/config.ts`):
+   ```typescript
+   BASE_URL: 'https://xyz-backend.ngrok-free.app/api/v1',
+   ```
+
+2. **Update Backend CORS** (`cooin-backend/.env`):
+   ```env
+   BACKEND_CORS_ORIGINS=["http://localhost:8083","https://abc-frontend.ngrok-free.app","https://xyz-backend.ngrok-free.app"]
+   ```
+
+3. **Restart both services** (Ctrl+C and restart)
+
+4. **Access on any device:** `https://abc-frontend.ngrok-free.app`
+
+---
+
+### Detailed Ngrok Guides
+
+- **Quick Reference:** [NGROK-QUICKSTART.md](./NGROK-QUICKSTART.md)
+- **Complete Guide:** [NGROK-SETUP.md](./NGROK-SETUP.md)
+- **Troubleshooting:** See guides above
+
+**⚠️ Important Notes:**
+- Free ngrok: URLs change every 2 hours
+- Keep ngrok terminal windows open while sharing
+- First-time visitors see ngrok warning - click "Visit Site"
+
+---
+
 ## URLs Reference
 
-| Service | URL | Purpose |
-|---------|-----|---------|
-| Frontend (Web App) | http://localhost:8082 | Main web application |
-| Backend API | http://localhost:8000 | API endpoints |
-| API Documentation | http://localhost:8000/docs | Interactive API docs (Swagger UI) |
-| Alternative API Docs | http://localhost:8000/redoc | Alternative API documentation |
+| Service              | URL                         | Purpose                           |
+| -------------------- | --------------------------- | --------------------------------- |
+| Frontend (Web App)   | http://localhost:8083       | Main web application              |
+| Backend API          | http://localhost:8000       | API endpoints                     |
+| API Documentation    | http://localhost:8000/docs  | Interactive API docs (Swagger UI) |
+| Alternative API Docs | http://localhost:8000/redoc | Alternative API documentation     |
+| Ngrok Dashboard      | http://localhost:4040       | View ngrok tunnels and traffic    |
 
 ---
 
 ## Keyboard Shortcuts in VS Code
 
-| Shortcut | Action |
-|----------|--------|
-| **Ctrl + `** | Toggle terminal |
-| **Ctrl + Shift + `** | New terminal |
-| **Ctrl + B** | Toggle sidebar |
-| **Ctrl + P** | Quick file open |
-| **Ctrl + Shift + P** | Command palette |
-| **Ctrl + F** | Find in file |
+| Shortcut             | Action            |
+| -------------------- | ----------------- |
+| **Ctrl + `**         | Toggle terminal   |
+| **Ctrl + Shift + `** | New terminal      |
+| **Ctrl + B**         | Toggle sidebar    |
+| **Ctrl + P**         | Quick file open   |
+| **Ctrl + Shift + P** | Command palette   |
+| **Ctrl + F**         | Find in file      |
 | **Ctrl + Shift + F** | Find in all files |
-| **F2** | Rename symbol |
-| **Alt + Up/Down** | Move line up/down |
+| **F2**               | Rename symbol     |
+| **Alt + Up/Down**    | Move line up/down |
 
 ---
 

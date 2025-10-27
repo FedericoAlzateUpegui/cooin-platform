@@ -7,7 +7,7 @@ const LANGUAGE_KEY = '@cooin_language';
 interface LanguageContextType {
   currentLanguage: string;
   changeLanguage: (language: string) => Promise<void>;
-  t: (key: string) => string;
+  t: (key: string, options?: any) => string;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -55,12 +55,12 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
     }
   };
 
-  const t = (key: string): string => {
+  const t = (key: string, options?: any): string => {
     if (!isI18nInitialized) {
       console.warn('i18n not initialized yet, returning key:', key);
       return key;
     }
-    return i18n.t(key);
+    return i18n.t(key, options);
   };
 
   // Show loading or return null while i18n initializes

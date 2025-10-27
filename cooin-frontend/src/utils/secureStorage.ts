@@ -25,7 +25,16 @@ class SecureStorage {
     if (Platform.OS === 'web') {
       // Use localStorage on web
       try {
-        return localStorage.getItem(key);
+        const value = localStorage.getItem(key);
+
+        // Check if the value is corrupted (e.g., "[object Object]")
+        if (value && value.startsWith('[object') && value.endsWith(']')) {
+          console.warn(`Corrupted data found for key "${key}". Clearing it.`);
+          localStorage.removeItem(key);
+          return null;
+        }
+
+        return value;
       } catch (error) {
         console.error('Error getting item from localStorage:', error);
         return null;

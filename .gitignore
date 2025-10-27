@@ -144,3 +144,14 @@ public
 # Temporary folders
 tmp/
 temp/
+
+# Ngrok configuration (contains auth token)
+ngrok.yml
+.ngrok
+
+# Backup files
+*.backup
+*.bak
+
+# Error output files
+nul

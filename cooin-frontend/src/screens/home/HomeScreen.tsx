@@ -14,6 +14,7 @@ import { useAuthStore } from '../../store/authStore';
 import { useProfileStore } from '../../store/profileStore';
 import { Button } from '../../components/Button';
 import { COLORS, SPACING, FONTS } from '../../constants/config';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 interface HomeScreenProps {
   navigation: any;
@@ -23,6 +24,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const { user } = useAuthStore();
   const { profile, loadProfile, profileCompletion } = useProfileStore();
+  const { t } = useLanguage();
 
   useEffect(() => {
     loadProfile();
@@ -36,36 +38,36 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
   const getGreeting = () => {
     const hour = new Date().getHours();
-    if (hour < 12) return 'Good Morning';
-    if (hour < 18) return 'Good Afternoon';
-    return 'Good Evening';
+    if (hour < 12) return t('home.good_morning');
+    if (hour < 18) return t('home.good_afternoon');
+    return t('home.good_evening');
   };
 
   const quickActions = [
     {
       id: 'discover',
-      title: 'Discover Matches',
+      title: t('home.discover_matches'),
       icon: 'people' as const,
       color: COLORS.primary,
       onPress: () => navigation.navigate('Matching'),
     },
     {
       id: 'connections',
-      title: 'My Connections',
+      title: t('home.my_connections'),
       icon: 'link' as const,
       color: COLORS.accent,
       onPress: () => navigation.navigate('Connections'),
     },
     {
       id: 'messages',
-      title: 'Messages',
+      title: t('home.messages'),
       icon: 'chatbubbles' as const,
       color: COLORS.success,
       onPress: () => navigation.navigate('Messages'),
     },
     {
       id: 'profile',
-      title: 'Complete Profile',
+      title: t('home.complete_profile'),
       icon: 'person' as const,
       color: COLORS.secondary,
       onPress: () => navigation.navigate('Profile'),
@@ -86,7 +88,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           <View>
             <Text style={styles.greeting}>{getGreeting()}</Text>
             <Text style={styles.userName}>
-              {profile?.display_name || user?.email?.split('@')[0] || 'User'}
+              {profile?.display_name || user?.username || user?.email?.split('@')[0] || 'User'}
             </Text>
           </View>
           <TouchableOpacity
@@ -102,16 +104,16 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           <View style={styles.completionCard}>
             <View style={styles.completionHeader}>
               <Ionicons name="information-circle" size={24} color={COLORS.primary} />
-              <Text style={styles.completionTitle}>Complete Your Profile</Text>
+              <Text style={styles.completionTitle}>{t('home.complete_your_profile')}</Text>
             </View>
             <Text style={styles.completionDescription}>
-              Your profile is {profileCompletion}% complete. Complete it to get better matches!
+              {t('home.profile_completion_description', { percentage: profileCompletion })}
             </Text>
             <View style={styles.progressBar}>
               <View style={[styles.progressFill, { width: `${profileCompletion}%` }]} />
             </View>
             <Button
-              title="Complete Now"
+              title={t('home.complete_now')}
               onPress={() => navigation.navigate('Profile')}
               variant="outline"
               style={styles.completeButton}
@@ -122,16 +124,17 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         {/* Welcome Message */}
         <View style={styles.welcomeCard}>
           <Ionicons name="rocket" size={32} color={COLORS.primary} />
-          <Text style={styles.welcomeTitle}>Welcome to Cooin</Text>
+          <Text style={styles.welcomeTitle}>{t('home.welcome_title')}</Text>
           <Text style={styles.welcomeDescription}>
-            Connect with {user?.role === 'lender' ? 'borrowers' : 'lenders'} who match your
-            criteria. Build trust, negotiate terms, and create successful lending relationships.
+            {t('home.welcome_description', {
+              role: user?.role === 'lender' ? t('home.borrowers') : t('home.lenders')
+            })}
           </Text>
         </View>
 
         {/* Quick Actions */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Quick Actions</Text>
+          <Text style={styles.sectionTitle}>{t('home.quick_actions')}</Text>
           <View style={styles.quickActionsGrid}>
             {quickActions.map((action) => (
               <TouchableOpacity
@@ -150,16 +153,16 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
         {/* Getting Started */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Getting Started</Text>
+          <Text style={styles.sectionTitle}>{t('home.getting_started')}</Text>
           <View style={styles.guideCard}>
             <View style={styles.guideStep}>
               <View style={styles.stepNumber}>
                 <Text style={styles.stepNumberText}>1</Text>
               </View>
               <View style={styles.stepContent}>
-                <Text style={styles.stepTitle}>Complete Your Profile</Text>
+                <Text style={styles.stepTitle}>{t('home.step1_title')}</Text>
                 <Text style={styles.stepDescription}>
-                  Add your information to build trust with potential matches
+                  {t('home.step1_description')}
                 </Text>
               </View>
             </View>
@@ -169,9 +172,9 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                 <Text style={styles.stepNumberText}>2</Text>
               </View>
               <View style={styles.stepContent}>
-                <Text style={styles.stepTitle}>Discover Matches</Text>
+                <Text style={styles.stepTitle}>{t('home.step2_title')}</Text>
                 <Text style={styles.stepDescription}>
-                  Browse and filter to find the perfect lending partners
+                  {t('home.step2_description')}
                 </Text>
               </View>
             </View>
@@ -181,9 +184,9 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                 <Text style={styles.stepNumberText}>3</Text>
               </View>
               <View style={styles.stepContent}>
-                <Text style={styles.stepTitle}>Connect & Message</Text>
+                <Text style={styles.stepTitle}>{t('home.step3_title')}</Text>
                 <Text style={styles.stepDescription}>
-                  Send connection requests and start conversations
+                  {t('home.step3_description')}
                 </Text>
               </View>
             </View>
@@ -193,9 +196,9 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                 <Text style={styles.stepNumberText}>4</Text>
               </View>
               <View style={styles.stepContent}>
-                <Text style={styles.stepTitle}>Negotiate Terms</Text>
+                <Text style={styles.stepTitle}>{t('home.step4_title')}</Text>
                 <Text style={styles.stepDescription}>
-                  Discuss and agree on loan terms that work for both parties
+                  {t('home.step4_description')}
                 </Text>
               </View>
             </View>
@@ -205,37 +208,37 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         {/* Role-specific tips */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>
-            {user?.role === 'lender' ? 'Lender Tips' : 'Borrower Tips'}
+            {user?.role === 'lender' ? t('home.lender_tips') : t('home.borrower_tips')}
           </Text>
           <View style={styles.tipsCard}>
             {user?.role === 'lender' ? (
               <>
                 <Text style={styles.tipText}>
-                  • Review borrower profiles carefully before connecting
+                  {t('home.lender_tip1')}
                 </Text>
                 <Text style={styles.tipText}>
-                  • Set clear interest rates and repayment terms
+                  {t('home.lender_tip2')}
                 </Text>
                 <Text style={styles.tipText}>
-                  • Use the messaging feature to ask questions
+                  {t('home.lender_tip3')}
                 </Text>
                 <Text style={styles.tipText}>
-                  • Start with smaller amounts to build trust
+                  {t('home.lender_tip4')}
                 </Text>
               </>
             ) : (
               <>
                 <Text style={styles.tipText}>
-                  • Complete your profile to increase trust
+                  {t('home.borrower_tip1')}
                 </Text>
                 <Text style={styles.tipText}>
-                  • Be clear about your borrowing needs
+                  {t('home.borrower_tip2')}
                 </Text>
                 <Text style={styles.tipText}>
-                  • Respond promptly to connection requests
+                  {t('home.borrower_tip3')}
                 </Text>
                 <Text style={styles.tipText}>
-                  • Be honest about your repayment ability
+                  {t('home.borrower_tip4')}
                 </Text>
               </>
             )}

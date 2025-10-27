@@ -10,7 +10,8 @@
     "next": "Siguiente",
     "email": "Correo electrónico",
     "password": "Contraseña",
-    "username": "Nombre de usuario"
+    "username": "Nombre de usuario",
+    "error": "Error"
   },
   "auth": {
     "login": "Iniciar sesión",
@@ -25,6 +26,7 @@
     "join_cooin": "Únete a Cooin",
     "create_account_subtitle": "Crea tu cuenta para comenzar a conectarte con la comunidad",
     "email_placeholder": "Ingresa tu correo electrónico",
+    "username": "Nombre de usuario",
     "username_placeholder": "Elige un nombre de usuario",
     "password_placeholder": "Crea una contraseña",
     "confirm_password": "Confirmar contraseña",
@@ -288,8 +290,11 @@
     "discover_matches": "Descubrir Coincidencias",
     "connection_accepted_title": "Conexión Aceptada",
     "connection_accepted_message": "Has aceptado exitosamente esta solicitud de conexión. Ahora pueden enviarse mensajes.",
+    "accept_response_message": "¡Conexión aceptada! Espero conectar contigo.",
     "reject_connection_title": "Rechazar Conexión",
     "reject_connection_message": "¿Estás seguro de que quieres rechazar esta solicitud de conexión?",
+    "reject_button": "Rechazar",
+    "reject_response_message": "Gracias por tu interés, pero no puedo conectar en este momento.",
     "error_loading": "Error al cargar las conexiones",
     "error_accept": "Error al aceptar la conexión",
     "error_reject": "Error al rechazar la conexión"
@@ -304,7 +309,8 @@
     "yesterday": "Ayer",
     "days_ago": "Hace {count} días",
     "pending_status": "Pendiente",
-    "inactive_status": "Inactivo"
+    "inactive_status": "Inactivo",
+    "discover_matches": "Descubrir Coincidencias"
   },
   "matching_screen": {
     "title": "Descubrir Coincidencias",
@@ -324,8 +330,11 @@
     "refresh": "Actualizar",
     "connection_sent_title": "¡Conexión Enviada!",
     "connection_sent_message": "Tu solicitud de conexión ha sido enviada a {name}. Serán notificados y pueden aceptar o rechazar tu solicitud.",
+    "connection_message": "¡Hola {name}! Estoy interesado en conectar contigo basándonos en nuestra compatibilidad.",
     "connection_failed_title": "Conexión Fallida",
+    "connection_failed_message": "Error al enviar solicitud de conexión",
     "search_error_title": "Error de Búsqueda",
+    "search_error_message": "Error al cargar coincidencias",
     "min_amount_placeholder": "$0",
     "max_amount_placeholder": "$1,000,000"
   },
@@ -389,5 +398,50 @@
     "weak": "Débil",
     "good": "Buena",
     "strong": "Fuerte"
+  },
+  "navigation": {
+    "home": "Inicio",
+    "matching": "Coincidencias",
+    "connections": "Conexiones",
+    "messages": "Mensajes",
+    "settings": "Configuración",
+    "profile": "Perfil",
+    "verification": "Verificación"
+  },
+  "home": {
+    "good_morning": "Buenos Días",
+    "good_afternoon": "Buenas Tardes",
+    "good_evening": "Buenas Noches",
+    "discover_matches": "Descubrir Coincidencias",
+    "my_connections": "Mis Conexiones",
+    "messages": "Mensajes",
+    "complete_profile": "Completar Perfil",
+    "complete_your_profile": "Completa Tu Perfil",
+    "profile_completion_description": "Tu perfil está {{percentage}}% completo. ¡Complétalo para obtener mejores coincidencias!",
+    "complete_now": "Completar Ahora",
+    "welcome_title": "Bienvenido a Cooin",
+    "welcome_description": "Conéctate con {{role}} que coincidan con tus criterios. Construye confianza, negocia términos y crea relaciones de préstamo exitosas.",
+    "borrowers": "prestatarios",
+    "lenders": "prestamistas",
+    "quick_actions": "Acciones Rápidas",
+    "getting_started": "Primeros Pasos",
+    "step1_title": "Completa Tu Perfil",
+    "step1_description": "Agrega tu información para generar confianza con posibles coincidencias",
+    "step2_title": "Descubre Coincidencias",
+    "step2_description": "Explora y filtra para encontrar los socios de préstamo perfectos",
+    "step3_title": "Conecta y Mensajea",
+    "step3_description": "Envía solicitudes de conexión e inicia conversaciones",
+    "step4_title": "Negocia Términos",
+    "step4_description": "Discute y acuerda términos de préstamo que funcionen para ambas partes",
+    "lender_tips": "Consejos para Prestamistas",
+    "borrower_tips": "Consejos para Prestatarios",
+    "lender_tip1": "• Revisa cuidadosamente los perfiles de los prestatarios antes de conectar",
+    "lender_tip2": "• Establece tasas de interés y términos de pago claros",
+    "lender_tip3": "• Usa la función de mensajería para hacer preguntas",
+    "lender_tip4": "• Comienza con cantidades más pequeñas para generar confianza",
+    "borrower_tip1": "• Completa tu perfil para aumentar la confianza",
+    "borrower_tip2": "• Sé claro acerca de tus necesidades de préstamo",
+    "borrower_tip3": "• Responde rápidamente a las solicitudes de conexión",
+    "borrower_tip4": "• Sé honesto acerca de tu capacidad de pago"
   }
 }

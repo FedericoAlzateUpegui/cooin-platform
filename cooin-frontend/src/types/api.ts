@@ -22,8 +22,11 @@ export interface LoginRequest {
 
 export interface RegisterRequest {
   email: string;
+  username: string;
   password: string;
+  confirm_password: string;
   role: 'lender' | 'borrower' | 'both';
+  agree_to_terms: boolean;
 }
 
 export interface AuthResponse {

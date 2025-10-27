@@ -13,6 +13,7 @@ import { useFocusEffect } from '@react-navigation/native';
 
 import { messagingService } from '../../services/messagingService';
 import { COLORS, SPACING, FONTS } from '../../constants/config';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 interface MessagesScreenProps {
   navigation: any;
@@ -31,6 +32,7 @@ export const MessagesScreen: React.FC<MessagesScreenProps> = ({ navigation }) =>
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const { t } = useLanguage();
 
   useFocusEffect(
     useCallback(() => {
@@ -73,12 +75,12 @@ export const MessagesScreen: React.FC<MessagesScreenProps> = ({ navigation }) =>
 
     if (diffInHours < 1) {
       const diffInMinutes = Math.floor(diffInHours * 60);
-      return diffInMinutes < 1 ? 'Just now' : `${diffInMinutes}m ago`;
+      return diffInMinutes < 1 ? t('messages.just_now') : t('messages.minutes_ago', { count: diffInMinutes });
     } else if (diffInHours < 24) {
-      return `${Math.floor(diffInHours)}h ago`;
+      return t('messages.hours_ago', { count: Math.floor(diffInHours) });
     } else {
       const diffInDays = Math.floor(diffInHours / 24);
-      return diffInDays === 1 ? 'Yesterday' : `${diffInDays} days ago`;
+      return diffInDays === 1 ? t('messages.yesterday') : t('messages.days_ago', { count: diffInDays });
     }
   };
 
@@ -121,7 +123,7 @@ export const MessagesScreen: React.FC<MessagesScreenProps> = ({ navigation }) =>
         {item.connection_status !== 'accepted' && (
           <View style={styles.statusBadge}>
             <Text style={styles.statusText}>
-              {item.connection_status === 'pending' ? 'Pending' : 'Inactive'}
+              {item.connection_status === 'pending' ? t('messages.pending_status') : t('messages.inactive_status')}
             </Text>
           </View>
         )}
@@ -134,15 +136,15 @@ export const MessagesScreen: React.FC<MessagesScreenProps> = ({ navigation }) =>
   const renderEmptyState = () => (
     <View style={styles.emptyState}>
       <Ionicons name="chatbubbles" size={64} color={COLORS.textSecondary} />
-      <Text style={styles.emptyTitle}>No Messages Yet</Text>
+      <Text style={styles.emptyTitle}>{t('messages.no_messages')}</Text>
       <Text style={styles.emptyDescription}>
-        Start connecting with matches to begin conversations.
+        {t('messages.start_connecting')}
       </Text>
       <TouchableOpacity
         style={styles.discoverButton}
         onPress={() => navigation.navigate('Matching')}
       >
-        <Text style={styles.discoverButtonText}>Discover Matches</Text>
+        <Text style={styles.discoverButtonText}>{t('messages.discover_matches')}</Text>
       </TouchableOpacity>
     </View>
   );
@@ -150,7 +152,7 @@ export const MessagesScreen: React.FC<MessagesScreenProps> = ({ navigation }) =>
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Messages</Text>
+        <Text style={styles.title}>{t('messages.title')}</Text>
       </View>
 
       <FlatList

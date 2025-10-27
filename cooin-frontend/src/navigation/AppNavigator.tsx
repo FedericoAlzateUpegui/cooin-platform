@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { View, ActivityIndicator } from 'react-native';
 
 import { useAuthStore } from '../store/authStore';
+import { useLanguage } from '../contexts/LanguageContext';
 import { AuthNavigator } from './AuthNavigator';
 import { MatchingScreen } from '../screens/matching/MatchingScreen';
 import { ConnectionsScreen } from '../screens/connections/ConnectionsScreen';
@@ -20,6 +21,8 @@ const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
 const MainTabNavigator = () => {
+  const { t } = useLanguage();
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -63,11 +66,31 @@ const MainTabNavigator = () => {
         },
       })}
     >
-      <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Matching" component={MatchingScreen} />
-      <Tab.Screen name="Connections" component={ConnectionsScreen} />
-      <Tab.Screen name="Messages" component={MessagesScreen} />
-      <Tab.Screen name="Settings" component={SettingsScreen} />
+      <Tab.Screen
+        name="Home"
+        component={HomeScreen}
+        options={{ title: t('navigation.home') }}
+      />
+      <Tab.Screen
+        name="Matching"
+        component={MatchingScreen}
+        options={{ title: t('navigation.matching') }}
+      />
+      <Tab.Screen
+        name="Connections"
+        component={ConnectionsScreen}
+        options={{ title: t('navigation.connections') }}
+      />
+      <Tab.Screen
+        name="Messages"
+        component={MessagesScreen}
+        options={{ title: t('navigation.messages') }}
+      />
+      <Tab.Screen
+        name="Settings"
+        component={SettingsScreen}
+        options={{ title: t('navigation.settings') }}
+      />
     </Tab.Navigator>
   );
 };

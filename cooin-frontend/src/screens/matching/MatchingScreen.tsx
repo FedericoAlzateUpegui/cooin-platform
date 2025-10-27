@@ -19,6 +19,7 @@ import { matchingService } from '../../services/matchingService';
 import { useAuthStore } from '../../store/authStore';
 import { MatchingResult, MatchingCriteria } from '../../types/api';
 import { COLORS, SPACING, FONTS } from '../../constants/config';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 interface MatchingScreenProps {
   navigation: any;
@@ -36,6 +37,7 @@ export const MatchingScreen: React.FC<MatchingScreenProps> = ({ navigation }) =>
   const [connectingId, setConnectingId] = useState<number | null>(null);
 
   const { user } = useAuthStore();
+  const { t } = useLanguage();
 
   const { control, handleSubmit, reset, watch } = useForm<MatchingCriteria>({
     defaultValues: {
@@ -69,7 +71,7 @@ export const MatchingScreen: React.FC<MatchingScreenProps> = ({ navigation }) =>
         search_time_ms: response.search_time_ms,
       });
     } catch (error: any) {
-      Alert.alert('Search Error', error.detail || 'Failed to load matches');
+      Alert.alert(t('matching_screen.search_error_title'), error.detail || t('matching_screen.search_error_message'));
     } finally {
       setIsLoading(false);
     }
@@ -92,19 +94,19 @@ export const MatchingScreen: React.FC<MatchingScreenProps> = ({ navigation }) =>
       await matchingService.createConnection({
         receiver_id: match.user_id,
         connection_type: user?.role === 'lender' ? 'lending_inquiry' : 'borrowing_request',
-        message: `Hi ${match.public_name}! I'm interested in connecting with you based on our compatibility.`,
+        message: t('matching_screen.connection_message', { name: match.public_name }),
       });
 
       Alert.alert(
-        'Connection Sent!',
-        `Your connection request has been sent to ${match.public_name}. They will be notified and can accept or decline your request.`,
-        [{ text: 'OK' }]
+        t('matching_screen.connection_sent_title'),
+        t('matching_screen.connection_sent_message', { name: match.public_name }),
+        [{ text: t('common.ok') }]
       );
 
       // Remove the match from the list since connection was sent
       setMatches(prev => prev.filter(m => m.user_id !== match.user_id));
     } catch (error: any) {
-      Alert.alert('Connection Failed', error.detail || 'Failed to send connection request');
+      Alert.alert(t('matching_screen.connection_failed_title'), error.detail || t('matching_screen.connection_failed_message'));
     } finally {
       setConnectingId(null);
     }
@@ -123,7 +125,7 @@ export const MatchingScreen: React.FC<MatchingScreenProps> = ({ navigation }) =>
   const renderHeader = () => (
     <View style={styles.header}>
       <View style={styles.headerTop}>
-        <Text style={styles.title}>Discover Matches</Text>
+        <Text style={styles.title}>{t('matching_screen.title')}</Text>
         <TouchableOpacity
           style={styles.filterButton}
           onPress={() => setShowFilters(!showFilters)}
@@ -138,21 +140,21 @@ export const MatchingScreen: React.FC<MatchingScreenProps> = ({ navigation }) =>
 
       {searchStats && (
         <Text style={styles.searchStats}>
-          Found {searchStats.total_matches} matches in {searchStats.search_time_ms}ms
+          {t('matching_screen.found_matches', { count: searchStats.total_matches, time: searchStats.search_time_ms })}
         </Text>
       )}
 
       {showFilters && (
         <View style={styles.filtersContainer}>
-          <Text style={styles.filtersTitle}>Search Filters</Text>
+          <Text style={styles.filtersTitle}>{t('matching_screen.search_filters')}</Text>
 
           <Controller
             control={control}
             name="location"
             render={({ field: { onChange, value } }) => (
               <Input
-                label="Location"
-                placeholder="City, State, or Country"
+                label={t('matching_screen.location')}
+                placeholder={t('matching_screen.location_placeholder')}
                 value={value || ''}
                 onChangeText={onChange}
                 leftIcon="location"
@@ -166,8 +168,8 @@ export const MatchingScreen: React.FC<MatchingScreenProps> = ({ navigation }) =>
               name="min_loan_amount"
               render={({ field: { onChange, value } }) => (
                 <Input
-                  label="Min Amount"
-                  placeholder="$0"
+                  label={t('matching_screen.min_amount')}
+                  placeholder={t('matching_screen.min_amount_placeholder')}
                   value={value?.toString() || ''}
                   onChangeText={(text) => {
                     const num = parseFloat(text.replace(/[^0-9.]/g, ''));
@@ -184,8 +186,8 @@ export const MatchingScreen: React.FC<MatchingScreenProps> = ({ navigation }) =>
               name="max_loan_amount"
               render={({ field: { onChange, value } }) => (
                 <Input
-                  label="Max Amount"
-                  placeholder="$1,000,000"
+                  label={t('matching_screen.max_amount')}
+                  placeholder={t('matching_screen.max_amount_placeholder')}
                   value={value?.toString() || ''}
                   onChangeText={(text) => {
                     const num = parseFloat(text.replace(/[^0-9.]/g, ''));
@@ -203,8 +205,8 @@ export const MatchingScreen: React.FC<MatchingScreenProps> = ({ navigation }) =>
             name="max_interest_rate"
             render={({ field: { onChange, value } }) => (
               <Input
-                label="Max Interest Rate (%)"
-                placeholder="e.g., 8.5"
+                label={t('matching_screen.max_interest_rate')}
+                placeholder={t('matching_screen.interest_rate_placeholder')}
                 value={value?.toString() || ''}
                 onChangeText={(text) => {
                   const num = parseFloat(text.replace(/[^0-9.]/g, ''));
@@ -226,20 +228,20 @@ export const MatchingScreen: React.FC<MatchingScreenProps> = ({ navigation }) =>
                 <View style={[styles.checkbox, value && styles.checkboxChecked]}>
                   {value && <Ionicons name="checkmark" size={16} color={COLORS.surface} />}
                 </View>
-                <Text style={styles.checkboxLabel}>Verified users only</Text>
+                <Text style={styles.checkboxLabel}>{t('matching_screen.verified_only')}</Text>
               </TouchableOpacity>
             )}
           />
 
           <View style={styles.filterActions}>
             <Button
-              title="Clear"
+              title={t('matching_screen.clear')}
               onPress={clearFilters}
               variant="outline"
               style={styles.filterActionButton}
             />
             <Button
-              title="Search"
+              title={t('matching_screen.search')}
               onPress={handleSubmit(handleSearch)}
               loading={isLoading}
               style={styles.filterActionButton}
@@ -253,12 +255,12 @@ export const MatchingScreen: React.FC<MatchingScreenProps> = ({ navigation }) =>
   const renderEmptyState = () => (
     <View style={styles.emptyState}>
       <Ionicons name="people" size={64} color={COLORS.textSecondary} />
-      <Text style={styles.emptyTitle}>No Matches Found</Text>
+      <Text style={styles.emptyTitle}>{t('matching_screen.no_matches_found')}</Text>
       <Text style={styles.emptyDescription}>
-        Try adjusting your search criteria or check back later for new matches.
+        {t('matching_screen.try_adjusting')}
       </Text>
       <Button
-        title="Refresh"
+        title={t('matching_screen.refresh')}
         onPress={handleRefresh}
         variant="outline"
         style={styles.refreshButton}

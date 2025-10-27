@@ -20,6 +20,7 @@ import { Input } from '../../components/Input';
 import { Button } from '../../components/Button';
 import { ProgressBar } from '../../components/ProgressBar';
 import { COLORS, SPACING, FONTS } from '../../constants/config';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 const profileSchema = z.object({
   first_name: z.string().min(2, 'First name must be at least 2 characters'),
@@ -46,6 +47,7 @@ export const ProfileSetupScreen: React.FC<ProfileSetupScreenProps> = ({ navigati
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const { profile, isLoading, error, updateProfile, uploadProfileImage, loadProfile, checkProfileCompletion } = useProfileStore();
   const { user } = useAuthStore();
+  const { t } = useLanguage();
 
   const totalSteps = 4;
   const progressPercentage = (currentStep / totalSteps) * 100;

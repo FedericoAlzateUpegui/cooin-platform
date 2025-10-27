@@ -17,6 +17,7 @@ import { matchingService } from '../../services/matchingService';
 import { useAuthStore } from '../../store/authStore';
 import { Connection } from '../../types/api';
 import { COLORS, SPACING, FONTS } from '../../constants/config';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 interface ConnectionsScreenProps {
   navigation: any;
@@ -40,6 +41,7 @@ export const ConnectionsScreen: React.FC<ConnectionsScreenProps> = ({ navigation
   } | null>(null);
 
   const { user } = useAuthStore();
+  const { t } = useLanguage();
 
   useEffect(() => {
     loadData();
@@ -68,7 +70,7 @@ export const ConnectionsScreen: React.FC<ConnectionsScreenProps> = ({ navigation
       });
       setConnections(response.data || []);
     } catch (error: any) {
-      Alert.alert('Error', error.detail || 'Failed to load connections');
+      Alert.alert(t('common.error'), error.detail || t('connections.error_loading'));
     }
   };
 
@@ -104,18 +106,18 @@ export const ConnectionsScreen: React.FC<ConnectionsScreenProps> = ({ navigation
     try {
       await matchingService.updateConnection(connection.id, {
         status: 'accepted',
-        response_message: 'Connection accepted! Looking forward to connecting with you.',
+        response_message: t('connections.accept_response_message'),
       });
 
       Alert.alert(
-        'Connection Accepted',
-        'You have successfully accepted this connection request. You can now message each other.',
-        [{ text: 'OK' }]
+        t('connections.connection_accepted_title'),
+        t('connections.connection_accepted_message'),
+        [{ text: t('common.ok') }]
       );
 
       await loadData();
     } catch (error: any) {
-      Alert.alert('Error', error.detail || 'Failed to accept connection');
+      Alert.alert(t('common.error'), error.detail || t('connections.error_accept'));
     } finally {
       setActionLoading(null);
     }
@@ -123,24 +125,24 @@ export const ConnectionsScreen: React.FC<ConnectionsScreenProps> = ({ navigation
 
   const handleRejectConnection = async (connection: Connection) => {
     Alert.alert(
-      'Reject Connection',
-      'Are you sure you want to reject this connection request?',
+      t('connections.reject_connection_title'),
+      t('connections.reject_connection_message'),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'Reject',
+          text: t('connections.reject_button'),
           style: 'destructive',
           onPress: async () => {
             setActionLoading(connection.id);
             try {
               await matchingService.updateConnection(connection.id, {
                 status: 'rejected',
-                response_message: 'Thank you for your interest, but I am not able to connect at this time.',
+                response_message: t('connections.reject_response_message'),
               });
 
               await loadData();
             } catch (error: any) {
-              Alert.alert('Error', error.detail || 'Failed to reject connection');
+              Alert.alert(t('common.error'), error.detail || t('connections.error_reject'));
             } finally {
               setActionLoading(null);
             }
@@ -184,29 +186,29 @@ export const ConnectionsScreen: React.FC<ConnectionsScreenProps> = ({ navigation
 
     return (
       <View style={styles.statsCard}>
-        <Text style={styles.statsTitle}>Connection Stats</Text>
+        <Text style={styles.statsTitle}>{t('connections.stats_title')}</Text>
         <View style={styles.statsGrid}>
           <View style={styles.statItem}>
             <Text style={styles.statNumber}>{stats.total_connections}</Text>
-            <Text style={styles.statLabel}>Total</Text>
+            <Text style={styles.statLabel}>{t('connections.total')}</Text>
           </View>
           <View style={styles.statItem}>
             <Text style={[styles.statNumber, { color: COLORS.accent }]}>
               {stats.pending_received}
             </Text>
-            <Text style={styles.statLabel}>Pending</Text>
+            <Text style={styles.statLabel}>{t('connections.pending')}</Text>
           </View>
           <View style={styles.statItem}>
             <Text style={[styles.statNumber, { color: COLORS.success }]}>
               {stats.accepted_connections}
             </Text>
-            <Text style={styles.statLabel}>Accepted</Text>
+            <Text style={styles.statLabel}>{t('connections.accepted')}</Text>
           </View>
           <View style={styles.statItem}>
             <Text style={[styles.statNumber, { color: COLORS.primary }]}>
               {stats.recent_activity}
             </Text>
-            <Text style={styles.statLabel}>Recent</Text>
+            <Text style={styles.statLabel}>{t('connections.recent')}</Text>
           </View>
         </View>
       </View>
@@ -215,10 +217,10 @@ export const ConnectionsScreen: React.FC<ConnectionsScreenProps> = ({ navigation
 
   const renderTabs = () => {
     const tabs: { key: TabType; label: string; count?: number }[] = [
-      { key: 'all', label: 'All', count: connections.length },
-      { key: 'pending', label: 'Pending', count: pendingConnections.filter(c => c.receiver_id === user?.id).length },
-      { key: 'accepted', label: 'Accepted', count: connections.filter(c => c.status === 'accepted').length },
-      { key: 'sent', label: 'Sent', count: connections.filter(c => c.status === 'pending' && c.requester_id === user?.id).length },
+      { key: 'all', label: t('connections.all'), count: connections.length },
+      { key: 'pending', label: t('connections.pending'), count: pendingConnections.filter(c => c.receiver_id === user?.id).length },
+      { key: 'accepted', label: t('connections.accepted'), count: connections.filter(c => c.status === 'accepted').length },
+      { key: 'sent', label: t('connections.sent'), count: connections.filter(c => c.status === 'pending' && c.requester_id === user?.id).length },
     ];
 
     return (
@@ -261,20 +263,20 @@ export const ConnectionsScreen: React.FC<ConnectionsScreenProps> = ({ navigation
     <View style={styles.emptyState}>
       <Ionicons name="link" size={64} color={COLORS.textSecondary} />
       <Text style={styles.emptyTitle}>
-        {activeTab === 'pending' && 'No Pending Requests'}
-        {activeTab === 'accepted' && 'No Accepted Connections'}
-        {activeTab === 'sent' && 'No Sent Requests'}
-        {activeTab === 'all' && 'No Connections Yet'}
+        {activeTab === 'pending' && t('connections.no_pending_requests')}
+        {activeTab === 'accepted' && t('connections.no_accepted_connections')}
+        {activeTab === 'sent' && t('connections.no_sent_requests')}
+        {activeTab === 'all' && t('connections.no_connections_yet')}
       </Text>
       <Text style={styles.emptyDescription}>
-        {activeTab === 'all' && 'Start by discovering matches and sending connection requests.'}
-        {activeTab === 'pending' && 'You don\'t have any pending connection requests at the moment.'}
-        {activeTab === 'accepted' && 'Accept some connection requests to start building your network.'}
-        {activeTab === 'sent' && 'Go to the Discover tab to find and connect with potential matches.'}
+        {activeTab === 'all' && t('connections.start_discovering')}
+        {activeTab === 'pending' && t('connections.no_pending_at_moment')}
+        {activeTab === 'accepted' && t('connections.accept_to_build_network')}
+        {activeTab === 'sent' && t('connections.go_discover')}
       </Text>
       {activeTab === 'all' && (
         <Button
-          title="Discover Matches"
+          title={t('connections.discover_matches')}
           onPress={() => navigation.navigate('Matching')}
           style={styles.discoverButton}
         />
@@ -296,7 +298,7 @@ export const ConnectionsScreen: React.FC<ConnectionsScreenProps> = ({ navigation
 
   const renderHeader = () => (
     <View style={styles.header}>
-      <Text style={styles.title}>Connections</Text>
+      <Text style={styles.title}>{t('connections.title')}</Text>
       {renderStatsCard()}
       {renderTabs()}
     </View>

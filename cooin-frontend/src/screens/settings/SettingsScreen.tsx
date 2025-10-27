@@ -8,6 +8,8 @@ import {
   TouchableOpacity,
   Switch,
   Alert,
+  Platform,
+  Modal,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -25,22 +27,38 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
   const { currentLanguage, changeLanguage, t } = useLanguage();
   const [notifications, setNotifications] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
+  const [showLanguageModal, setShowLanguageModal] = useState(false);
 
   const handleLogout = async () => {
-    Alert.alert(
-      t('settings.logout_confirm_title'),
-      t('settings.logout_confirm_message'),
-      [
-        { text: t('settings.cancel'), style: 'cancel' },
-        {
-          text: t('settings.logout'),
-          style: 'destructive',
-          onPress: async () => {
-            await logout();
+    console.log('Logout button pressed');
+
+    if (Platform.OS === 'web') {
+      // Use window.confirm for web
+      const confirmed = window.confirm(
+        `${t('settings.logout_confirm_title')}\n\n${t('settings.logout_confirm_message')}`
+      );
+      if (confirmed) {
+        console.log('Logout confirmed');
+        logout();
+      }
+    } else {
+      // Use Alert.alert for mobile
+      Alert.alert(
+        t('settings.logout_confirm_title'),
+        t('settings.logout_confirm_message'),
+        [
+          { text: t('settings.cancel'), style: 'cancel' },
+          {
+            text: t('settings.logout'),
+            style: 'destructive',
+            onPress: () => {
+              console.log('Logout confirmed');
+              logout();
+            },
           },
-        },
-      ]
-    );
+        ]
+      );
+    }
   };
 
   const settingsSections = [
@@ -54,15 +72,8 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
           value: currentLanguage === 'en' ? t('settings.english') : currentLanguage === 'es' ? t('settings.spanish') : currentLanguage,
           type: 'select' as const,
           onPress: () => {
-            Alert.alert(
-              t('settings.select_language'),
-              t('settings.choose_language'),
-              [
-                { text: t('settings.english'), onPress: async () => await changeLanguage('en') },
-                { text: t('settings.spanish'), onPress: async () => await changeLanguage('es') },
-                { text: t('settings.cancel'), style: 'cancel' },
-              ]
-            );
+            console.log('Language selector pressed');
+            setShowLanguageModal(true);
           },
         },
         {
@@ -233,6 +244,80 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
           style={styles.logoutButton}
         />
       </ScrollView>
+
+      {/* Language Selection Modal */}
+      <Modal
+        visible={showLanguageModal}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowLanguageModal(false)}
+      >
+        <TouchableOpacity
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPress={() => setShowLanguageModal(false)}
+        >
+          <View style={styles.modalContent} onStartShouldSetResponder={() => true}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>{t('settings.select_language')}</Text>
+              <TouchableOpacity onPress={() => setShowLanguageModal(false)}>
+                <Ionicons name="close" size={24} color={COLORS.text} />
+              </TouchableOpacity>
+            </View>
+
+            <Text style={styles.modalDescription}>{t('settings.choose_language')}</Text>
+
+            {/* Language Options */}
+            <TouchableOpacity
+              style={[
+                styles.languageOption,
+                currentLanguage === 'en' && styles.languageOptionSelected
+              ]}
+              onPress={() => {
+                changeLanguage('en');
+                setShowLanguageModal(false);
+              }}
+            >
+              <View style={styles.languageOptionContent}>
+                <View style={styles.languageFlag}>
+                  <Text style={styles.flagEmoji}>🇺🇸</Text>
+                </View>
+                <View style={styles.languageInfo}>
+                  <Text style={styles.languageName}>{t('settings.english')}</Text>
+                  <Text style={styles.languageNative}>English</Text>
+                </View>
+              </View>
+              {currentLanguage === 'en' && (
+                <Ionicons name="checkmark-circle" size={24} color={COLORS.primary} />
+              )}
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.languageOption,
+                currentLanguage === 'es' && styles.languageOptionSelected
+              ]}
+              onPress={() => {
+                changeLanguage('es');
+                setShowLanguageModal(false);
+              }}
+            >
+              <View style={styles.languageOptionContent}>
+                <View style={styles.languageFlag}>
+                  <Text style={styles.flagEmoji}>🇪🇸</Text>
+                </View>
+                <View style={styles.languageInfo}>
+                  <Text style={styles.languageName}>{t('settings.spanish')}</Text>
+                  <Text style={styles.languageNative}>Español</Text>
+                </View>
+              </View>
+              {currentLanguage === 'es' && (
+                <Ionicons name="checkmark-circle" size={24} color={COLORS.primary} />
+              )}
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -362,5 +447,87 @@ const styles = StyleSheet.create({
   },
   logoutButton: {
     marginBottom: SPACING.xl,
+  },
+  // Language Modal Styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: SPACING.lg,
+  },
+  modalContent: {
+    backgroundColor: COLORS.surface,
+    borderRadius: 20,
+    padding: SPACING.xl,
+    width: '100%',
+    maxWidth: 400,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: SPACING.md,
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontFamily: FONTS.bold,
+    color: COLORS.text,
+  },
+  modalDescription: {
+    fontSize: 14,
+    fontFamily: FONTS.regular,
+    color: COLORS.textSecondary,
+    marginBottom: SPACING.lg,
+  },
+  languageOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: SPACING.lg,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: COLORS.border,
+    marginBottom: SPACING.md,
+    backgroundColor: COLORS.background,
+  },
+  languageOptionSelected: {
+    borderColor: COLORS.primary,
+    backgroundColor: `${COLORS.primary}08`,
+  },
+  languageOptionContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  languageFlag: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: COLORS.surface,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: SPACING.md,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  flagEmoji: {
+    fontSize: 28,
+  },
+  languageInfo: {
+    flex: 1,
+  },
+  languageName: {
+    fontSize: 16,
+    fontFamily: FONTS.bold,
+    color: COLORS.text,
+    marginBottom: 2,
+  },
+  languageNative: {
+    fontSize: 14,
+    fontFamily: FONTS.regular,
+    color: COLORS.textSecondary,
   },
 });
