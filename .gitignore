@@ -149,6 +149,12 @@ temp/
 ngrok.yml
 .ngrok
 
+# Cloudflare Tunnel configuration (contains credentials)
+cloudflare-config.yml
+cloudflare-frontend-config.yml
+.cloudflared/
+*.cloudflared/
+
 # Backup files
 *.backup
 *.bak

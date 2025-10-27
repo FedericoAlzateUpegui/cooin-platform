@@ -385,15 +385,28 @@ redis-server
 postgres -D /usr/local/var/postgres
 ```
 
-## 🌐 Exposing Your App Publicly (Ngrok)
+## 🌐 Exposing Your App Publicly
 
-Want to share your local app with others or access it from the internet? Use ngrok to create secure tunnels.
+Want to share your local app with others or access it from the internet? We support two methods:
 
-### Quick Setup
+### Cloudflare Tunnel (Recommended) ⭐
 
-1. **Install ngrok**: Download from [ngrok.com/download](https://ngrok.com/download)
-2. **Configure auth token**: Edit `ngrok.yml` with your token from [dashboard.ngrok.com](https://dashboard.ngrok.com)
-3. **Start your services**:
+**Best for: Production use, demos, long-term testing**
+
+Free, permanent URLs with no time limits or session restrictions!
+
+#### Quick Setup (5 minutes)
+
+1. **Install cloudflared**:
+   ```bash
+   # Windows
+   winget install cloudflare.cloudflared
+
+   # Mac
+   brew install cloudflared
+   ```
+
+2. **Start your services**:
    ```bash
    # Backend (port 8000)
    cd cooin-backend && python start_dev.py
@@ -401,29 +414,75 @@ Want to share your local app with others or access it from the internet? Use ngr
    # Frontend (port 8083)
    cd cooin-frontend && npx expo start --web --port 8083
    ```
-4. **Start ngrok**: Run `start-ngrok.bat`
-5. **Get URLs**: Run `get-ngrok-urls.ps1` and follow prompts
 
-### Features
+3. **Start Cloudflare Tunnels**:
+   ```bash
+   # Quick method (URLs change each restart)
+   cloudflared tunnel --url http://localhost:8000  # Backend
+   cloudflared tunnel --url http://localhost:8083  # Frontend
 
-- ✅ Automated tunnel setup for frontend and backend
-- ✅ Auto-updates frontend config with ngrok backend URL
-- ✅ Creates config backups before changes
-- ✅ Interactive PowerShell script with color output
-- ✅ Comprehensive documentation and troubleshooting
+   # Or use automated script
+   ./start-cloudflare.bat  # Windows
+   ./start-cloudflare.sh   # Mac/Linux
+   ```
 
-### Documentation
+#### Features
 
-- **[NGROK-QUICKSTART.md](./NGROK-QUICKSTART.md)** - One-page quick reference
-- **[NGROK-SETUP.md](./NGROK-SETUP.md)** - Complete setup guide with troubleshooting
+- ✅ **100% Free** - No paid plan needed
+- ✅ **Persistent URLs** - Same URL every time (with named tunnels)
+- ✅ **No Time Limits** - Works forever, not just 2 hours
+- ✅ **Custom Domains** - Use your own domain
+- ✅ **Better Performance** - Cloudflare's global CDN
+- ✅ **Built-in DDoS Protection**
 
-### Example URLs
+#### Documentation
 
-After running ngrok, you'll get public URLs like:
-- Frontend: `https://abc123.ngrok.io`
-- Backend: `https://xyz789.ngrok.io`
+- **[CLOUDFLARE-QUICKSTART.md](./CLOUDFLARE-QUICKSTART.md)** - 5-minute setup guide
+- **[CLOUDFLARE-TUNNEL-SETUP.md](./CLOUDFLARE-TUNNEL-SETUP.md)** - Complete setup with persistent URLs
 
-**Note**: Free plan URLs change every session (2-hour limit). Consider paid plan for persistent URLs.
+#### Example URLs
+
+Quick tunnels:
+- Frontend: `https://random-words.trycloudflare.com`
+- Backend: `https://other-words.trycloudflare.com`
+
+Named tunnels (persistent):
+- Frontend: `https://cooin-app.YOUR_DOMAIN.com`
+- Backend: `https://cooin-api.YOUR_DOMAIN.com`
+
+---
+
+### Ngrok (Alternative)
+
+**Best for: Quick testing, familiar with ngrok**
+
+#### Quick Setup
+
+1. **Install ngrok**: Download from [ngrok.com/download](https://ngrok.com/download)
+2. **Configure auth token**: Edit `ngrok.yml` with your token from [dashboard.ngrok.com](https://dashboard.ngrok.com)
+3. **Start services** (backend on 8000, frontend on 8083)
+4. **Start ngrok**: Run `start-ngrok.bat` or `get-ngrok-urls.ps1`
+
+#### Documentation
+
+- **[NGROK-QUICKSTART.md](./NGROK-QUICKSTART.md)** - Quick reference
+- **[NGROK-SETUP.md](./NGROK-SETUP.md)** - Complete setup guide
+
+**Note**: Free plan has 2-hour session limits and random URLs each time.
+
+---
+
+### 🆚 Comparison
+
+| Feature | Cloudflare Tunnel | Ngrok (Free) |
+|---------|-------------------|--------------|
+| **Price** | Free forever | Free (limited) |
+| **Session Time** | Unlimited | 2 hours |
+| **Persistent URL** | Yes (named) | No |
+| **Custom Domain** | Yes (free) | Paid only |
+| **Setup Time** | 5 minutes | 5 minutes |
+
+**Recommendation: Use Cloudflare Tunnel** for better performance and no restrictions.
 
 ---
 
@@ -435,7 +494,8 @@ After running ngrok, you'll get public URLs like:
 - ✅ Authentication System - Complete
 - ✅ Matching Algorithm - Complete
 - ✅ Real-time Messaging - Complete
-- ✅ Ngrok Integration - Complete (Session 5)
+- ✅ Cloudflare Tunnel Integration - Complete (Recommended)
+- ✅ Ngrok Integration - Complete (Alternative)
 - 🚧 Payment Integration - In Progress
 - 🚧 Admin Dashboard - In Progress
 
@@ -445,9 +505,11 @@ After running ngrok, you'll get public URLs like:
 - [HOW-TO-LAUNCH-WEB-APP.md](./HOW-TO-LAUNCH-WEB-APP.md) - Detailed launch instructions for VS Code
 - [TECH_STACK.md](./TECH_STACK.md) - Comprehensive technology documentation with code examples
 
-### Ngrok Public Access
-- [NGROK-QUICKSTART.md](./NGROK-QUICKSTART.md) - Quick reference for ngrok setup
-- [NGROK-SETUP.md](./NGROK-SETUP.md) - Complete ngrok guide with troubleshooting
+### Public Access & Tunneling
+- [CLOUDFLARE-QUICKSTART.md](./CLOUDFLARE-QUICKSTART.md) - Quick Cloudflare Tunnel setup (Recommended)
+- [CLOUDFLARE-TUNNEL-SETUP.md](./CLOUDFLARE-TUNNEL-SETUP.md) - Complete Cloudflare guide with persistent URLs
+- [NGROK-QUICKSTART.md](./NGROK-QUICKSTART.md) - Alternative ngrok setup
+- [NGROK-SETUP.md](./NGROK-SETUP.md) - Complete ngrok guide
 
 ### Troubleshooting
 - [PERMISSION-FIX.md](./PERMISSION-FIX.md) - Solutions for file permission issues
