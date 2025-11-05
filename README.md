@@ -1,16 +1,11 @@
 # Cooin Platform
 
-A peer-to-peer lending and borrowing platform with web, iOS, and mobile applications. Cooin connects lenders and borrowers through intelligent matching algorithms and provides a secure, transparent platform for financial transactions.
+Peer-to-peer lending/borrowing platform with web, iOS, and mobile apps.
 
 ## 🌟 Features
 
-- **Multi-Language Support**: Full internationalization (i18n) with English and Spanish
-- **Intelligent Matching**: Algorithm-based matching between lenders and borrowers
-- **Secure Authentication**: JWT-based auth with access and refresh tokens
-- **Real-time Connections**: WebSocket support for instant messaging
-- **Cross-Platform**: Web app, iOS app, and React Native mobile app
-- **Advanced Security**: Multi-layer security middleware, rate limiting, and CORS protection
-- **Caching System**: Two-tier caching (Redis + in-memory fallback)
+- Multi-language (English/Spanish) | Intelligent matching | JWT auth | Real-time messaging
+- Cross-platform (Web/iOS/Mobile) | Advanced security & rate limiting | Redis caching
 
 ## 📁 Project Structure
 
@@ -24,511 +19,138 @@ cooin-platform/
 
 ## 🚀 Quick Start
 
-### Prerequisites
+**Prerequisites**: Python 3.10+, PostgreSQL 14+, Node.js 18+, Redis (optional)
 
-- **Backend**: Python 3.10+, PostgreSQL 14+, Redis (optional)
-- **Frontend**: Node.js 18+, npm or yarn
-- **iOS**: Xcode 15+, macOS 13+
-
-### 1. Backend Setup
-
+### Backend
 ```bash
 cd cooin-backend
-
-# Create virtual environment
-python3 -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install dependencies
+python3 -m venv venv && source venv/bin/activate  # Windows: venv\Scripts\activate
 pip install -r requirements.txt
-
-# Set up environment variables
-cp .env.example .env
-# Edit .env with your database credentials and configuration
-
-# Generate a secure SECRET_KEY
-python3 -c "import secrets; print(secrets.token_urlsafe(64))"
-# Copy the output to SECRET_KEY in .env
-
-# Create database
-createdb cooin_db
-
-# Run database migrations
-alembic upgrade head
-
-# Start development server
+cp .env.example .env  # Edit with DB credentials + generate SECRET_KEY
+createdb cooin_db && alembic upgrade head
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
+**Windows**: If `ModuleNotFoundError`, use full path: `"C:\Users\USERNAME\AppData\Local\Microsoft\WindowsApps\python.exe" -m uvicorn...`
 
-**⚠️ Windows Users:** If you get `ModuleNotFoundError`, you may have multiple Python installations. Use the full path:
+→ `http://localhost:8000` | API docs: `/api/v1/docs` | Health: `/health`
+
+### Frontend
 ```bash
-"C:\Users\YOUR_USERNAME\AppData\Local\Microsoft\WindowsApps\python.exe" -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+cd cooin-frontend && npm install
+npx expo start --web          # Web: http://localhost:8081
+npx expo start --ios          # iOS simulator
+npx expo start --android      # Android
 ```
 
-See [Common Issues](#common-issues--solutions) below for details.
-
-Backend will be available at: `http://localhost:8000`
-- API docs: `http://localhost:8000/api/v1/docs`
-- Health check: `http://localhost:8000/health`
-
-### 2. Frontend Setup (Web & Mobile)
-
+### iOS Native
 ```bash
-cd cooin-frontend
-
-# Install dependencies
-npm install
-
-# Start development server
-# For web:
-npx expo start --web
-
-# For mobile (iOS simulator):
-npx expo start --ios
-
-# For mobile (Android):
-npx expo start --android
-```
-
-Web app will be available at: `http://localhost:8081`
-
-### 3. iOS Setup (Native Swift App)
-
-```bash
-cd cooin-ios/CooinNew
-
-# Open in Xcode
-open CooinNew.xcodeproj
-
-# Or build from command line
-xcodebuild build \
-  -project CooinNew.xcodeproj \
-  -scheme CooinNew \
-  -destination 'platform=iOS Simulator,name=iPhone 16' \
-  -configuration Debug
+cd cooin-ios/CooinNew && open CooinNew.xcodeproj
 ```
 
 ## 🔧 Configuration
 
-### Backend Configuration
-
-Key environment variables (see `.env.example` for complete list):
-
+**Backend** (`.env`):
 ```env
-# Database
 DATABASE_URL=postgresql://username@localhost:5432/cooin_db
-
-# Security
 SECRET_KEY=<generated-secret-key>
 ACCESS_TOKEN_EXPIRE_MINUTES=30
-
-# CORS - Add all frontend origins
 BACKEND_CORS_ORIGINS=["http://localhost:3000","http://localhost:8081"]
-
-# Redis (optional)
-REDIS_URL=redis://localhost:6379/0
-
-# Email
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USER=your-email@gmail.com
-SMTP_PASSWORD=your-app-password
+REDIS_URL=redis://localhost:6379/0  # Optional
 ```
 
-### Frontend Configuration
-
-Edit `cooin-frontend/src/constants/config.ts`:
-
+**Frontend** (`src/constants/config.ts`):
 ```typescript
 export const API_CONFIG = {
   BASE_URL: 'http://127.0.0.1:8000/api/v1',
   TIMEOUT: 10000,
-  RETRY_ATTEMPTS: 3,
 } as const;
 ```
 
 ## 🧪 Testing
-
-### Backend Tests
-
 ```bash
-cd cooin-backend
-pytest
+cd cooin-backend && pytest                      # Backend
+cd cooin-frontend && npm test                   # Frontend
+cd cooin-ios/CooinNew && xcodebuild test ...    # iOS
 ```
 
-### Frontend Tests
+## 🏗️ Tech Stack
 
+**Backend**: FastAPI, PostgreSQL, SQLAlchemy, Redis, JWT, Uvicorn
+**Frontend**: React Native, Expo, TypeScript, i18next, Zustand, Axios
+**iOS**: Swift, SwiftUI, Combine
+→ See [TECH_STACK.md](./TECH_STACK.md) for details
+
+## 🌍 i18n
+
+**Languages**: English, Spanish (275+ keys)
+**Add Language**: Create `src/i18n/locales/{code}.json`, copy `en.json` structure, add to `config.ts`
+
+## 📱 Platform Status
+
+| Platform | Status |
+|----------|--------|
+| Web/Backend/iOS | ✅ Production Ready |
+| Android | 🚧 In Development |
+
+## 🔒 Security
+
+Multi-layer middleware (headers, validation, DDoS, rate limiting 100/hr) | JWT (30min access, 7day refresh) | bcrypt | CORS whitelist
+
+**API Docs**: `http://localhost:8000/api/v1/docs` (Swagger) | `/redoc` | `/openapi.json`
+
+## 🐛 Common Issues
+
+**CORS errors**: Add frontend URL to `BACKEND_CORS_ORIGINS` in `.env`
+**DB connection**: Verify PostgreSQL running: `pg_ctl status` | `createdb cooin_db`
+**Redis**: Optional - falls back to in-memory cache
+**ModuleNotFoundError (Windows)**: Multiple Pythons - use full path or venv (see TODO.md)
+**Frontend cache**: `rm -rf node_modules && npm install` | `npx expo start --clear`
+**Permission denied**: Project in System32 - run `fix-permissions.bat` as admin OR move to user folder
+
+→ See [PERMISSION-FIX.md](./PERMISSION-FIX.md) | [HISTORY.md](./HISTORY.md)
+
+## 🤝 Development
+
+**Git**: Create branch → commit → push → PR | **Always use GitHub Desktop for pushing** (credential issues)
+
+**Services** (separate terminals):
 ```bash
-cd cooin-frontend
-npm test
+# 1. Backend: uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+# 2. Frontend: npx expo start --web
+# 3. Redis: redis-server (optional)
 ```
 
-### iOS Tests
-
-```bash
-cd cooin-ios/CooinNew
-xcodebuild test \
-  -project CooinNew.xcodeproj \
-  -scheme CooinNew \
-  -destination 'platform=iOS Simulator,name=iPhone 16'
-```
-
-## 🏗️ Technology Stack
-
-### Backend
-- **FastAPI** - Modern Python web framework
-- **PostgreSQL** - Primary database
-- **SQLAlchemy** - ORM for database operations
-- **Pydantic** - Data validation
-- **Redis** - Caching and sessions
-- **JWT** - Authentication
-- **Uvicorn** - ASGI server
-
-### Frontend (Web & Mobile)
-- **React Native** - Cross-platform framework
-- **Expo** - Development platform
-- **TypeScript** - Type-safe JavaScript
-- **i18next** - Internationalization
-- **React Hook Form** - Form management
-- **Zod** - Schema validation
-- **Axios** - HTTP client
-- **Zustand** - State management
-
-### iOS
-- **Swift** - Native iOS development
-- **SwiftUI** - Modern UI framework
-- **Combine** - Reactive programming
-
-For detailed information about the technology stack, see [TECH_STACK.md](./TECH_STACK.md).
-
-## 🌍 Internationalization (i18n)
-
-The platform supports multiple languages:
-
-- **Supported Languages**: English (en), Spanish (es)
-- **Translation Files**: `cooin-frontend/src/i18n/locales/`
-- **202+ translation keys** covering all screens and components
-
-### Adding a New Language
-
-1. Create translation file: `src/i18n/locales/{language-code}.json`
-2. Copy structure from `en.json` and translate all values
-3. Add language to `src/i18n/config.ts`
-
-## 📱 Platform Support
-
-| Platform | Status | Location |
-|----------|--------|----------|
-| Web App | ✅ Production Ready | `cooin-frontend/` |
-| iOS Native | ✅ Production Ready | `cooin-ios/` |
-| Android | 🚧 In Development | `cooin-frontend/` |
-| API Backend | ✅ Production Ready | `cooin-backend/` |
-
-## 🔒 Security Features
-
-- **Multi-layer Security Middleware**:
-  - Security headers (X-Frame-Options, CSP, etc.)
-  - Request validation and sanitization
-  - API security checks
-  - DDoS protection
-  - Rate limiting (100 requests/hour per IP)
-
-- **Authentication**:
-  - JWT tokens with 30-minute access tokens
-  - 7-day refresh tokens
-  - Secure password hashing (bcrypt)
-
-- **CORS Configuration**:
-  - Whitelist-based origin validation
-  - Automatic trailing slash handling
-
-## 📚 API Documentation
-
-Interactive API documentation is available when running the backend in debug mode:
-
-- **Swagger UI**: `http://localhost:8000/api/v1/docs`
-- **ReDoc**: `http://localhost:8000/api/v1/redoc`
-- **OpenAPI Schema**: `http://localhost:8000/api/v1/openapi.json`
-
-## 🐛 Common Issues & Solutions
-
-### Backend Issues
-
-**Problem**: CORS errors when accessing from web app
-**Solution**: Add your frontend URL to `BACKEND_CORS_ORIGINS` in `.env`
-```env
-BACKEND_CORS_ORIGINS=["http://localhost:8081"]
-```
-
-**Problem**: Database connection failed
-**Solution**: Ensure PostgreSQL is running and credentials are correct:
-```bash
-# Check PostgreSQL status
-pg_ctl status
-
-# Create database if it doesn't exist
-createdb cooin_db
-```
-
-**Problem**: Redis connection failed
-**Solution**: Redis is optional. The app will fall back to in-memory cache. To use Redis:
-```bash
-# Start Redis
-redis-server
-
-# Or install via Homebrew (macOS)
-brew install redis
-brew services start redis
-```
-
-**Problem**: `ModuleNotFoundError` - Backend can't find installed packages (Windows)
-**Solution**: You likely have multiple Python installations. The packages are installed in one Python, but you're running another.
-
-**Diagnosis:**
-```bash
-where python
-# Shows all Python installations
-
-pip --version
-# Shows where packages are installed
-```
-
-**Fix Option 1 - Use Full Python Path** (Quick):
-```bash
-"C:\Users\YOUR_USERNAME\AppData\Local\Microsoft\WindowsApps\python.exe" -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-```
-
-**Fix Option 2 - Virtual Environment** (Recommended):
-```bash
-cd cooin-backend
-python -m venv venv
-venv\Scripts\activate
-pip install -r requirements.txt
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-```
-
-**Fix Option 3 - Fix PATH Order**:
-Move Microsoft Store Python higher in Windows PATH environment variable.
-
-### Frontend Issues
-
-**Problem**: Module not found errors
-**Solution**: Clear cache and reinstall dependencies:
-```bash
-rm -rf node_modules package-lock.json
-npm install
-```
-
-**Problem**: Expo server won't start
-**Solution**: Clear Expo cache:
-```bash
-npx expo start --clear
-```
-
-### iOS Issues
-
-**Problem**: Build fails in Xcode
-**Solution**: Clean build folder and derived data:
-```bash
-# In Xcode: Product > Clean Build Folder (Cmd+Shift+K)
-# Or via command line:
-rm -rf ~/Library/Developer/Xcode/DerivedData
-```
-
-### Permission Issues (Windows)
-
-**Problem**: Cannot edit files, "Access denied" errors
-**Solution**: If project is in `C:\Windows\System32\cooin-app`:
-
-**Option 1 - Quick Fix**: Run `fix-permissions.bat` as administrator
-**Option 2 - Alternative**: Run VS Code as administrator
-**Option 3 - Recommended**: Move project to user folder (e.g., `C:\Users\USERNAME\Documents\cooin-app`)
-
-See [PERMISSION-FIX.md](./PERMISSION-FIX.md) for detailed instructions.
-
-## 🤝 Development Workflow
-
-### Git Workflow
-
-```bash
-# Create feature branch
-git checkout -b feature/your-feature-name
-
-# Make changes and commit
-git add .
-git commit -m "Add feature: description"
-
-# Push to remote
-git push origin feature/your-feature-name
-
-# Create pull request on GitHub
-```
-
-### Running All Services
-
-Use separate terminal windows/tabs:
-
-```bash
-# Terminal 1: Backend
-cd cooin-backend
-source venv/bin/activate
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-
-# Terminal 2: Frontend Web
-cd cooin-frontend
-npx expo start --web
-
-# Terminal 3: Redis (optional)
-redis-server
-
-# Terminal 4: PostgreSQL (if not running as service)
-postgres -D /usr/local/var/postgres
-```
-
-## 🌐 Exposing Your App Publicly
-
-Want to share your local app with others or access it from the internet? We support two methods:
+## 🌐 Public Access
 
 ### Cloudflare Tunnel (Recommended) ⭐
+**Free forever | Unlimited | Persistent URLs | Custom domains | CDN performance**
 
-**Best for: Production use, demos, long-term testing**
-
-Free, permanent URLs with no time limits or session restrictions!
-
-#### Quick Setup (5 minutes)
-
-1. **Install cloudflared**:
-   ```bash
-   # Windows
-   winget install cloudflare.cloudflared
-
-   # Mac
-   brew install cloudflared
-   ```
-
-2. **Start your services**:
-   ```bash
-   # Backend (port 8000)
-   cd cooin-backend && python start_dev.py
-
-   # Frontend (port 8083)
-   cd cooin-frontend && npx expo start --web --port 8083
-   ```
-
-3. **Start Cloudflare Tunnels**:
-   ```bash
-   # Quick method (URLs change each restart)
-   cloudflared tunnel --url http://localhost:8000  # Backend
-   cloudflared tunnel --url http://localhost:8083  # Frontend
-
-   # Or use automated script
-   ./start-cloudflare.bat  # Windows
-   ./start-cloudflare.sh   # Mac/Linux
-   ```
-
-#### Features
-
-- ✅ **100% Free** - No paid plan needed
-- ✅ **Persistent URLs** - Same URL every time (with named tunnels)
-- ✅ **No Time Limits** - Works forever, not just 2 hours
-- ✅ **Custom Domains** - Use your own domain
-- ✅ **Better Performance** - Cloudflare's global CDN
-- ✅ **Built-in DDoS Protection**
-
-#### Documentation
-
-- **[CLOUDFLARE-QUICKSTART.md](./CLOUDFLARE-QUICKSTART.md)** - 5-minute setup guide
-- **[CLOUDFLARE-TUNNEL-SETUP.md](./CLOUDFLARE-TUNNEL-SETUP.md)** - Complete setup with persistent URLs
-
-#### Example URLs
-
-Quick tunnels:
-- Frontend: `https://random-words.trycloudflare.com`
-- Backend: `https://other-words.trycloudflare.com`
-
-Named tunnels (persistent):
-- Frontend: `https://cooin-app.YOUR_DOMAIN.com`
-- Backend: `https://cooin-api.YOUR_DOMAIN.com`
-
----
+```bash
+# Install: winget install cloudflare.cloudflared (Windows) | brew install cloudflared (Mac)
+cloudflared tunnel --url http://localhost:8000   # Backend
+cloudflared tunnel --url http://localhost:8083   # Frontend
+```
+→ [CLOUDFLARE-QUICKSTART.md](./CLOUDFLARE-QUICKSTART.md) | [Full Setup](./CLOUDFLARE-TUNNEL-SETUP.md)
 
 ### Ngrok (Alternative)
+**2hr sessions | Random URLs**
+```bash
+ngrok http 8000   # Backend
+ngrok http 8083   # Frontend
+```
+→ [NGROK-QUICKSTART.md](./NGROK-QUICKSTART.md) | [Full Setup](./NGROK-SETUP.md)
 
-**Best for: Quick testing, familiar with ngrok**
+## 📊 Status
 
-#### Quick Setup
+✅ Backend API | Web/iOS (i18n) | Auth | Matching | Messaging | Cloudflare/Ngrok
+🚧 Payment | Admin Dashboard
 
-1. **Install ngrok**: Download from [ngrok.com/download](https://ngrok.com/download)
-2. **Configure auth token**: Edit `ngrok.yml` with your token from [dashboard.ngrok.com](https://dashboard.ngrok.com)
-3. **Start services** (backend on 8000, frontend on 8083)
-4. **Start ngrok**: Run `start-ngrok.bat` or `get-ngrok-urls.ps1`
+## 📖 Documentation
 
-#### Documentation
-
-- **[NGROK-QUICKSTART.md](./NGROK-QUICKSTART.md)** - Quick reference
-- **[NGROK-SETUP.md](./NGROK-SETUP.md)** - Complete setup guide
-
-**Note**: Free plan has 2-hour session limits and random URLs each time.
-
----
-
-### 🆚 Comparison
-
-| Feature | Cloudflare Tunnel | Ngrok (Free) |
-|---------|-------------------|--------------|
-| **Price** | Free forever | Free (limited) |
-| **Session Time** | Unlimited | 2 hours |
-| **Persistent URL** | Yes (named) | No |
-| **Custom Domain** | Yes (free) | Paid only |
-| **Setup Time** | 5 minutes | 5 minutes |
-
-**Recommendation: Use Cloudflare Tunnel** for better performance and no restrictions.
+**Setup**: [LAUNCH-WEB-APP.md](./HOW-TO-LAUNCH-WEB-APP.md) | [TECH_STACK.md](./TECH_STACK.md)
+**Tunnels**: [Cloudflare Quick](./CLOUDFLARE-QUICKSTART.md) | [Cloudflare Full](./CLOUDFLARE-TUNNEL-SETUP.md) | [Ngrok Quick](./NGROK-QUICKSTART.md) | [Ngrok Full](./NGROK-SETUP.md)
+**Troubleshooting**: [PERMISSION-FIX.md](./PERMISSION-FIX.md) | [HISTORY.md](./HISTORY.md) | [TODO.md](./TODO.md)
 
 ---
 
-## 📊 Project Status
-
-- ✅ Backend API - Complete
-- ✅ Web Frontend - Complete with full i18n
-- ✅ iOS App - Complete with full i18n
-- ✅ Authentication System - Complete
-- ✅ Matching Algorithm - Complete
-- ✅ Real-time Messaging - Complete
-- ✅ Cloudflare Tunnel Integration - Complete (Recommended)
-- ✅ Ngrok Integration - Complete (Alternative)
-- 🚧 Payment Integration - In Progress
-- 🚧 Admin Dashboard - In Progress
-
-## 📖 Additional Documentation
-
-### Setup & Configuration
-- [HOW-TO-LAUNCH-WEB-APP.md](./HOW-TO-LAUNCH-WEB-APP.md) - Detailed launch instructions for VS Code
-- [TECH_STACK.md](./TECH_STACK.md) - Comprehensive technology documentation with code examples
-
-### Public Access & Tunneling
-- [CLOUDFLARE-QUICKSTART.md](./CLOUDFLARE-QUICKSTART.md) - Quick Cloudflare Tunnel setup (Recommended)
-- [CLOUDFLARE-TUNNEL-SETUP.md](./CLOUDFLARE-TUNNEL-SETUP.md) - Complete Cloudflare guide with persistent URLs
-- [NGROK-QUICKSTART.md](./NGROK-QUICKSTART.md) - Alternative ngrok setup
-- [NGROK-SETUP.md](./NGROK-SETUP.md) - Complete ngrok guide
-
-### Troubleshooting
-- [PERMISSION-FIX.md](./PERMISSION-FIX.md) - Solutions for file permission issues
-
-### Change History
-- [HISTORY.md](./HISTORY.md) - Complete changelog with all sessions and fixes
-- [TODO.md](./TODO.md) - Current tasks and future enhancements
-
-### API Documentation
-- [Backend API Documentation](http://localhost:8000/api/v1/docs) - Interactive Swagger UI (when running)
-
-## 📄 License
-
-This project is proprietary software. All rights reserved.
-
-## 👥 Contributors
-
-Developed with assistance from Claude AI.
-
----
-
-For questions or issues, please open an issue on GitHub.
+Proprietary software. Developed with Claude AI.
