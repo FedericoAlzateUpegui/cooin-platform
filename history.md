@@ -1,5 +1,57 @@
 # Cooin Web App - Change History
 
+## 2025-11-06 (Session 9) - Dev Branch Setup & Documentation Workflow
+
+**Goal**: Establish dev branch workflow and streamline commit documentation process.
+
+**Changes**:
+1. **Git Workflow**: Created dev branch for all development work (main protected)
+2. **Documentation Process**: Added "Auto-Documentation on Commit" quick flow section to DOCUMENTATION_PROCESS.md
+3. **Session Continuity**: Captured Session 8 changes (config fixes, python path updates, documentation system)
+
+**Files Changed**:
+- `DOCUMENTATION_PROCESS.md` - Added auto-documentation workflow (lines 472-506)
+- `HISTORY.md` - Added this session entry
+- `TODO.md` - Updated session number and completed tasks
+- `config.ts`, `package.json`, `HOW-TO-LAUNCH-WEB-APP.md` - Session 8 fixes
+
+**Status**: Dev branch established, documentation workflow streamlined ✅
+
+---
+
+## 2025-11-05 (Session 8) - Documentation Cleanup & Config Fixes
+
+**Goal**: Clean up documentation, fix connectivity issues, and improve form validation.
+
+**Fixes**:
+1. **Python Path Documentation**: Updated all docs (TODO.md, HOW-TO-LAUNCH-WEB-APP.md, HISTORY.md) to use simple `python` command instead of full path `"C:\Users\Usuario\AppData\Local\Microsoft\WindowsApps\python.exe"`
+2. **Config URL Fix**: Updated `config.ts` BASE_URL from old Cloudflare tunnel to `http://localhost:8000/api/v1` - fixed "Cannot connect to server" timeout error
+3. **Cache Clearing**: Identified need to restart frontend with `--clear` flag after config changes
+
+**Educational Sessions**:
+- **TECH-001**: Taught package update process (npm outdated, expo-doctor, npx expo install --fix)
+- **Form Validation**: Identified need for real-time validation in RegisterScreen (onTouched mode)
+
+**Files Changed**:
+- `TODO.md` - Removed 7 occurrences of old Python path, updated Known Issues, restructured sections
+- `HOW-TO-LAUNCH-WEB-APP.md` - Simplified Python commands
+- `HISTORY.md` - Updated Python path documentation, added this session
+- `config.ts` - Changed BASE_URL to localhost
+- `README.md` - Added link to documentation process guide
+- `DOCUMENTATION_PROCESS.md` - NEW: Complete documentation guide with "How to Read" section
+- `SESSION_8_SUMMARY.md` - NEW: Session summary
+
+**Pending Work**:
+- [ ] Implement form validation improvements (RegisterScreen.tsx - add `mode: 'onTouched'`)
+- [ ] Update Expo packages (waiting for user decision)
+- [ ] Fix React Native Web deprecation warnings (shadow*, pointerEvents)
+
+**Key Learning**: Metro bundler caches config changes - always restart with `--clear` flag!
+
+**Status**: Connectivity fixed, local development working ✅
+
+---
+
 ## 2025-11-03 (Session 7) - Cloudflare Tunnel Setup
 
 **Goal**: Replace ngrok with Cloudflare Tunnel for unlimited free partner sharing.
@@ -28,7 +80,7 @@
 
 **Critical Fixes**:
 1. **requirements.txt**: Fixed line 53 - separated merged packages `gunicorn==21.2.0user-agents==2.2.0`
-2. **Python Path**: Identified 2 Python installations. Use: `"C:\Users\Usuario\AppData\Local\Microsoft\WindowsApps\python.exe"`
+2. **Python Path**: Fixed - now works with simple `python` command (Python 3.11.9)
 3. **ngrok.yml**: Updated v2 syntax `bind_tls: true` → v3 syntax `schemes: [https]`
 4. **Ngrok Reserved Domain**: Conflicts resolved - use separate tunnels: `ngrok http 8083` and `ngrok http 8000`
 5. **start-ngrok.bat**: Removed `...` for Spanish Windows compatibility
