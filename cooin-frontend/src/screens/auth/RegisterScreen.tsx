@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -6,12 +6,13 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
-  SafeAreaView,
   useWindowDimensions,
+  Platform,
 } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { Ionicons } from '@expo/vector-icons';
 import { useAuthStore } from '../../store/authStore';
 import { Input } from '../../components/Input';
 import { Button } from '../../components/Button';
@@ -38,9 +39,18 @@ interface RegisterScreenProps {
 export const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) => {
   const [selectedRole, setSelectedRole] = useState<'lender' | 'borrower' | 'both'>('borrower');
   const [agreedToTerms, setAgreedToTerms] = useState(false);
-  const { register, isLoading, error, clearError } = useAuthStore();
+  const [localError, setLocalError] = useState<string | null>(null);
+  const { register, isLoading, isAuthenticated, logout } = useAuthStore();
   const { width } = useWindowDimensions();
   const { t } = useLanguage();
+
+  // Safety check: if there's a local error, make sure we're not authenticated
+  useEffect(() => {
+    if (localError && isAuthenticated) {
+      console.log('ERROR: User authenticated despite error! Forcing logout...');
+      logout();
+    }
+  }, [localError, isAuthenticated, logout]);
 
   const {
     control,
@@ -48,6 +58,8 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) =>
     formState: { errors },
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
+    mode: 'onBlur',
+    reValidateMode: 'onBlur',
     defaultValues: {
       email: '',
       username: '',
@@ -58,19 +70,39 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) =>
 
   const onSubmit = async (data: RegisterFormData) => {
     if (!agreedToTerms) {
-      Alert.alert('Terms Required', 'Please agree to the Terms of Service and Privacy Policy');
+      setLocalError('Please agree to the Terms of Service and Privacy Policy');
       return;
     }
 
     try {
-      clearError();
+      // Clear any previous errors
+      setLocalError(null);
+
+      // Attempt registration
       await register(data.email, data.username, data.password, data.confirmPassword, selectedRole, agreedToTerms);
-      // Navigation will be handled by the auth flow
+      // If successful, navigation will be handled by the auth flow
     } catch (error: any) {
-      Alert.alert(
-        'Registration Failed',
-        error.detail || 'Please check your information and try again.'
-      );
+      console.error('Registration error FULL OBJECT:', JSON.stringify(error, null, 2));
+      console.error('Registration error detail:', error.detail);
+      console.error('Registration error message:', error.message);
+      console.error('Registration error status_code:', error.status_code);
+
+      // Extract error message from various possible formats
+      let errorMessage = 'Registration failed. Please try again.';
+
+      if (error.detail) {
+        errorMessage = error.detail;
+      } else if (error.message) {
+        errorMessage = error.message;
+      } else if (typeof error === 'string') {
+        errorMessage = error;
+      }
+
+      // Set local error to display
+      setLocalError(errorMessage);
+
+      // Prevent any navigation by not re-throwing the error
+      return; // Explicitly return to prevent any further execution
     }
   };
 
@@ -113,7 +145,7 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) =>
   ];
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <View style={styles.languageSwitcherContainer}>
         <LanguageSwitcher variant="button" />
       </View>
@@ -121,6 +153,7 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) =>
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={true}
       >
         <View style={[styles.header, { width: responsiveWidth }]}>
           <Text style={styles.title}>{t('register.join_cooin')}</Text>
@@ -253,9 +286,12 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) =>
             </Text>
           </TouchableOpacity>
 
-          {error && (
+          {localError && (
             <View style={styles.errorContainer}>
-              <Text style={styles.errorText}>{error}</Text>
+              <View style={styles.errorIconContainer}>
+                <Ionicons name="alert-circle" size={20} color={COLORS.error} />
+              </View>
+              <Text style={styles.errorText}>{localError}</Text>
             </View>
           )}
 
@@ -274,7 +310,7 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) =>
           </View>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -282,6 +318,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
+    ...Platform.select({
+      web: {
+        height: '100vh' as any,
+        maxHeight: '100vh' as any,
+        overflow: 'hidden',
+        display: 'flex' as any,
+        flexDirection: 'column' as any,
+      },
+    }),
   },
   languageSwitcherContainer: {
     position: 'absolute',
@@ -291,11 +336,20 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
+    ...Platform.select({
+      web: {
+        height: '100%' as any,
+        maxHeight: '100%' as any,
+        overflowY: 'scroll' as any,
+        overflowX: 'hidden' as any,
+        WebkitOverflowScrolling: 'touch' as any,
+      },
+    }),
   },
   scrollContent: {
-    flexGrow: 1,
     padding: SPACING.lg,
-    justifyContent: 'center',
+    paddingTop: SPACING.xl * 2,
+    paddingBottom: 200,
     alignItems: 'center',
   },
   header: {
@@ -420,13 +474,24 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.medium,
   },
   errorContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: `${COLORS.error}15`,
+    borderWidth: 1,
+    borderColor: COLORS.error,
+    borderRadius: 8,
+    padding: SPACING.md,
     marginBottom: SPACING.md,
   },
+  errorIconContainer: {
+    marginRight: SPACING.sm,
+  },
   errorText: {
+    flex: 1,
     fontSize: 14,
-    fontFamily: FONTS.regular,
+    fontFamily: FONTS.medium,
     color: COLORS.error,
-    textAlign: 'center',
+    lineHeight: 20,
   },
   registerButton: {
     marginBottom: SPACING.lg,
@@ -435,6 +500,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+    marginBottom: 100,
   },
   loginText: {
     fontSize: 16,

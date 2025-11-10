@@ -7,6 +7,7 @@ interface ProfileState {
   isLoading: boolean;
   error: string | null;
   isProfileComplete: boolean;
+  profileCompletion: number;
 
   // Actions
   loadProfile: () => Promise<void>;
@@ -21,6 +22,7 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
   isLoading: false,
   error: null,
   isProfileComplete: false,
+  profileCompletion: 0,
 
   loadProfile: async () => {
     set({ isLoading: true, error: null });
@@ -91,7 +93,7 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
   checkProfileCompletion: () => {
     const profile = get().profile;
     if (!profile) {
-      set({ isProfileComplete: false });
+      set({ isProfileComplete: false, profileCompletion: 0 });
       return;
     }
 
@@ -99,12 +101,20 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
     const requiredFields = [
       profile.first_name,
       profile.last_name,
+      profile.display_name,
       profile.bio,
       profile.city,
+      profile.state_province,
       profile.country,
+      profile.phone_number,
+      profile.profile_image_url,
+      profile.employment_status,
     ];
 
-    const isComplete = requiredFields.every(field => field && field.trim().length > 0);
-    set({ isProfileComplete: isComplete });
+    const completedFields = requiredFields.filter(field => field && String(field).trim().length > 0).length;
+    const percentage = Math.round((completedFields / requiredFields.length) * 100);
+    const isComplete = percentage === 100;
+
+    set({ isProfileComplete: isComplete, profileCompletion: percentage });
   },
 }));

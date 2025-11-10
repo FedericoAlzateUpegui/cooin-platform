@@ -55,30 +55,43 @@ class AuthService {
   }
 
   async register(userData: RegisterRequest): Promise<AuthResponse> {
-    const response = await apiClient.post<any>('/auth/register', userData);
+    try {
+      const response = await apiClient.post<any>('/auth/register', userData);
 
-    // Backend returns tokens nested in {user, tokens, message}
-    // Extract tokens from nested structure
-    const tokens = response.tokens || response;
-    const access_token = tokens.access_token;
-    const refresh_token = tokens.refresh_token;
+      // Backend returns tokens nested in {user, tokens, message}
+      // Extract tokens from nested structure
+      const tokens = response.tokens || response;
+      const access_token = tokens.access_token;
+      const refresh_token = tokens.refresh_token;
 
-    // Store tokens securely
-    await apiClient.storeTokens(access_token, refresh_token);
+      if (!access_token || !refresh_token) {
+        throw new Error('Registration failed: No tokens received');
+      }
 
-    // Store user data (only if user object exists and is valid)
-    if (response.user && typeof response.user === 'object') {
-      await secureStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(response.user));
+      // Store tokens securely
+      await apiClient.storeTokens(access_token, refresh_token);
+
+      // Store user data (only if user object exists and is valid)
+      if (response.user && typeof response.user === 'object') {
+        await secureStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(response.user));
+      }
+
+      // Return in expected format
+      return {
+        access_token,
+        refresh_token,
+        token_type: tokens.token_type || 'bearer',
+        expires_in: tokens.expires_in,
+        user: response.user
+      };
+    } catch (error: any) {
+      console.error('Registration error in authService:', error);
+      // Make sure error detail is preserved
+      if (error.detail) {
+        error.message = error.detail;
+      }
+      throw error;
     }
-
-    // Return in expected format
-    return {
-      access_token,
-      refresh_token,
-      token_type: tokens.token_type || 'bearer',
-      expires_in: tokens.expires_in,
-      user: response.user
-    };
   }
 
   async logout(): Promise<void> {

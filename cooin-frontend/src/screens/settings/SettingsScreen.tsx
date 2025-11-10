@@ -170,6 +170,8 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
+        bounces={true}
+        keyboardShouldPersistTaps="handled"
       >
         {/* User Info */}
         <View style={styles.userCard}>

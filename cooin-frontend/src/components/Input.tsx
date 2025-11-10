@@ -36,14 +36,14 @@ export const Input: React.FC<InputProps> = ({
     setIsPasswordVisible(!isPasswordVisible);
   };
 
-  const handleFocus = () => {
+  const handleFocus = (e: any) => {
     setIsFocused(true);
-    props.onFocus?.({} as any);
+    props.onFocus?.(e);
   };
 
-  const handleBlur = () => {
+  const handleBlur = (e: any) => {
     setIsFocused(false);
-    props.onBlur?.({} as any);
+    props.onBlur?.(e);
   };
 
   return (

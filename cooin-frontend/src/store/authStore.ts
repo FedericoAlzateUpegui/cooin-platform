@@ -50,7 +50,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   register: async (email: string, username: string, password: string, confirmPassword: string, role: 'lender' | 'borrower' | 'both', agreeToTerms: boolean) => {
-    set({ isLoading: true, error: null });
+    console.log('[authStore] Starting registration...');
+    set({ isLoading: true, error: null, isAuthenticated: false, user: null });
     try {
       const response = await authService.register({
         email,
@@ -61,19 +62,33 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         agree_to_terms: agreeToTerms,
       });
 
-      set({
-        user: response.user,
-        isAuthenticated: true,
-        isLoading: false,
-        error: null,
-      });
+      console.log('[authStore] Registration response received:', { hasUser: !!response.user, hasToken: !!response.access_token });
+
+      // Only set authenticated if we have a valid user and tokens
+      if (response.user && response.access_token) {
+        console.log('[authStore] Setting user as authenticated');
+        set({
+          user: response.user,
+          isAuthenticated: true,
+          isLoading: false,
+          error: null,
+        });
+      } else {
+        // Registration response incomplete
+        console.error('[authStore] Invalid registration response - missing user or token');
+        throw new Error('Invalid registration response');
+      }
     } catch (error: any) {
+      // Make sure we DON'T authenticate on error
+      console.error('[authStore] Registration error:', error);
+      console.log('[authStore] Setting isAuthenticated to FALSE due to error');
       set({
         isLoading: false,
-        error: error.detail || 'Registration failed',
+        error: error.detail || error.message || 'Registration failed',
         isAuthenticated: false,
         user: null,
       });
+      // Re-throw error so RegisterScreen can catch it
       throw error;
     }
   },

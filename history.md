@@ -1,21 +1,100 @@
 # Cooin Web App - Change History
 
-## 2025-11-06 (Session 9) - Dev Branch Setup & Documentation Workflow
+## 2025-11-10 (Session 10) - Registration Error Handling & Form Validation
 
-**Goal**: Establish dev branch workflow and streamline commit documentation process.
+**Goal**: Fix duplicate email registration error handling to show specific error messages and prevent redirect to login screen.
 
-**Changes**:
-1. **Git Workflow**: Created dev branch for all development work (main protected)
-2. **Documentation Process**: Added "Auto-Documentation on Commit" quick flow section to DOCUMENTATION_PROCESS.md
-3. **Session Continuity**: Captured Session 8 changes (config fixes, python path updates, documentation system)
+**Problem Identified**:
+- When registering with an existing email, app redirects to login screen instead of staying on register screen
+- Generic "Please check your input data and try again" (422 error) shown instead of specific "An account with this email already exists"
+- Form data gets cleared
+- Poor user experience
+
+**Changes/Fixes**:
+1. **Form Validation Mode Change**: Updated RegisterScreen from `mode: 'onTouched'` to `mode: 'onBlur'` + added `reValidateMode: 'onBlur'`
+   - Validation now triggers when user leaves a field (jumps to next field)
+2. **Input Component Event Fix**: Updated Input.tsx `handleFocus` and `handleBlur` to properly pass event objects to React Hook Form
+   - Changed from `props.onBlur?.({} as any)` to `props.onBlur?.(e)`
+3. **Local Error State**: Added `localError` state to RegisterScreen to capture and display errors independently from authStore
+   - Prevents errors from being cleared during navigation
+4. **API Error Extraction Fix**: Updated `api.ts` handleError method to properly extract error messages from backend response structure
+   - Backend wraps errors in `error.message` and `error.detail` via `create_error_response`
+   - Now checks `responseData.error.message` and `responseData.error.detail` first
+5. **Error Display Enhancement**: Improved error UI with icon and styled red box
+   - Added Ionicons alert-circle icon
+   - Created prominent error container with background color, border, and padding
+6. **Navigation Guard**: Added useEffect to force logout if user is authenticated despite having a local error
+   - Prevents accidental navigation to authenticated screens on error
+7. **Comprehensive Console Logging**: Added detailed console.log statements throughout registration flow
+   - RegisterScreen: Logs full error object, detail, message, status_code
+   - authStore: Logs registration start, response received, authentication state changes
+   - authService: Logs registration errors
+8. **authStore Error Handling**: Enhanced registration method to explicitly set `isAuthenticated: false`
+   - Sets false at registration start
+   - Only sets true if both user and access_token exist in response
+   - Guarantees false on error
+9. **authService Try-Catch**: Added try-catch wrapper around registration with error detail preservation
+   - Validates tokens exist before storing
+   - Preserves `error.detail` as `error.message`
 
 **Files Changed**:
-- `DOCUMENTATION_PROCESS.md` - Added auto-documentation workflow (lines 472-506)
-- `HISTORY.md` - Added this session entry
-- `TODO.md` - Updated session number and completed tasks
-- `config.ts`, `package.json`, `HOW-TO-LAUNCH-WEB-APP.md` - Session 8 fixes
+- `RegisterScreen.tsx:1` - Added useEffect import
+- `RegisterScreen.tsx:15` - Added Ionicons import
+- `RegisterScreen.tsx:40-53` - Added localError state, isAuthenticated, logout from authStore, navigation guard useEffect
+- `RegisterScreen.tsx:51-52` - Changed form validation from `mode: 'onTouched'` to `mode: 'onBlur'`, added `reValidateMode: 'onBlur'`
+- `RegisterScreen.tsx:63-99` - Completely rewrote onSubmit error handling with local error state and extensive logging
+- `RegisterScreen.tsx:277-284` - Updated error display to use localError with icon
+- `RegisterScreen.tsx:445-464` - Enhanced error container styles (flexDirection, backgroundColor, border, icon container)
+- `Input.tsx:39-47` - Fixed handleFocus and handleBlur to pass event objects properly
+- `authStore.ts:52-94` - Enhanced register method with logging and explicit isAuthenticated handling
+- `authService.ts:57-95` - Added try-catch wrapper with error preservation
+- `api.ts:138-191` - Rewrote handleError to check nested error object first (responseData.error.message/detail)
 
-**Status**: Dev branch established, documentation workflow streamlined ✅
+**Pending Work**:
+- [ ] **Test duplicate email registration** - Verify error message shows correctly
+- [ ] **Verify no redirect** - Confirm user stays on register screen
+- [ ] **Check form data persistence** - Ensure email, username, password remain filled
+- [ ] **Analyze console logs** - Review [authStore] and error logs to identify any remaining issues
+
+**Key Learning**: Backend error response structure uses nested `error` object via `create_error_response()`. Frontend must extract `responseData.error.message` or `responseData.error.detail`, not just top-level `detail`.
+
+**Status**: Multiple fixes implemented ⚠️, needs testing with console log analysis to verify success
+
+**Next Session**: Test duplicate email registration, review console output, and finalize error handling if needed.
+
+---
+
+## 2025-11-07 (Session 9) - Form Validation, Package Cleanup & Scroll Investigation
+
+**Goal**: Enhance form UX, clean up dependencies, fix scrolling issues on web platform.
+
+**Changes/Fixes**:
+1. **Form Validation Enhancement**: Added `mode: 'onTouched'` to RegisterScreen useForm hook for real-time field validation
+2. **ProfileCompletion Fix**: Fixed type error in HomeScreen - added `profileCompletion` (percentage 0-100) to ProfileState
+   - Updated `profileStore.ts` to calculate completion percentage based on 10 profile fields
+   - HomeScreen now displays profile completion progress bar correctly
+3. **Package Cleanup**: Removed redundant `react-native-vector-icons` package (13 packages removed, no vulnerabilities)
+4. **Package Validation**: Verified all required packages installed and up-to-date (React 19.1.0, Expo 54.0.22, React Native 0.81.5)
+5. **Scroll Investigation**: Multiple approaches attempted for RegisterScreen and ProfileSetupScreen web scrolling (pending resolution)
+
+**Files Changed**:
+- `RegisterScreen.tsx:51` - Added `mode: 'onTouched'` to form validation
+- `RegisterScreen.tsx:299,320` - Removed `flexGrow: 1`, updated scroll styles (multiple iterations)
+- `ProfileSetupScreen.tsx:488` - Removed `flexGrow: 1`, updated scroll styles (multiple iterations)
+- `profileStore.ts:10,25` - Added `profileCompletion: number` property
+- `profileStore.ts:93-119` - Enhanced `checkProfileCompletion()` to calculate percentage (10 fields)
+- `HomeScreen.tsx:26` - Updated to use both `isProfileComplete` and `profileCompletion`
+- `package.json` - Removed `react-native-vector-icons` dependency
+
+**Pending Work**:
+- [ ] **CRITICAL**: Resolve web scrolling issue on Windows (mouse wheel not working on RegisterScreen/ProfileSetupScreen)
+  - Attempted: SafeAreaView removal, Platform.select CSS, View with overflow, ScrollView with explicit heights
+  - Status: Scrollbar visible but mouse wheel scroll range limited
+- [ ] Fix `props.pointerEvents` deprecation warning (React Navigation internal - requires library update)
+
+**Key Learning**: React Native Web ScrollView compatibility is challenging - may require custom web-specific implementation or third-party scroll library.
+
+**Status**: Form validation improved ✅, Profile completion tracking working ✅, Web scrolling pending ⚠️
 
 ---
 

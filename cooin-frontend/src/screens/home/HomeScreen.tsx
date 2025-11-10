@@ -23,7 +23,7 @@ interface HomeScreenProps {
 export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const { user } = useAuthStore();
-  const { profile, loadProfile, profileCompletion } = useProfileStore();
+  const { profile, loadProfile, isProfileComplete, profileCompletion } = useProfileStore();
   const { t } = useLanguage();
 
   useEffect(() => {

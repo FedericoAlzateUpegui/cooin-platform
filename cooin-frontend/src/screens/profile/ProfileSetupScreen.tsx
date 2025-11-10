@@ -5,8 +5,8 @@ import {
   StyleSheet,
   ScrollView,
   Alert,
-  SafeAreaView,
   TouchableOpacity,
+  Platform,
 } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -385,7 +385,7 @@ export const ProfileSetupScreen: React.FC<ProfileSetupScreenProps> = ({ navigati
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color={COLORS.text} />
@@ -401,7 +401,12 @@ export const ProfileSetupScreen: React.FC<ProfileSetupScreenProps> = ({ navigati
         />
       </View>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.content}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={true}
+        keyboardShouldPersistTaps="handled"
+      >
         {renderStepContent()}
 
         {error && (
@@ -438,7 +443,7 @@ export const ProfileSetupScreen: React.FC<ProfileSetupScreenProps> = ({ navigati
           )}
         </View>
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -446,6 +451,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
+    ...Platform.select({
+      web: {
+        height: '100vh' as any,
+        maxHeight: '100vh' as any,
+        overflow: 'hidden',
+        display: 'flex' as any,
+        flexDirection: 'column' as any,
+      },
+    }),
   },
   header: {
     flexDirection: 'row',
@@ -476,6 +490,18 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: SPACING.lg,
+    ...Platform.select({
+      web: {
+        height: '100%' as any,
+        maxHeight: '100%' as any,
+        overflowY: 'scroll' as any,
+        overflowX: 'hidden' as any,
+        WebkitOverflowScrolling: 'touch' as any,
+      },
+    }),
+  },
+  scrollContent: {
+    paddingBottom: 200,
   },
   stepContent: {
     paddingVertical: SPACING.lg,
