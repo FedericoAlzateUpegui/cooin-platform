@@ -262,8 +262,23 @@
   "validation": {
     "required_field": "Este campo es obligatorio",
     "invalid_email": "Por favor ingresa un correo electrónico válido",
+    "email_required": "El correo electrónico es obligatorio",
+    "email_invalid": "Por favor ingresa un correo electrónico válido",
+    "username_required": "El nombre de usuario es obligatorio",
+    "username_min": "El nombre de usuario debe tener al menos 3 caracteres",
+    "username_max": "El nombre de usuario debe tener como máximo 30 caracteres",
+    "username_invalid": "El nombre de usuario solo puede contener letras, números, guiones bajos y guiones",
+    "password_required": "La contraseña es obligatoria",
     "password_too_short": "La contraseña debe tener al menos 8 caracteres",
-    "passwords_must_match": "Las contraseñas deben coincidir"
+    "password_weak": "La contraseña debe contener al menos una letra mayúscula, una letra minúscula y un número",
+    "confirm_password_required": "Por favor confirma tu contraseña",
+    "passwords_must_match": "Las contraseñas no coinciden",
+    "terms_required": "Por favor acepta los Términos de Servicio y la Política de Privacidad",
+    "email_already_exists": "Ya existe una cuenta con este correo electrónico",
+    "username_already_exists": "Este nombre de usuario ya está en uso",
+    "registration_failed": "El registro falló. Por favor intenta de nuevo.",
+    "value_error_username": "El nombre de usuario solo puede contener letras, números, guiones bajos y guiones",
+    "backend_error": "Ocurrió un error. Por favor intenta de nuevo."
   },
   "loading": {
     "please_wait": "Por favor espera...",
@@ -340,7 +355,7 @@
   },
   "profile_setup": {
     "title": "Completa Tu Perfil",
-    "step_of": "Paso {current} de {total}",
+    "step_of": "Paso {{current}} de {{total}}",
     "basic_info_title": "Información Básica",
     "basic_info_description": "Comencemos con tus detalles básicos para crear tu perfil.",
     "first_name": "Nombre",

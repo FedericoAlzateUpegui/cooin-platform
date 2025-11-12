@@ -23,7 +23,7 @@ Open **Terminal 1** in VS Code:
 
 ```cmd
 cd C:\Windows\System32\cooin-app\cooin-backend
-"C:\Users\Usuario\AppData\Local\Microsoft\WindowsApps\python.exe" -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 **Wait for:**
@@ -65,7 +65,7 @@ To share your webapp with partners or access it from other devices, use Cloudfla
 **Terminal 1:**
 ```cmd
 cd C:\Windows\System32\cooin-app\cooin-backend
-"C:\Users\Usuario\AppData\Local\Microsoft\WindowsApps\python.exe" -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 ---
@@ -155,7 +155,7 @@ BACKEND_CORS_ORIGINS=["http://localhost:3000","http://localhost:8080","http://lo
 
 Press `Ctrl+C` to stop, then run:
 ```cmd
-"C:\Users\Usuario\AppData\Local\Microsoft\WindowsApps\python.exe" -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 #### Restart Frontend (Terminal 2)
@@ -279,14 +279,14 @@ Access to fetch at 'https://...' from origin 'https://...' has been blocked by C
 
 ### Issue: "Module not found" Error (Backend)
 
-**Problem:** Multiple Python installations.
+**Problem:** Python not in PATH or wrong Python version.
 
-**Solution:** Use full Python path:
+**Solution:** Use simple Python command:
 ```cmd
-"C:\Users\Usuario\AppData\Local\Microsoft\WindowsApps\python.exe" -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-See [README.md](./README.md) Common Issues section for permanent fix.
+See [README.md](./README.md) Common Issues section for more details.
 
 ---
 
@@ -321,7 +321,7 @@ When running with public access, you need **4 terminals**:
 **Terminal 1 - Backend:**
 ```cmd
 cd C:\Windows\System32\cooin-app\cooin-backend
-"C:\Users\Usuario\AppData\Local\Microsoft\WindowsApps\python.exe" -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 **Terminal 2 - Frontend:**

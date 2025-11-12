@@ -262,8 +262,23 @@
   "validation": {
     "required_field": "This field is required",
     "invalid_email": "Please enter a valid email address",
+    "email_required": "Email is required",
+    "email_invalid": "Please enter a valid email address",
+    "username_required": "Username is required",
+    "username_min": "Username must be at least 3 characters",
+    "username_max": "Username must be at most 30 characters",
+    "username_invalid": "Username can only contain letters, numbers, underscores, and hyphens",
+    "password_required": "Password is required",
     "password_too_short": "Password must be at least 8 characters",
-    "passwords_must_match": "Passwords must match"
+    "password_weak": "Password must contain at least one uppercase letter, one lowercase letter, and one number",
+    "confirm_password_required": "Please confirm your password",
+    "passwords_must_match": "Passwords don't match",
+    "terms_required": "Please agree to the Terms of Service and Privacy Policy",
+    "email_already_exists": "An account with this email already exists",
+    "username_already_exists": "This username is already taken",
+    "registration_failed": "Registration failed. Please try again.",
+    "value_error_username": "Username can only contain letters, numbers, underscores, and hyphens",
+    "backend_error": "An error occurred. Please try again."
   },
   "loading": {
     "please_wait": "Please wait...",
@@ -340,7 +355,7 @@
   },
   "profile_setup": {
     "title": "Complete Your Profile",
-    "step_of": "Step {current} of {total}",
+    "step_of": "Step {{current}} of {{total}}",
     "basic_info_title": "Basic Information",
     "basic_info_description": "Let's start with your basic details to create your profile.",
     "first_name": "First Name",

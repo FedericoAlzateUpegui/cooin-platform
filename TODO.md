@@ -1,19 +1,48 @@
 # Cooin Web App - TODO
 
-## 🚀 Current Session (Session 7) - Cloudflare Tunnel
+## 🚀 Current Session (Session 11) - Next Features
 
-### Pending Actions
-- [ ] **Restart Backend** - `"C:\Users\Usuario\AppData\Local\Microsoft\WindowsApps\python.exe" -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000`
-- [ ] **Restart Frontend** - `npx expo start --web --port 8083 --clear`
-- [ ] **Test** - `https://hobby-wax-option-shakira.trycloudflare.com`
-- [ ] **Share URL** with partners
+### 🔨 In Progress
+- [ ] **TBD** - Planning next features and improvements
 
-### Terminal Setup (4 required)
+### ✅ Completed This Session (Session 11)
+- [x] **Navigation Bug Fix** - Fixed registration error redirect issue by separating isLoading and isInitializing states
+- [x] **Dynamic Translation System** - Implemented i18n for all form validation errors (RegisterScreen)
+- [x] **Error Message Translation Mapping** - Created getTranslatedErrorMessage helper with fuzzy matching
+- [x] **Enhanced Error Extraction** - Improved api.ts to combine multiple field errors
+- [x] **ProfileSetupScreen TypeScript Fix** - Resolved style prop error on line 434
+- [x] **ProfileSetupScreen Internationalization** - Replaced all hardcoded strings with translations (4 steps, alerts, buttons)
+
+### 📝 Completed Previous Sessions (Session 10)
+- [x] **Form Validation on Blur** - Changed RegisterScreen from `mode: 'onTouched'` to `mode: 'onBlur'` + fixed Input component event handling
+- [x] **Local Error State** - Added `localError` state in RegisterScreen to capture and display errors without relying on authStore
+- [x] **Error Extraction Fix** - Updated api.ts handleError to properly extract nested error messages from backend `error.message` and `error.detail`
+- [x] **Error Display Enhancement** - Added error icon and prominent red box styling for better error visibility
+- [x] **Navigation Guard** - Added useEffect to force logout if user is authenticated despite local error
+- [x] **Comprehensive Logging** - Added console.log statements throughout registration flow for debugging
+- [x] **authStore Error Handling** - Explicitly set `isAuthenticated: false` on registration start and error
+- [x] **authService Try-Catch** - Added error handling to preserve error.detail as error.message
+
+### 🌐 Local Development (Current Mode)
 ```cmd
-# 1. Backend: python uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-# 2. Frontend: npx expo start --web --port 8083 --clear
-# 3. Backend Tunnel: cloudflared tunnel --url http://localhost:8000
-# 4. Frontend Tunnel: cloudflared tunnel --url http://localhost:8083
+# Terminal 1 - Backend
+cd C:\Windows\System32\cooin-app\cooin-backend
+python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+
+# Terminal 2 - Frontend
+cd C:\Windows\System32\cooin-app\cooin-frontend
+npx expo start --web --port 8083 --clear
+```
+
+### 🌍 Public Sharing Setup (When Needed)
+```cmd
+# Terminal 3 - Backend Tunnel
+cloudflared tunnel --url http://localhost:8000
+
+# Terminal 4 - Frontend Tunnel
+cloudflared tunnel --url http://localhost:8083
+
+# Then update config.ts and .env with new tunnel URLs
 ```
 
 ---
@@ -38,13 +67,42 @@
 
 ## 🐛 Known Issues
 
+- 🔴 **CRITICAL: Duplicate Email Registration Error** - App redirects to login screen when registering with existing email
+  - Issue: Generic 422 error message instead of specific "An account with this email already exists"
+  - Status: Multiple fixes implemented (local error state, error extraction, navigation guard, logging)
+  - Next: Test with duplicate email registration and analyze console logs
+  - Impact: Poor UX - users don't know why registration failed and lose form data
 - ⚠️ **Project in System32** - Permission issues. Solution: Move to `C:\Users\USERNAME\Documents\cooin-app` or run `fix-permissions.bat` as admin
-- ⚠️ **Multiple Python Installations** - Use full path or virtual environment
+- ✅ **Python Path** - FIXED: Now works with simple `python` command (Python 3.11.9)
+- ✅ **Web Scrolling** - FIXED: Mouse wheel scrolling now working on RegisterScreen/ProfileSetupScreen
 - ⚠️ **Ngrok Reserved Domain** - Delete from https://dashboard.ngrok.com/cloud-edge/domains if using ngrok
 
 ---
 
+## 🐞 Technical Debt
+
+### Code Quality
+- [ ] Fix React Native Web deprecation warnings:
+  - `shadow*` props → Use `boxShadow` (MatchCard.tsx:145)
+  - `props.pointerEvents` → Use `style.pointerEvents` (AppNavigator.tsx:122) - Note: This is from React Navigation library, requires library update
+- [ ] Implement error boundary for better error handling
+- [ ] Add loading states for all async operations
+- [ ] Resolve web scrolling compatibility (consider react-native-web-scroll-view or custom implementation)
+
+### Testing
+- [ ] Add unit tests for form validation
+- [ ] Add integration tests for auth flow
+- [ ] Test Cloudflare tunnel configuration
+
+---
+
 ## 🔧 Future Enhancements
+
+### UX Improvements
+- [ ] Add password strength indicator
+- [ ] Add email verification flow
+- [ ] Implement forgot password functionality
+- [ ] Add profile picture upload
 
 ### Automation
 - [ ] All-in-one startup script (backend + frontend + tunnels)
@@ -53,6 +111,7 @@
 ### Deployment
 - [ ] Move project out of System32
 - [ ] Implement automated deployment workflow
+- [ ] Set up CI/CD pipeline
 - [ ] Payment integration
 - [ ] Admin dashboard
 
@@ -62,8 +121,8 @@
 
 ### Backend
 ```cmd
-# With full Python path
-"C:\Users\Usuario\AppData\Local\Microsoft\WindowsApps\python.exe" -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+# Simple Python command
+python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 # With venv
 venv\Scripts\activate && uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
@@ -88,4 +147,6 @@ ngrok http 8083   # Frontend
 
 ---
 
-**Last Updated**: 2025-11-03 (Session 7)
+**Last Updated**: 2025-11-10 (Session 10)
+
+**Quick Links**: [HISTORY.md](./HISTORY.md) | [README.md](./README.md) | [HOW-TO-LAUNCH-WEB-APP.md](./HOW-TO-LAUNCH-WEB-APP.md)

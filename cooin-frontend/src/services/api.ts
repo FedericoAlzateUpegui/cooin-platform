@@ -145,25 +145,48 @@ class ApiClient {
       const responseData = error.response.data as any;
 
       // Extract error message from various possible formats
-      if (responseData.detail) {
-        // FastAPI standard error format
+      // Backend wraps errors in an "error" object via create_error_response
+      if (responseData.error) {
+        const errorObj = responseData.error;
+
+        // Check nested error object first (our backend format)
+        if (errorObj.message) {
+          apiError.detail = errorObj.message;
+        } else if (errorObj.detail) {
+          apiError.detail = errorObj.detail;
+        } else if (typeof errorObj === 'string') {
+          apiError.detail = errorObj;
+        }
+
+        // Check for field errors and combine them into a helpful message
+        if (errorObj.field_errors && Array.isArray(errorObj.field_errors)) {
+          const fieldErrors = errorObj.field_errors;
+          if (fieldErrors.length > 0) {
+            // If multiple field errors, show them all
+            if (fieldErrors.length > 1) {
+              const errorMessages = fieldErrors.map((fe: any) => {
+                const fieldName = fe.field || 'field';
+                const message = fe.message || fe.msg || 'invalid';
+                return `${fieldName}: ${message}`;
+              });
+              apiError.detail = errorMessages.join('; ');
+            } else {
+              // Single field error - just show the message
+              apiError.detail = fieldErrors[0].message || fieldErrors[0].msg || apiError.detail;
+            }
+          }
+        }
+      } else if (responseData.detail) {
+        // FastAPI standard error format (top level)
         apiError.detail = responseData.detail;
       } else if (responseData.message) {
-        // Alternative message field
+        // Alternative message field (top level)
         apiError.detail = responseData.message;
       } else if (responseData.field_errors) {
-        // Validation errors (422)
+        // Validation errors (422) at top level
         const fieldErrors = responseData.field_errors as any[];
         if (fieldErrors.length > 0) {
-          // Show first field error
           apiError.detail = fieldErrors[0].message || fieldErrors[0].msg || 'Validation error';
-        }
-      } else if (responseData.error) {
-        // Another possible error format
-        if (typeof responseData.error === 'string') {
-          apiError.detail = responseData.error;
-        } else if (responseData.error.message) {
-          apiError.detail = responseData.error.message;
         }
       }
     } else if (error.message) {

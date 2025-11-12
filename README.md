@@ -150,6 +150,7 @@ ngrok http 8083   # Frontend
 **Setup**: [LAUNCH-WEB-APP.md](./HOW-TO-LAUNCH-WEB-APP.md) | [TECH_STACK.md](./TECH_STACK.md)
 **Tunnels**: [Cloudflare Quick](./CLOUDFLARE-QUICKSTART.md) | [Cloudflare Full](./CLOUDFLARE-TUNNEL-SETUP.md) | [Ngrok Quick](./NGROK-QUICKSTART.md) | [Ngrok Full](./NGROK-SETUP.md)
 **Troubleshooting**: [PERMISSION-FIX.md](./PERMISSION-FIX.md) | [HISTORY.md](./HISTORY.md) | [TODO.md](./TODO.md)
+**Contributing**: [DOCUMENTATION_PROCESS.md](./DOCUMENTATION_PROCESS.md) - How to maintain project documentation
 
 ---
 

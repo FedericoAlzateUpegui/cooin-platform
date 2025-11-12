@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 
 import { useAuthStore } from '../../store/authStore';
 import { useProfileStore } from '../../store/profileStore';
@@ -16,14 +17,11 @@ import { Button } from '../../components/Button';
 import { COLORS, SPACING, FONTS } from '../../constants/config';
 import { useLanguage } from '../../contexts/LanguageContext';
 
-interface HomeScreenProps {
-  navigation: any;
-}
-
-export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
+export const HomeScreen: React.FC = () => {
+  const navigation = useNavigation();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const { user } = useAuthStore();
-  const { profile, loadProfile, profileCompletion } = useProfileStore();
+  const { profile, loadProfile, isProfileComplete, profileCompletion } = useProfileStore();
   const { t } = useLanguage();
 
   useEffect(() => {

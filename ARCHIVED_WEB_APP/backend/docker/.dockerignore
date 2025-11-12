@@ -1,0 +1,116 @@
+# Docker ignore file for Cooin Backend
+# Excludes unnecessary files from Docker build context
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Testing
+.coverage
+.pytest_cache/
+.tox/
+htmlcov/
+.coverage.*
+coverage.xml
+test.db
+test_*.json
+
+# Logs
+*.log
+logs/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Environment variables
+.env
+.env.local
+.env.staging
+.env.production
+
+# Documentation
+README.md
+CHANGELOG.md
+*.md
+docs/
+
+# Development files
+test_*.py
+tests/
+TESTING_GUIDE.md
+run_tests.py
+
+# Temporary files
+*.tmp
+*.temp
+temp/
+tmp/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Node modules (if any)
+node_modules/
+
+# Upload directories (will be created in container)
+uploads/*
+!uploads/.gitkeep
+
+# Cache
+.cache/
+
+# Local development scripts
+start_dev.py
+dev_*.py
+
+# Backup files
+*.bak
+*.backup
