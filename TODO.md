@@ -1,15 +1,19 @@
 # Cooin Web App - TODO
 
-## 🚀 Current Session (Session 10) - Registration Error Handling & Form Validation
+## 🚀 Current Session (Session 11) - Next Features
 
 ### 🔨 In Progress
-- [ ] **CRITICAL: Duplicate Email Registration** - Fix error handling when registering with existing email
-  - Issue: App redirects to login screen on error instead of staying on register screen
-  - Issue: Generic 422 error shown instead of specific "email already exists" message
-  - Status: Multiple fixes implemented, needs testing with console logs
-  - Next: Test with duplicate email and review console output
+- [ ] **TBD** - Planning next features and improvements
 
-### ✅ Completed This Session
+### ✅ Completed This Session (Session 11)
+- [x] **Navigation Bug Fix** - Fixed registration error redirect issue by separating isLoading and isInitializing states
+- [x] **Dynamic Translation System** - Implemented i18n for all form validation errors (RegisterScreen)
+- [x] **Error Message Translation Mapping** - Created getTranslatedErrorMessage helper with fuzzy matching
+- [x] **Enhanced Error Extraction** - Improved api.ts to combine multiple field errors
+- [x] **ProfileSetupScreen TypeScript Fix** - Resolved style prop error on line 434
+- [x] **ProfileSetupScreen Internationalization** - Replaced all hardcoded strings with translations (4 steps, alerts, buttons)
+
+### 📝 Completed Previous Sessions (Session 10)
 - [x] **Form Validation on Blur** - Changed RegisterScreen from `mode: 'onTouched'` to `mode: 'onBlur'` + fixed Input component event handling
 - [x] **Local Error State** - Added `localError` state in RegisterScreen to capture and display errors without relying on authStore
 - [x] **Error Extraction Fix** - Updated api.ts handleError to properly extract nested error messages from backend `error.message` and `error.detail`
@@ -18,13 +22,6 @@
 - [x] **Comprehensive Logging** - Added console.log statements throughout registration flow for debugging
 - [x] **authStore Error Handling** - Explicitly set `isAuthenticated: false` on registration start and error
 - [x] **authService Try-Catch** - Added error handling to preserve error.detail as error.message
-
-### 📝 Completed Previous Sessions (Session 9)
-- [x] **Form Validation Enhancement** - Added `mode: 'onTouched'` to RegisterScreen.tsx useForm hook (line 51)
-- [x] **ProfileCompletion Fix** - Fixed HomeScreen type error, added percentage calculation to profileStore
-- [x] **Package Cleanup** - Removed redundant react-native-vector-icons package (13 packages removed)
-- [x] **Package Validation** - Verified all required packages up-to-date (React 19.1.0, Expo 54.0.22, RN 0.81.5)
-- [x] **Web Scrolling** - Confirmed working (issue resolved from previous session)
 
 ### 🌐 Local Development (Current Mode)
 ```cmd

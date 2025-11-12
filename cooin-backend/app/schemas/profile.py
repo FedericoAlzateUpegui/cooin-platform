@@ -1,6 +1,6 @@
 from datetime import datetime, date
 from typing import Optional, List
-from pydantic import BaseModel, validator, Field
+from pydantic import BaseModel, validator, Field, computed_field
 from enum import Enum
 
 from app.models.profile import IncomeRange, EmploymentStatus, LoanPurpose
@@ -204,15 +204,92 @@ class UserProfileResponse(UserProfileBase):
     updated_at: datetime
     last_profile_update: Optional[datetime] = None
 
-    # Computed fields
+    class Config:
+        from_attributes = True
+
+    # Computed fields - these will be automatically computed from the model properties
+    @computed_field
+    @property
+    def age(self) -> Optional[int]:
+        # Access from ORM model if available
+        return getattr(self, '_age', None)
+
+    @computed_field
+    @property
+    def location_string(self) -> Optional[str]:
+        # Build location string from available fields
+        if not self.show_location:
+            return "Location hidden"
+
+        location_parts = []
+        if self.city:
+            location_parts.append(self.city)
+        if self.state_province:
+            location_parts.append(self.state_province)
+        if self.country:
+            location_parts.append(self.country)
+
+        return ", ".join(location_parts) if location_parts else "Location not specified"
+
+    @computed_field
+    @property
+    def public_name(self) -> str:
+        if self.show_real_name and self.first_name and self.last_name:
+            return f"{self.first_name} {self.last_name}"
+        return self.display_name or f"User {self.user_id}"
+
+    @computed_field
+    @property
+    def full_name(self) -> str:
+        if self.first_name and self.last_name:
+            return f"{self.first_name} {self.last_name}"
+        return self.display_name or f"User {self.user_id}"
+
+
+class UserProfilePublicResponse(BaseModel):
+    """Schema for public user profile (what other users can see)."""
+    id: int
+    user_id: int
+    public_name: str
+    display_name: Optional[str] = None
+    bio: Optional[str] = None
     age: Optional[int] = None
     location_string: str
-    public_name: str
-    full_name: str
+
+    # Financial information (if user allows)
+    income_range: Optional[IncomeRangeSchema] = None
+    employment_status: Optional[EmploymentStatusSchema] = None
+
+    # Preferences (relevant to connection type)
+    loan_purpose: Optional[LoanPurposeSchema] = None
+    requested_loan_amount: Optional[float] = None
+    min_loan_amount: Optional[float] = None
+    max_loan_amount: Optional[float] = None
+
+    # Profile status
+    profile_completion_percentage: float
+    identity_verified: bool
+    income_verified: bool
+
+    # Profile media
+    avatar_url: Optional[str] = None
+
+    # Timestamps
+    created_at: datetime
 
     class Config:
         from_attributes = True
-        schema_extra = {
+
+
+class ProfileCompletionResponse(BaseModel):
+    """Schema for profile completion status."""
+    completion_percentage: float
+    missing_fields: List[str]
+    suggestions: List[str]
+    next_steps: List[str]
+
+    class Config:
+        json_schema_extra = {
             "example": {
                 "id": 1,
                 "user_id": 1,

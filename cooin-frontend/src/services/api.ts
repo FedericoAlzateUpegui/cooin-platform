@@ -158,11 +158,22 @@ class ApiClient {
           apiError.detail = errorObj;
         }
 
-        // Check for field errors
+        // Check for field errors and combine them into a helpful message
         if (errorObj.field_errors && Array.isArray(errorObj.field_errors)) {
           const fieldErrors = errorObj.field_errors;
           if (fieldErrors.length > 0) {
-            apiError.detail = fieldErrors[0].message || fieldErrors[0].msg || apiError.detail;
+            // If multiple field errors, show them all
+            if (fieldErrors.length > 1) {
+              const errorMessages = fieldErrors.map((fe: any) => {
+                const fieldName = fe.field || 'field';
+                const message = fe.message || fe.msg || 'invalid';
+                return `${fieldName}: ${message}`;
+              });
+              apiError.detail = errorMessages.join('; ');
+            } else {
+              // Single field error - just show the message
+              apiError.detail = fieldErrors[0].message || fieldErrors[0].msg || apiError.detail;
+            }
           }
         }
       } else if (responseData.detail) {

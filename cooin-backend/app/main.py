@@ -158,4 +158,25 @@ async def health_check():
     }
 
 
+# Startup and shutdown events
+@app.on_event("startup")
+async def startup_event():
+    """Initialize services on startup."""
+    logger.info("Starting up Cooin API...")
+
+    # Initialize cache service (will fall back to in-memory if Redis unavailable)
+    await init_cache()
+    logger.info("Cache service initialized")
+
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    """Cleanup services on shutdown."""
+    logger.info("Shutting down Cooin API...")
+
+    # Cleanup cache service
+    await cleanup_cache()
+    logger.info("Cache service cleaned up")
+
+
 # B

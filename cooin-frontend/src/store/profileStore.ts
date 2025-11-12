@@ -35,9 +35,24 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
       });
       get().checkProfileCompletion();
     } catch (error: any) {
+      console.log('[ProfileStore] loadProfile error:', error);
+
+      // Don't show error for "profile not found" - this is expected for first-time setup
+      const isProfileNotFound = error.status_code === 404 ||
+                                error.detail?.toLowerCase().includes('profile not found') ||
+                                error.detail?.toLowerCase().includes('not found');
+
+      // Also don't show error for network/connection issues during initial load
+      // User can still proceed with profile creation
+      const isConnectionError = error.detail?.includes('Cannot connect') ||
+                               error.detail?.includes('Network Error') ||
+                               error.detail?.includes('timeout');
+
+      const shouldShowError = !isProfileNotFound && !isConnectionError;
+
       set({
         isLoading: false,
-        error: error.detail || 'Failed to load profile',
+        error: shouldShowError ? (error.detail || 'Failed to load profile') : null,
         profile: null,
       });
     }

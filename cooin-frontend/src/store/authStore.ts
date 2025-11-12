@@ -6,6 +6,7 @@ interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  isInitializing: boolean; // Separate flag for initial auth check
   error: string | null;
 
   // Actions
@@ -21,6 +22,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
   isAuthenticated: false,
   isLoading: false,
+  isInitializing: true, // Start as true for initial auth check
   error: null,
 
   login: async (email: string, password: string, rememberMe = false) => {
@@ -94,7 +96,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   logout: async () => {
-    set({ isLoading: true });
     try {
       await authService.logout();
     } catch (error) {
@@ -110,7 +111,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   checkAuth: async () => {
-    set({ isLoading: true });
+    set({ isInitializing: true });
     try {
       const isAuthenticated = await authService.isAuthenticated();
       if (isAuthenticated) {
@@ -118,13 +119,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         set({
           user,
           isAuthenticated: !!user,
-          isLoading: false,
+          isInitializing: false,
         });
       } else {
         set({
           user: null,
           isAuthenticated: false,
-          isLoading: false,
+          isInitializing: false,
         });
       }
     } catch (error) {
@@ -132,7 +133,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       set({
         user: null,
         isAuthenticated: false,
-        isLoading: false,
+        isInitializing: false,
       });
     }
   },

@@ -1,5 +1,150 @@
 # Cooin Web App - Change History
 
+## 2025-11-12 (Session 12) - Responsive Navigation & Navigation Hook Fixes
+
+**Goal**: Implement responsive navigation with desktop sidebar and mobile bottom tabs, fix web scrolling issues, and resolve navigation prop access problems.
+
+**Changes/Fixes**:
+1. **Responsive Navigation System**: Implemented adaptive navigation that switches between desktop sidebar and mobile bottom tabs
+   - Added desktop breakpoint constant: `DESKTOP_BREAKPOINT = 768`
+   - Created `DesktopSidebarNavigator` component with left sidebar navigation (240px width)
+   - Created `MobileTabNavigator` component with bottom tab navigation
+   - Added `MainTabNavigator` wrapper that uses `useWindowDimensions()` to detect screen size
+   - Sidebar includes: Logo header, navigation items with icons/labels, active state highlighting
+
+2. **Web Scrolling Fix**: Resolved scrolling issues on desktop by implementing proper layout hierarchy
+   - Added explicit viewport units to desktop container: `width: '100vw', height: '100vh'`
+   - Created `mainContent` wrapper with `flex: 1` to take remaining width after sidebar
+   - Added `screenContainer` wrapper with `width: '100%', height: '100%'` for proper constraints
+   - Used `Platform.select` to apply web-specific layout rules while maintaining mobile compatibility
+   - Result: ScrollView components inside screens (Settings, Matching, etc.) now work properly
+
+3. **Backend Profile Schema Fix**: Fixed 500 Internal Server Error on `/api/v1/profiles/me` endpoint
+   - Issue: Pydantic V2 `from_attributes=True` doesn't automatically call `@property` methods
+   - Updated `UserProfileResponse` schema to use `@computed_field` decorator with `@property`
+   - Converted `age`, `location_string`, `public_name`, and `full_name` to computed fields
+   - Fields now compute from other schema attributes instead of requiring ORM model properties
+   - Backend restarted to apply changes
+
+4. **Navigation Hook Migration**: Fixed navigation access issues in screens rendered directly in desktop sidebar
+   - **ProfileSetupScreen**: Migrated from navigation prop to `useNavigation()` hook
+     - Added `import { useNavigation } from '@react-navigation/native'`
+     - Removed `ProfileSetupScreenProps` interface
+     - Changed from `({ navigation })` to `const navigation = useNavigation()`
+     - Fixes `navigation.goBack()` calls on lines 144 and 405
+   - **HomeScreen**: Migrated from navigation prop to `useNavigation()` hook
+     - Added `import { useNavigation } from '@react-navigation/native'`
+     - Removed `HomeScreenProps` interface
+     - Changed from `({ navigation })` to `const navigation = useNavigation()`
+     - Fixes all `navigation.navigate()` calls (Profile, Matching, Connections, Messages)
+
+**Files Changed**:
+- `AppNavigator.tsx:27-33` - Added navigation items configuration array with icons and labels
+- `AppNavigator.tsx:36-57` - Created `SidebarNavItem` component for desktop navigation
+- `AppNavigator.tsx:60-94` - Created `DesktopSidebarNavigator` with state-based screen switching
+- `AppNavigator.tsx:97-133` - Created `MobileTabNavigator` using Tab.Navigator
+- `AppNavigator.tsx:136-141` - Created `MainTabNavigator` with responsive layout detection
+- `AppNavigator.tsx:182-258` - Added desktop sidebar styles (sidebar, navigation items, containers)
+- `AppNavigator.tsx:184-195,244-258` - Added Platform.select web-specific layout styles
+- `profile.py:3,211,217,234,242` - Added `computed_field` import and decorators
+- `profile.py:213-247` - Converted age, location_string, public_name, full_name to @computed_field
+- `ProfileSetupScreen.tsx:16` - Added `useNavigation` import
+- `ProfileSetupScreen.tsx:40-41` - Removed interface, added `const navigation = useNavigation()`
+- `HomeScreen.tsx:12` - Added `useNavigation` import
+- `HomeScreen.tsx:20-21` - Removed interface, added `const navigation = useNavigation()`
+
+**Testing Results**:
+- ✅ Desktop view (≥768px) shows left sidebar navigation with proper styling
+- ✅ Mobile view (<768px) shows bottom tab navigation
+- ✅ Scrolling works correctly on all screens (Settings, Matching, Home, etc.)
+- ✅ Profile setup navigation works from HomeScreen "complete your profile" button
+- ✅ All quick action navigation buttons work (Discover Matches, Connections, Messages, Profile)
+- ✅ Backend `/api/v1/profiles/me` endpoint returns 200 with computed fields
+- ✅ No console errors for navigation prop access
+
+**Key Technical Decisions**:
+1. **Desktop Sidebar vs Tab Navigator**: Desktop uses direct component rendering instead of Tab.Navigator to avoid navigation stack complexity
+2. **useNavigation Hook**: Allows components to access navigation from React Navigation context regardless of how they're rendered
+3. **Platform.select for Web**: Used web-specific CSS properties (vh, vw, boxShadow) while maintaining RN compatibility
+4. **@computed_field Decorator**: Pydantic V2's recommended approach for computed properties that derive from other schema fields
+
+**Key Learning**:
+- When rendering React Navigation screens outside of Stack/Tab navigators, they lose navigation prop access
+- `useNavigation()` hook provides universal navigation access from React Navigation context
+- React Native Web layout requires explicit viewport constraints (vh/vw) for proper scrolling
+- Pydantic V2 requires `@computed_field` decorator to compute fields from schema attributes vs ORM model properties
+
+**Status**: All features working ✅ - Responsive navigation implemented, scrolling fixed, navigation hooks working
+
+---
+
+## 2025-11-11 (Session 11) - Internationalization & Bug Fixes
+
+**Goal**: Fix registration navigation bug, implement dynamic translation system for error messages, and resolve TypeScript errors.
+
+**Changes/Fixes**:
+1. **Navigation Bug Fixed**: Resolved issue where registration errors caused redirect to login screen
+   - Root cause: `isLoading` state change caused AppNavigator to unmount/remount auth flow
+   - Solution: Added separate `isInitializing` flag for app startup authentication checks
+   - Updated AppNavigator to use `isInitializing` instead of `isLoading` for LoadingScreen
+   - Now `isLoading` only controls button states, preventing navigation unmounts
+2. **Dynamic Translation System**: Implemented comprehensive internationalization for form validation
+   - Added 20+ validation error messages to both `en.json` and `es.json` translation files
+   - Updated RegisterScreen to use `useMemo` for dynamic zod schema creation with `t()` function
+   - Schema recreates automatically when language changes
+   - Created `getTranslatedErrorMessage()` helper function to map backend errors to translation keys
+   - Supports both exact matches and fuzzy matching for error messages
+3. **Error Message Improvements**: Enhanced error extraction and display in `api.ts`
+   - Updated field error handling to combine multiple validation errors
+   - Shows all field errors when multiple exist (e.g., "username: invalid; email: already exists")
+   - Single field errors display message only
+4. **ProfileSetupScreen TypeScript Fix**: Resolved style prop type error on line 434
+   - Button component accepts `ViewStyle` (single object), not `ViewStyle[]` (array)
+   - Changed from conditional array to merged style object using spread operator
+5. **ProfileSetupScreen Internationalization**: Replaced all hardcoded English strings with translations
+   - All 4 steps now fully translatable (Basic Info, Photo/Bio, Location, Financial Info)
+   - Converted static zod schema to dynamic `useMemo` schema with translated validation messages
+   - Updated employment status options to use translation keys
+   - Translated all UI elements: header, progress label, buttons, alerts, placeholders
+
+**Files Changed**:
+- `authStore.ts:9,25` - Added `isInitializing` state flag
+- `authStore.ts:98-111` - Removed isLoading from logout (unnecessary)
+- `authStore.ts:114-140` - Updated checkAuth to use isInitializing instead of isLoading
+- `AppNavigator.tsx:110,116` - Changed from isLoading to isInitializing in LoadingScreen check
+- `i18n/locales/en.json:262-282` - Added comprehensive validation error messages
+- `i18n/locales/es.json:262-282` - Added Spanish translations for all validation errors
+- `RegisterScreen.tsx:1` - Added useMemo import
+- `RegisterScreen.tsx:23-29` - Moved RegisterFormData type definition before component
+- `RegisterScreen.tsx:43-60` - Created dynamic registerSchema with useMemo and translations
+- `RegisterScreen.tsx:86-133` - Added getTranslatedErrorMessage helper function with mapping logic
+- `RegisterScreen.tsx:135-158` - Updated onSubmit to use translated errors
+- `api.ts:161-178` - Enhanced field error extraction to combine multiple errors
+- `ProfileSetupScreen.tsx:1` - Added useMemo import
+- `ProfileSetupScreen.tsx:25-37` - Moved ProfileFormData type, removed static schema
+- `ProfileSetupScreen.tsx:53-68` - Created dynamic profileSchema with useMemo and translations
+- `ProfileSetupScreen.tsx:98-134` - Translated all Alert messages
+- `ProfileSetupScreen.tsx:150-380` - Replaced all hardcoded strings in steps 1-4 with t() function
+- `ProfileSetupScreen.tsx:393,400,423,432,441` - Translated header, progress, and button text
+- `ProfileSetupScreen.tsx:434` - Fixed TypeScript error with style prop (merged object vs array)
+
+**Testing Results**:
+- ✅ Duplicate email registration now stays on register screen
+- ✅ Shows translated error: "An account with this email already exists" (English)
+- ✅ Shows translated error: "Ya existe una cuenta con este correo electrónico" (Spanish)
+- ✅ Username validation errors properly translated in both languages
+- ✅ ProfileSetupScreen displays correctly in Spanish when selected
+- ✅ All form validation errors translate dynamically on language change
+
+**Key Learning**:
+- Separating `isLoading` (UI state) from `isInitializing` (app startup state) prevents navigation unmounts
+- Using `useMemo` with `t()` function enables dynamic schema recreation on language changes
+- Backend error messages need intelligent mapping to translation keys for proper i18n support
+
+**Status**: All features working ✅
+
+---
+
 ## 2025-11-10 (Session 10) - Registration Error Handling & Form Validation
 
 **Goal**: Fix duplicate email registration error handling to show specific error messages and prevent redirect to login screen.

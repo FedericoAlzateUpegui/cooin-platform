@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -13,6 +13,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
+import { useNavigation } from '@react-navigation/native';
 
 import { useProfileStore } from '../../store/profileStore';
 import { useAuthStore } from '../../store/authStore';
@@ -22,27 +23,22 @@ import { ProgressBar } from '../../components/ProgressBar';
 import { COLORS, SPACING, FONTS } from '../../constants/config';
 import { useLanguage } from '../../contexts/LanguageContext';
 
-const profileSchema = z.object({
-  first_name: z.string().min(2, 'First name must be at least 2 characters'),
-  last_name: z.string().min(2, 'Last name must be at least 2 characters'),
-  display_name: z.string().min(3, 'Display name must be at least 3 characters'),
-  bio: z.string().min(50, 'Bio must be at least 50 characters').max(500, 'Bio must be less than 500 characters'),
-  phone_number: z.string().optional(),
-  date_of_birth: z.string().optional(),
-  city: z.string().min(2, 'City is required'),
-  state_province: z.string().min(2, 'State/Province is required'),
-  country: z.string().min(2, 'Country is required'),
-  annual_income: z.number().optional(),
-  employment_status: z.string().optional(),
-});
+type ProfileFormData = {
+  first_name: string;
+  last_name: string;
+  display_name: string;
+  bio: string;
+  phone_number?: string;
+  date_of_birth?: string;
+  city: string;
+  state_province: string;
+  country: string;
+  annual_income?: number;
+  employment_status?: string;
+};
 
-type ProfileFormData = z.infer<typeof profileSchema>;
-
-interface ProfileSetupScreenProps {
-  navigation: any;
-}
-
-export const ProfileSetupScreen: React.FC<ProfileSetupScreenProps> = ({ navigation }) => {
+export const ProfileSetupScreen: React.FC = () => {
+  const navigation = useNavigation();
   const [currentStep, setCurrentStep] = useState(1);
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const { profile, isLoading, error, updateProfile, uploadProfileImage, loadProfile, checkProfileCompletion } = useProfileStore();
@@ -51,6 +47,23 @@ export const ProfileSetupScreen: React.FC<ProfileSetupScreenProps> = ({ navigati
 
   const totalSteps = 4;
   const progressPercentage = (currentStep / totalSteps) * 100;
+
+  // Create schema with translated messages - recreates when language changes
+  const profileSchema = useMemo(() => {
+    return z.object({
+      first_name: z.string().min(2, t('profile_setup.validation_first_name')),
+      last_name: z.string().min(2, t('profile_setup.validation_last_name')),
+      display_name: z.string().min(3, t('profile_setup.validation_display_name')),
+      bio: z.string().min(50, t('profile_setup.validation_bio_min')).max(500, t('profile_setup.validation_bio_max')),
+      phone_number: z.string().optional(),
+      date_of_birth: z.string().optional(),
+      city: z.string().min(2, t('profile_setup.validation_city')),
+      state_province: z.string().min(2, t('profile_setup.validation_state')),
+      country: z.string().min(2, t('profile_setup.validation_country')),
+      annual_income: z.number().optional(),
+      employment_status: z.string().optional(),
+    });
+  }, [t]);
 
   const {
     control,
@@ -98,7 +111,7 @@ export const ProfileSetupScreen: React.FC<ProfileSetupScreenProps> = ({ navigati
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
-      Alert.alert('Permission Required', 'Sorry, we need camera roll permissions to upload your photo.');
+      Alert.alert(t('profile_setup.permission_required_title'), t('profile_setup.permission_required_message'));
       return;
     }
 
@@ -124,12 +137,12 @@ export const ProfileSetupScreen: React.FC<ProfileSetupScreenProps> = ({ navigati
 
       checkProfileCompletion();
       Alert.alert(
-        'Profile Updated',
-        'Your profile has been successfully updated!',
-        [{ text: 'OK', onPress: () => navigation.goBack() }]
+        t('profile_setup.profile_updated_title'),
+        t('profile_setup.profile_updated_message'),
+        [{ text: t('common.ok'), onPress: () => navigation.goBack() }]
       );
     } catch (error: any) {
-      Alert.alert('Update Failed', error.detail || 'Failed to update profile');
+      Alert.alert(t('profile_setup.update_failed_title'), error.detail || 'Failed to update profile');
     }
   };
 
@@ -150,9 +163,9 @@ export const ProfileSetupScreen: React.FC<ProfileSetupScreenProps> = ({ navigati
       case 1:
         return (
           <View style={styles.stepContent}>
-            <Text style={styles.stepTitle}>Basic Information</Text>
+            <Text style={styles.stepTitle}>{t('profile_setup.basic_info_title')}</Text>
             <Text style={styles.stepDescription}>
-              Let's start with your basic details to create your profile.
+              {t('profile_setup.basic_info_description')}
             </Text>
 
             <Controller
@@ -160,8 +173,8 @@ export const ProfileSetupScreen: React.FC<ProfileSetupScreenProps> = ({ navigati
               name="first_name"
               render={({ field: { onChange, onBlur, value } }) => (
                 <Input
-                  label="First Name"
-                  placeholder="Enter your first name"
+                  label={t('profile_setup.first_name')}
+                  placeholder={t('profile_setup.first_name_placeholder')}
                   value={value}
                   onChangeText={onChange}
                   onBlur={onBlur}
@@ -176,8 +189,8 @@ export const ProfileSetupScreen: React.FC<ProfileSetupScreenProps> = ({ navigati
               name="last_name"
               render={({ field: { onChange, onBlur, value } }) => (
                 <Input
-                  label="Last Name"
-                  placeholder="Enter your last name"
+                  label={t('profile_setup.last_name')}
+                  placeholder={t('profile_setup.last_name_placeholder')}
                   value={value}
                   onChangeText={onChange}
                   onBlur={onBlur}
@@ -192,8 +205,8 @@ export const ProfileSetupScreen: React.FC<ProfileSetupScreenProps> = ({ navigati
               name="display_name"
               render={({ field: { onChange, onBlur, value } }) => (
                 <Input
-                  label="Display Name"
-                  placeholder="How others will see you"
+                  label={t('profile_setup.display_name')}
+                  placeholder={t('profile_setup.display_name_placeholder')}
                   value={value}
                   onChangeText={onChange}
                   onBlur={onBlur}
@@ -208,20 +221,20 @@ export const ProfileSetupScreen: React.FC<ProfileSetupScreenProps> = ({ navigati
       case 2:
         return (
           <View style={styles.stepContent}>
-            <Text style={styles.stepTitle}>Profile Photo & Bio</Text>
+            <Text style={styles.stepTitle}>{t('profile_setup.photo_bio_title')}</Text>
             <Text style={styles.stepDescription}>
-              Add a photo and tell others about yourself.
+              {t('profile_setup.photo_bio_description')}
             </Text>
 
             <View style={styles.imageSection}>
-              <Text style={styles.inputLabel}>Profile Photo</Text>
+              <Text style={styles.inputLabel}>{t('profile_setup.profile_photo')}</Text>
               <TouchableOpacity style={styles.imagePicker} onPress={pickImage}>
                 {profileImage ? (
-                  <Text style={styles.imagePickerText}>Photo Selected ✓</Text>
+                  <Text style={styles.imagePickerText}>{t('profile_setup.photo_selected')}</Text>
                 ) : (
                   <>
                     <Ionicons name="camera" size={32} color={COLORS.textSecondary} />
-                    <Text style={styles.imagePickerText}>Tap to add photo</Text>
+                    <Text style={styles.imagePickerText}>{t('profile_setup.tap_to_add_photo')}</Text>
                   </>
                 )}
               </TouchableOpacity>
@@ -232,8 +245,8 @@ export const ProfileSetupScreen: React.FC<ProfileSetupScreenProps> = ({ navigati
               name="bio"
               render={({ field: { onChange, onBlur, value } }) => (
                 <Input
-                  label="Bio"
-                  placeholder="Tell others about yourself, your goals, and what you're looking for..."
+                  label={t('profile_setup.bio')}
+                  placeholder={t('profile_setup.bio_placeholder')}
                   value={value}
                   onChangeText={onChange}
                   onBlur={onBlur}
@@ -249,8 +262,8 @@ export const ProfileSetupScreen: React.FC<ProfileSetupScreenProps> = ({ navigati
               name="phone_number"
               render={({ field: { onChange, onBlur, value } }) => (
                 <Input
-                  label="Phone Number (Optional)"
-                  placeholder="Enter your phone number"
+                  label={t('profile_setup.phone_optional')}
+                  placeholder={t('profile_setup.phone_placeholder')}
                   value={value}
                   onChangeText={onChange}
                   onBlur={onBlur}
@@ -266,9 +279,9 @@ export const ProfileSetupScreen: React.FC<ProfileSetupScreenProps> = ({ navigati
       case 3:
         return (
           <View style={styles.stepContent}>
-            <Text style={styles.stepTitle}>Location</Text>
+            <Text style={styles.stepTitle}>{t('profile_setup.location_title')}</Text>
             <Text style={styles.stepDescription}>
-              Help others find you by sharing your location.
+              {t('profile_setup.location_description')}
             </Text>
 
             <Controller
@@ -276,8 +289,8 @@ export const ProfileSetupScreen: React.FC<ProfileSetupScreenProps> = ({ navigati
               name="city"
               render={({ field: { onChange, onBlur, value } }) => (
                 <Input
-                  label="City"
-                  placeholder="Enter your city"
+                  label={t('profile_setup.city')}
+                  placeholder={t('profile_setup.city_placeholder')}
                   value={value}
                   onChangeText={onChange}
                   onBlur={onBlur}
@@ -292,8 +305,8 @@ export const ProfileSetupScreen: React.FC<ProfileSetupScreenProps> = ({ navigati
               name="state_province"
               render={({ field: { onChange, onBlur, value } }) => (
                 <Input
-                  label="State/Province"
-                  placeholder="Enter your state or province"
+                  label={t('profile_setup.state_province')}
+                  placeholder={t('profile_setup.state_province_placeholder')}
                   value={value}
                   onChangeText={onChange}
                   onBlur={onBlur}
@@ -308,8 +321,8 @@ export const ProfileSetupScreen: React.FC<ProfileSetupScreenProps> = ({ navigati
               name="country"
               render={({ field: { onChange, onBlur, value } }) => (
                 <Input
-                  label="Country"
-                  placeholder="Enter your country"
+                  label={t('profile_setup.country')}
+                  placeholder={t('profile_setup.country_placeholder')}
                   value={value}
                   onChangeText={onChange}
                   onBlur={onBlur}
@@ -324,9 +337,9 @@ export const ProfileSetupScreen: React.FC<ProfileSetupScreenProps> = ({ navigati
       case 4:
         return (
           <View style={styles.stepContent}>
-            <Text style={styles.stepTitle}>Financial Information</Text>
+            <Text style={styles.stepTitle}>{t('profile_setup.financial_info_title')}</Text>
             <Text style={styles.stepDescription}>
-              Optional information to help with better matching.
+              {t('profile_setup.financial_info_description')}
             </Text>
 
             <Controller
@@ -334,7 +347,7 @@ export const ProfileSetupScreen: React.FC<ProfileSetupScreenProps> = ({ navigati
               name="employment_status"
               render={({ field: { onChange, value } }) => (
                 <View style={styles.fieldContainer}>
-                  <Text style={styles.inputLabel}>Employment Status</Text>
+                  <Text style={styles.inputLabel}>{t('profile_setup.employment_status')}</Text>
                   <View style={styles.optionsContainer}>
                     {['employed', 'self_employed', 'student', 'unemployed', 'retired'].map((status) => (
                       <TouchableOpacity
@@ -349,7 +362,7 @@ export const ProfileSetupScreen: React.FC<ProfileSetupScreenProps> = ({ navigati
                           styles.optionText,
                           value === status && styles.optionTextSelected,
                         ]}>
-                          {status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                          {t(`profile_setup.${status}`)}
                         </Text>
                       </TouchableOpacity>
                     ))}
@@ -363,8 +376,8 @@ export const ProfileSetupScreen: React.FC<ProfileSetupScreenProps> = ({ navigati
               name="annual_income"
               render={({ field: { onChange, onBlur, value } }) => (
                 <Input
-                  label="Annual Income (Optional)"
-                  placeholder="Enter your annual income"
+                  label={t('profile_setup.annual_income')}
+                  placeholder={t('profile_setup.annual_income_placeholder')}
                   value={value?.toString() || ''}
                   onChangeText={(text) => {
                     const numericValue = parseInt(text.replace(/[^0-9]/g, ''));
@@ -390,14 +403,14 @@ export const ProfileSetupScreen: React.FC<ProfileSetupScreenProps> = ({ navigati
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color={COLORS.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Complete Your Profile</Text>
+        <Text style={styles.headerTitle}>{t('profile_setup.title')}</Text>
         <View style={styles.headerRight} />
       </View>
 
       <View style={styles.progressSection}>
         <ProgressBar
           progress={progressPercentage}
-          label={`Step ${currentStep} of ${totalSteps}`}
+          label={t('profile_setup.step_of', { current: currentStep, total: totalSteps })}
         />
       </View>
 
@@ -420,7 +433,7 @@ export const ProfileSetupScreen: React.FC<ProfileSetupScreenProps> = ({ navigati
         <View style={styles.buttonRow}>
           {currentStep > 1 && (
             <Button
-              title="Previous"
+              title={t('profile_setup.previous')}
               onPress={prevStep}
               variant="outline"
               style={styles.footerButton}
@@ -429,13 +442,16 @@ export const ProfileSetupScreen: React.FC<ProfileSetupScreenProps> = ({ navigati
 
           {currentStep < totalSteps ? (
             <Button
-              title="Next"
+              title={t('profile_setup.next')}
               onPress={nextStep}
-              style={[styles.footerButton, currentStep === 1 && styles.fullWidthButton]}
+              style={{
+                ...styles.footerButton,
+                ...(currentStep === 1 ? styles.fullWidthButton : {}),
+              }}
             />
           ) : (
             <Button
-              title="Complete Profile"
+              title={t('profile_setup.complete_profile')}
               onPress={handleSubmit(onSubmit)}
               loading={isLoading}
               style={styles.footerButton}

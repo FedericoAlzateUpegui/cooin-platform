@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -20,17 +20,13 @@ import { LanguageSwitcher } from '../../components/LanguageSwitcher';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { COLORS, SPACING, FONTS } from '../../constants/config';
 
-const registerSchema = z.object({
-  email: z.string().email('Please enter a valid email address'),
-  username: z.string().min(3, 'Username must be at least 3 characters').max(30, 'Username must be at most 30 characters'),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
-  confirmPassword: z.string(),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
-});
-
-type RegisterFormData = z.infer<typeof registerSchema>;
+// Type for form data (will be inferred from schema)
+type RegisterFormData = {
+  email: string;
+  username: string;
+  password: string;
+  confirmPassword: string;
+};
 
 interface RegisterScreenProps {
   navigation: any;
@@ -43,6 +39,25 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) =>
   const { register, isLoading, isAuthenticated, logout } = useAuthStore();
   const { width } = useWindowDimensions();
   const { t } = useLanguage();
+
+  // Create schema with translated messages - recreates when language changes
+  const registerSchema = useMemo(() => {
+    return z.object({
+      email: z.string()
+        .min(1, t('validation.email_required'))
+        .email(t('validation.email_invalid')),
+      username: z.string()
+        .min(3, t('validation.username_min'))
+        .max(30, t('validation.username_max')),
+      password: z.string()
+        .min(8, t('validation.password_too_short')),
+      confirmPassword: z.string()
+        .min(1, t('validation.confirm_password_required')),
+    }).refine((data) => data.password === data.confirmPassword, {
+      message: t('validation.passwords_must_match'),
+      path: ["confirmPassword"],
+    });
+  }, [t]);
 
   // Safety check: if there's a local error, make sure we're not authenticated
   useEffect(() => {
@@ -68,9 +83,58 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) =>
     },
   });
 
+  // Helper function to map backend errors to translated messages
+  const getTranslatedErrorMessage = (error: any): string => {
+    console.error('Registration error FULL OBJECT:', JSON.stringify(error, null, 2));
+    console.error('Registration error detail:', error.detail);
+    console.error('Registration error message:', error.message);
+    console.error('Registration error status_code:', error.status_code);
+
+    // Extract the raw error message
+    const rawError = error.detail || error.message || '';
+
+    // Map common backend error messages to translation keys
+    const errorMappings: Record<string, string> = {
+      'An account with this email already exists': 'validation.email_already_exists',
+      'This username is already taken': 'validation.username_already_exists',
+      'Username can only contain letters, numbers, underscores, and hyphens': 'validation.username_invalid',
+      'Value error, Username can only contain letters, numbers, underscores, and hyphens': 'validation.value_error_username',
+      'Password must contain at least one uppercase letter, one lowercase letter, and one number': 'validation.password_weak',
+      'Password must be at least 8 characters long': 'validation.password_too_short',
+      'Password confirmation does not match password': 'validation.passwords_must_match',
+      'Registration failed': 'validation.registration_failed',
+    };
+
+    // Check for exact matches
+    if (errorMappings[rawError]) {
+      return t(errorMappings[rawError]);
+    }
+
+    // Check for partial matches
+    const lowerError = rawError.toLowerCase();
+    if (lowerError.includes('email already exists') || lowerError.includes('email') && lowerError.includes('exists')) {
+      return t('validation.email_already_exists');
+    }
+    if (lowerError.includes('username') && lowerError.includes('taken')) {
+      return t('validation.username_already_exists');
+    }
+    if (lowerError.includes('username') && (lowerError.includes('letters') || lowerError.includes('contain'))) {
+      return t('validation.username_invalid');
+    }
+    if (lowerError.includes('password') && lowerError.includes('uppercase')) {
+      return t('validation.password_weak');
+    }
+    if (lowerError.includes('passwords') && lowerError.includes('match')) {
+      return t('validation.passwords_must_match');
+    }
+
+    // If no mapping found, return the original message or a generic error
+    return rawError || t('validation.backend_error');
+  };
+
   const onSubmit = async (data: RegisterFormData) => {
     if (!agreedToTerms) {
-      setLocalError('Please agree to the Terms of Service and Privacy Policy');
+      setLocalError(t('validation.terms_required'));
       return;
     }
 
@@ -82,24 +146,11 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) =>
       await register(data.email, data.username, data.password, data.confirmPassword, selectedRole, agreedToTerms);
       // If successful, navigation will be handled by the auth flow
     } catch (error: any) {
-      console.error('Registration error FULL OBJECT:', JSON.stringify(error, null, 2));
-      console.error('Registration error detail:', error.detail);
-      console.error('Registration error message:', error.message);
-      console.error('Registration error status_code:', error.status_code);
-
-      // Extract error message from various possible formats
-      let errorMessage = 'Registration failed. Please try again.';
-
-      if (error.detail) {
-        errorMessage = error.detail;
-      } else if (error.message) {
-        errorMessage = error.message;
-      } else if (typeof error === 'string') {
-        errorMessage = error;
-      }
+      // Get translated error message
+      const translatedError = getTranslatedErrorMessage(error);
 
       // Set local error to display
-      setLocalError(errorMessage);
+      setLocalError(translatedError);
 
       // Prevent any navigation by not re-throwing the error
       return; // Explicitly return to prevent any further execution
