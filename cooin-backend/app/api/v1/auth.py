@@ -16,6 +16,7 @@ from app.services.user_service import UserService
 from app.core.deps import get_current_active_user, get_database
 from app.core.security import jwt_handler
 from app.core.config import settings
+from app.utils.educational_messages import EducationalMessageSender
 
 logger = logging.getLogger(__name__)
 
@@ -88,6 +89,13 @@ async def register(
 
     # Convert to response schema
     user_response = UserResponse.from_orm(user)
+
+    # Send welcome message with educational content
+    try:
+        EducationalMessageSender.send_welcome_message(db, user.id)
+    except Exception as e:
+        logger.error(f"Failed to send welcome message to user {user.id}: {e}")
+        # Don't fail registration if message sending fails
 
     logger.info(f"New user registered: {user.email}")
 

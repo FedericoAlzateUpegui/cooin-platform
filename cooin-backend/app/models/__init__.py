@@ -40,6 +40,13 @@ from app.models.rating import (
     RatingCategory
 )
 
+# Import system message models
+from app.models.system_message import (
+    SystemMessage,
+    SystemMessageType,
+    SystemMessagePriority
+)
+
 # Export all models
 __all__ = [
     # User models
@@ -73,4 +80,9 @@ __all__ = [
     "DocumentUpload",
     "DocumentType",
     "DocumentStatus",
+
+    # System message models
+    "SystemMessage",
+    "SystemMessageType",
+    "SystemMessagePriority",
 ]

@@ -177,71 +177,74 @@ async def search_matches(
     return matches
 
 
-@router.post("/{connection_id}/messages", response_model=MessageResponse, status_code=status.HTTP_201_CREATED)
-async def send_message(
-    connection_id: int,
-    message_data: MessageCreate,
-    current_user: User = Depends(get_current_active_user),
-    db: Session = Depends(get_database)
-):
-    """Send a message in a connection."""
-    message = ConnectionService.send_message(
-        db=db,
-        connection_id=connection_id,
-        sender_id=current_user.id,
-        message_data=message_data
-    )
-    if not message:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Connection not found or you don't have permission to send messages"
-        )
-    return message
+# DISABLED: User-to-user messaging has been removed
+# System-to-user notifications are now available via /api/v1/system-messages
+
+# @router.post("/{connection_id}/messages", response_model=MessageResponse, status_code=status.HTTP_201_CREATED)
+# async def send_message(
+#     connection_id: int,
+#     message_data: MessageCreate,
+#     current_user: User = Depends(get_current_active_user),
+#     db: Session = Depends(get_database)
+# ):
+#     """Send a message in a connection."""
+#     message = ConnectionService.send_message(
+#         db=db,
+#         connection_id=connection_id,
+#         sender_id=current_user.id,
+#         message_data=message_data
+#     )
+#     if not message:
+#         raise HTTPException(
+#             status_code=status.HTTP_404_NOT_FOUND,
+#             detail="Connection not found or you don't have permission to send messages"
+#         )
+#     return message
 
 
-@router.get("/{connection_id}/messages", response_model=MessageListResponse)
-async def get_messages(
-    connection_id: int,
-    page: int = Query(1, ge=1),
-    page_size: int = Query(50, ge=1, le=100),
-    current_user: User = Depends(get_current_active_user),
-    db: Session = Depends(get_database)
-):
-    """Get messages for a connection."""
-    messages = ConnectionService.get_connection_messages(
-        db=db,
-        connection_id=connection_id,
-        user_id=current_user.id,
-        page=page,
-        page_size=page_size
-    )
-    if messages is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Connection not found or you don't have access"
-        )
-    return messages
+# @router.get("/{connection_id}/messages", response_model=MessageListResponse)
+# async def get_messages(
+#     connection_id: int,
+#     page: int = Query(1, ge=1),
+#     page_size: int = Query(50, ge=1, le=100),
+#     current_user: User = Depends(get_current_active_user),
+#     db: Session = Depends(get_database)
+# ):
+#     """Get messages for a connection."""
+#     messages = ConnectionService.get_connection_messages(
+#         db=db,
+#         connection_id=connection_id,
+#         user_id=current_user.id,
+#         page=page,
+#         page_size=page_size
+#     )
+#     if messages is None:
+#         raise HTTPException(
+#             status_code=status.HTTP_404_NOT_FOUND,
+#             detail="Connection not found or you don't have access"
+#         )
+#     return messages
 
 
-@router.put("/{connection_id}/messages/{message_id}/read", status_code=status.HTTP_204_NO_CONTENT)
-async def mark_message_read(
-    connection_id: int,
-    message_id: int,
-    current_user: User = Depends(get_current_active_user),
-    db: Session = Depends(get_database)
-):
-    """Mark a message as read."""
-    success = ConnectionService.mark_message_read(
-        db=db,
-        message_id=message_id,
-        user_id=current_user.id,
-        connection_id=connection_id
-    )
-    if not success:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Message not found or you don't have permission"
-        )
+# @router.put("/{connection_id}/messages/{message_id}/read", status_code=status.HTTP_204_NO_CONTENT)
+# async def mark_message_read(
+#     connection_id: int,
+#     message_id: int,
+#     current_user: User = Depends(get_current_active_user),
+#     db: Session = Depends(get_database)
+# ):
+#     """Mark a message as read."""
+#     success = ConnectionService.mark_message_read(
+#         db=db,
+#         message_id=message_id,
+#         user_id=current_user.id,
+#         connection_id=connection_id
+#     )
+#     if not success:
+#         raise HTTPException(
+#             status_code=status.HTTP_404_NOT_FOUND,
+#             detail="Message not found or you don't have permission"
+#         )
 
 
 @router.post("/{connection_id}/block", status_code=status.HTTP_204_NO_CONTENT)

@@ -1,5 +1,197 @@
 # Cooin Web App - Change History
 
+## 2025-11-14 (Session 13) - System-to-User Notifications with Educational Content
+
+**Goal**: Replace user-to-user chat with system-to-user notifications featuring educational content about lending business, and implement full internationalization (i18n) support.
+
+**Changes/Fixes**:
+
+### Backend Implementation
+
+1. **System Message Model** (`app/models/system_message.py`)
+   - Created comprehensive `SystemMessage` model with 6 message types:
+     - `MATCH_NOTIFICATION` - Match and connection updates
+     - `EDUCATIONAL` - Educational tips about lending
+     - `ANNOUNCEMENT` - Platform announcements
+     - `REMINDER` - Activity reminders
+     - `SAFETY_TIP` - Safety and security tips
+     - `FEATURE_UPDATE` - New feature notifications
+   - Added 4 priority levels: `LOW`, `MEDIUM`, `HIGH`, `URGENT`
+   - Included fields: title, content, action_url, action_label, image_url, category, tags
+   - Implemented status tracking: is_read, is_archived, is_deleted with timestamps
+   - Added expiration support for time-sensitive messages
+   - Methods: `mark_as_read()`, `archive()`, `soft_delete()`, `is_expired()`
+
+2. **Database Migration** (`alembic/versions/5508a3cefef2_add_system_messages_table.py`)
+   - Created `system_messages` table with all necessary columns
+   - Added enums for `SystemMessageType` and `SystemMessagePriority`
+   - Created indexes on `user_id` and `is_read` for performance
+   - Migration successfully applied: `alembic upgrade head`
+
+3. **System Message Service** (`app/services/system_message_service.py`)
+   - Created `SystemMessageService` class with methods:
+     - `create_message()` - Create single message
+     - `create_bulk_messages()` - Send to multiple users
+     - `get_user_messages()` - Paginated retrieval with filters
+     - `mark_as_read()`, `mark_all_as_read()` - Read status management
+     - `archive_message()`, `delete_message()` - Message management
+     - `get_unread_count()` - For notification badges
+     - `get_message_stats()` - Statistics by type and priority
+     - `cleanup_expired_messages()` - Scheduled job support
+   - **8 Educational Tips about Lending Business**:
+     - Verify borrower's credit history
+     - Diversify lending portfolio
+     - Set clear repayment terms
+     - Understanding interest rate calculations
+     - Assess borrower creditworthiness
+     - Document everything
+     - Red flags to watch for
+     - Know your local lending laws
+   - **4 Safety Tips**:
+     - Never share banking passwords
+     - Meet in public places
+     - Verify identity documents
+     - Trust your instincts
+
+4. **Educational Message Helper** (`app/utils/educational_messages.py`)
+   - Created `EducationalMessageSender` class with methods:
+     - `send_welcome_message()` - Welcome new users
+     - `send_random_educational_tip()` - Send lending tips
+     - `send_random_safety_tip()` - Send safety reminders
+     - `send_daily_tip_to_all_users()` - Bulk educational content
+     - `send_match_notification()` - New match alerts
+     - `send_connection_accepted_notification()` - Connection updates
+     - `send_profile_completion_reminder()` - Activity prompts
+     - `send_feature_announcement()` - Platform updates
+     - `send_security_alert()` - Urgent security notices
+   - Helper functions: `send_weekly_educational_content()`, `send_onboarding_sequence()`
+
+5. **System Message API Endpoints** (`app/api/v1/system_messages.py`)
+   - `GET /api/v1/system-messages/` - Get paginated messages with filters
+   - `GET /api/v1/system-messages/stats` - Message statistics
+   - `GET /api/v1/system-messages/unread-count` - Unread count for badges
+   - `GET /api/v1/system-messages/{id}` - Get specific message
+   - `PUT /api/v1/system-messages/{id}/read` - Mark as read
+   - `PUT /api/v1/system-messages/read-all` - Mark all as read
+   - `PUT /api/v1/system-messages/{id}/archive` - Archive message
+   - `DELETE /api/v1/system-messages/{id}` - Delete message (soft delete)
+   - All endpoints require authentication via `get_current_user` dependency
+
+6. **Welcome Message Integration** (`app/api/v1/auth.py`)
+   - Added `EducationalMessageSender.send_welcome_message()` to registration flow
+   - New users automatically receive welcome message with app introduction
+   - Error handling ensures registration succeeds even if message fails
+
+7. **Disabled User-to-User Messaging** (`app/api/v1/connections.py`)
+   - Commented out all user-to-user message endpoints:
+     - `POST /connections/{connection_id}/messages` ❌
+     - `GET /connections/{connection_id}/messages` ❌
+     - `PUT /connections/{connection_id}/messages/{message_id}/read` ❌
+   - Added comment directing to new system: `/api/v1/system-messages`
+
+8. **Model Registration** (`app/models/__init__.py`)
+   - Added `SystemMessage`, `SystemMessageType`, `SystemMessagePriority` to imports
+   - Updated `__all__` exports for Alembic autodiscovery
+
+9. **User Model Relationship** (`app/models/user.py`)
+   - Added `system_messages` relationship with cascade delete
+
+### Frontend Implementation
+
+10. **System Notification Service** (`src/services/systemNotificationService.ts`)
+    - Created TypeScript service with interfaces: `SystemMessage`, `SystemMessageListResponse`, `SystemMessageStats`
+    - Methods matching backend API:
+      - `getMessages()` - Fetch with filters (type, priority, read status)
+      - `getMessage()` - Get single message
+      - `getUnreadCount()` - For notification badge
+      - `getStats()` - Message statistics
+      - `markAsRead()`, `markAllAsRead()` - Read management
+      - `archiveMessage()`, `deleteMessage()` - Message actions
+    - Helper functions:
+      - `getMessageTypeLabel()` - Human-readable type names
+      - `getMessageTypeIcon()` - Emoji icons (🤝📚📢⏰🛡️✨)
+      - `getPriorityColor()` - Color coding for priorities
+
+11. **NotificationsScreen** (`src/screens/notifications/NotificationsScreen.tsx`)
+    - Replaced `MessagesScreen` with modern notification center
+    - **Features**:
+      - Three filter tabs: All / Unread / Educational (📚 Learning)
+      - Unread count badge display
+      - "Mark all read" functionality
+      - Pull-to-refresh support
+      - Color-coded message types
+      - Priority indicators (urgent badge)
+      - Category tags
+      - Action buttons with deep linking support
+      - Empty states with helpful messages
+      - Time formatting (just now, Xm ago, Xh ago, etc.)
+    - **UI Components**:
+      - Icon container with emoji and colored background
+      - Unread dot indicator
+      - Timestamp display
+      - Category badges
+      - Urgent priority badge (red)
+      - Unread messages highlighted with border
+
+12. **Navigation Updates** (`src/navigation/AppNavigator.tsx`)
+    - Changed navigation item: "Messages" → "Notifications"
+    - Updated icon: `chatbubbles` → `notifications`
+    - Updated component import: `MessagesScreen` → `NotificationsScreen`
+    - Updated label key: `navigation.messages` → `navigation.notifications`
+
+13. **Internationalization Support**
+    - **Spanish Translations** (`src/i18n/locales/es.json`):
+      - `notifications.title`: "Notificaciones"
+      - `notifications.mark_all_read`: "Marcar todo como leído"
+      - Filter tabs: "Todas", "No leídas", "Aprendizaje"
+      - Time formats: "Ahora mismo", "Hace {{count}}m", "Hace {{count}}h", "Ayer"
+      - Empty states and descriptions
+      - Message types and urgent label
+    - **English Translations** (`src/i18n/locales/en.json`):
+      - Complete matching translations for English
+      - Same structure with proper interpolation support
+    - **NotificationsScreen i18n**:
+      - All hardcoded strings replaced with `t()` function
+      - Dynamic time formatting: `t('notifications.minutes_ago', { count: minutes })`
+      - Filter tabs use translation keys
+      - Empty states use conditional translations based on filter
+      - Language switches automatically based on user preference
+
+14. **Color Configuration** (`src/constants/config.ts`)
+    - Added `info: "#3b82f6"` color for informational messages
+
+**Files Changed**:
+- **Backend (Python/FastAPI)**:
+  - `app/models/system_message.py` - New SystemMessage model
+  - `app/models/user.py:70` - Added system_messages relationship
+  - `app/models/__init__.py:44-48,85-87` - Registered SystemMessage exports
+  - `app/schemas/system_message.py` - New schemas (Create, Update, Response, List, Stats)
+  - `app/services/system_message_service.py` - Service layer with educational content
+  - `app/utils/educational_messages.py` - Educational message helper utilities
+  - `app/api/v1/system_messages.py` - New API endpoints
+  - `app/api/v1/__init__.py:3,9` - Registered system_messages router
+  - `app/api/v1/auth.py:19,94-98` - Welcome message integration
+  - `app/api/v1/connections.py:180-247` - Commented out user messaging endpoints
+  - `alembic/versions/5508a3cefef2_add_system_messages_table.py` - Database migration
+
+- **Frontend (React Native/TypeScript)**:
+  - `src/services/systemNotificationService.ts` - New notification service
+  - `src/screens/notifications/NotificationsScreen.tsx` - New notification screen (replacing MessagesScreen)
+  - `src/navigation/AppNavigator.tsx:13,31` - Updated to NotificationsScreen
+  - `src/constants/config.ts:44` - Added info color
+  - `src/i18n/locales/es.json:422,427-448` - Spanish translations for notifications
+  - `src/i18n/locales/en.json:422,427-448` - English translations for notifications
+
+**Educational Content Included**:
+- **8 Lending Tips**: Credit verification, diversification, interest calculations, risk assessment, documentation, red flags, legal compliance
+- **4 Safety Tips**: Password security, public meetings, identity verification, trusting instincts
+
+**Status**: ✅ Backend running successfully on http://localhost:8000 | Frontend ready with full i18n support | System-to-user messaging operational | Educational content integrated
+
+**Key Learning**: Successfully transformed peer-to-peer messaging into a scalable system-to-user notification platform with educational content that helps users make informed lending decisions. Implemented comprehensive internationalization ensuring all user-facing text dynamically adapts to language preferences.
+
+---
+
 ## 2025-11-12 (Session 12) - Responsive Navigation & Navigation Hook Fixes
 
 **Goal**: Implement responsive navigation with desktop sidebar and mobile bottom tabs, fix web scrolling issues, and resolve navigation prop access problems.

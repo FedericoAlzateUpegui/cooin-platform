@@ -67,6 +67,7 @@ class User(Base):
     saved_searches = relationship("SavedSearch", back_populates="user", cascade="all, delete-orphan")
     search_logs = relationship("SearchLog", back_populates="user", cascade="all, delete-orphan")
     documents = relationship("DocumentUpload", foreign_keys="DocumentUpload.user_id", back_populates="user", cascade="all, delete-orphan")
+    system_messages = relationship("SystemMessage", back_populates="user", cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"<User(id={self.id}, email='{self.email}', role='{self.role.value}')>"

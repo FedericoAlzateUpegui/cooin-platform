@@ -10,7 +10,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { AuthNavigator } from './AuthNavigator';
 import { MatchingScreen } from '../screens/matching/MatchingScreen';
 import { ConnectionsScreen } from '../screens/connections/ConnectionsScreen';
-import { MessagesScreen } from '../screens/messages/MessagesScreen';
+import { NotificationsScreen } from '../screens/notifications/NotificationsScreen';
 import { ProfileSetupScreen } from '../screens/profile/ProfileSetupScreen';
 import { HomeScreen } from '../screens/home/HomeScreen';
 import { SettingsScreen } from '../screens/settings/SettingsScreen';
@@ -28,7 +28,7 @@ const navigationItems = [
   { name: 'Home', component: HomeScreen, iconFocused: 'home', iconOutline: 'home-outline', labelKey: 'navigation.home' },
   { name: 'Matching', component: MatchingScreen, iconFocused: 'people', iconOutline: 'people-outline', labelKey: 'navigation.matching' },
   { name: 'Connections', component: ConnectionsScreen, iconFocused: 'link', iconOutline: 'link-outline', labelKey: 'navigation.connections' },
-  { name: 'Messages', component: MessagesScreen, iconFocused: 'chatbubbles', iconOutline: 'chatbubbles-outline', labelKey: 'navigation.messages' },
+  { name: 'Notifications', component: NotificationsScreen, iconFocused: 'notifications', iconOutline: 'notifications-outline', labelKey: 'navigation.notifications' },
   { name: 'Settings', component: SettingsScreen, iconFocused: 'settings', iconOutline: 'settings-outline', labelKey: 'navigation.settings' },
 ];
 
