@@ -11,15 +11,42 @@ Before launching, ensure you have:
 - ✅ Python 3.10+ installed
 - ✅ Node.js 18+ installed
 - ✅ PostgreSQL 14+ or SQLite (for development)
+- ✅ Docker Desktop (for Redis) - see [DOCKER-SETUP-GUIDE.md](./DOCKER-SETUP-GUIDE.md)
 - ✅ cloudflared installed (for sharing with partners)
 
 ---
 
 ## 🚀 Quick Launch (Local Development Only)
 
-### Step 1: Start Backend
+### Step 0: Start Redis (Docker)
+
+**First Time Setup**: See [DOCKER-SETUP-GUIDE.md](./DOCKER-SETUP-GUIDE.md) to install Docker Desktop
 
 Open **Terminal 1** in VS Code:
+
+```cmd
+cd C:\Windows\System32\cooin-app
+docker-compose up -d redis
+```
+
+**Verify Redis is running:**
+```cmd
+docker ps
+```
+
+**Expected output:**
+```
+CONTAINER ID   IMAGE            STATUS                   PORTS                    NAMES
+018605d62c13   redis:7-alpine   Up 2 minutes (healthy)   0.0.0.0:6379->6379/tcp   cooin-redis
+```
+
+**Redis Connection**: Backend automatically connects to `redis://localhost:6379/0`
+
+---
+
+### Step 1: Start Backend
+
+Open **Terminal 2** in VS Code:
 
 ```cmd
 cd C:\Windows\System32\cooin-app\cooin-backend
@@ -28,6 +55,7 @@ python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 **Wait for:**
 ```
+INFO: Connected to Redis cache server
 INFO: Uvicorn running on http://0.0.0.0:8000
 INFO: Application startup complete.
 ```
@@ -39,7 +67,7 @@ INFO: Application startup complete.
 
 ### Step 2: Start Frontend
 
-Open **Terminal 2** in VS Code:
+Open **Terminal 3** in VS Code:
 
 ```cmd
 cd C:\Windows\System32\cooin-app\cooin-frontend

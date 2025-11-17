@@ -15,6 +15,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { MatchCard } from '../../components/MatchCard';
 import { Button } from '../../components/Button';
 import { Input } from '../../components/Input';
+import { LoadingState, EmptyState } from '../../components/LoadingState';
 import { matchingService } from '../../services/matchingService';
 import { useAuthStore } from '../../store/authStore';
 import { MatchingResult, MatchingCriteria } from '../../types/api';
@@ -276,6 +277,19 @@ export const MatchingScreen: React.FC<MatchingScreenProps> = ({ navigation }) =>
       loading={connectingId === item.user_id}
     />
   );
+
+  // Show full screen loading on initial load
+  if (isLoading && matches.length === 0) {
+    return (
+      <SafeAreaView style={styles.container}>
+        {renderHeader()}
+        <LoadingState
+          text={t('matching_screen.loading')}
+          fullScreen
+        />
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>

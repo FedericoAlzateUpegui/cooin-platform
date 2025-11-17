@@ -1,54 +1,53 @@
 # FastAPI and ASGI Server
-fastapi==0.104.1
-uvicorn[standard]==0.24.0
+fastapi==0.115.5
+uvicorn[standard]==0.32.1
 
 # Database
-sqlalchemy==2.0.23
-alembic==1.12.1
-psycopg2-binary==2.9.9
+sqlalchemy==2.0.36
+alembic==1.14.0
+psycopg2-binary==2.9.10
 
 # Authentication & Security
 python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
-bcrypt==4.0.1
-python-multipart==0.0.6
+bcrypt==4.2.1
+python-multipart==0.0.17
 
 # Environment & Configuration
-python-dotenv==1.0.0
-pydantic-settings==2.0.3
+python-dotenv==1.0.1
+pydantic-settings==2.6.1
 
 # HTTP Client for external API calls
-httpx==0.25.2
+httpx==0.28.1
 
 # Validation & Serialization
-email-validator==2.1.0
-pydantic[email]==2.5.0
+email-validator==2.2.0
+pydantic[email]==2.10.3
 
 # Development & Testing
-pytest==7.4.3
-pytest-asyncio==0.21.1
-pytest-cov==4.1.0
-pytest-mock==3.12.0
-httpx==0.25.2
-factory-boy==3.3.0
+pytest==8.3.4
+pytest-asyncio==0.24.0
+pytest-cov==6.0.0
+pytest-mock==3.14.0
+factory-boy==3.3.1
 
 # CORS is handled by FastAPI's built-in middleware
 # No separate package needed
 
 # Logging & Monitoring
-structlog==23.2.0
+structlog==24.4.0
 
 # Background Tasks (optional for future use)
-celery==5.3.4
-redis==5.0.1
+celery==5.4.0
+redis==5.2.1
 
 # File handling (for profile images, documents)
 python-magic==0.4.27
-pillow==10.1.0
+pillow==11.0.0
 
 # Date & Time utilities
-python-dateutil==2.8.2
+python-dateutil==2.9.0.post0
 
 # Production WSGI server (alternative to uvicorn)
-gunicorn==21.2.0
+gunicorn==23.0.0
 user-agents==2.2.0

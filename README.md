@@ -19,7 +19,22 @@ cooin-platform/
 
 ## 🚀 Quick Start
 
-**Prerequisites**: Python 3.10+, PostgreSQL 14+, Node.js 18+, Redis (optional)
+**Prerequisites**: Python 3.10+, PostgreSQL 14+, Node.js 18+, Docker Desktop (for Redis)
+
+### Docker & Redis (Recommended)
+```bash
+# Start Redis container (runs in background)
+docker-compose up -d redis
+
+# Check Redis status
+docker ps
+
+# Stop Redis
+docker-compose down
+```
+**Note**: Requires Docker Desktop with Intel VT-x/AMD-V virtualization enabled in BIOS
+
+→ See [DOCKER-SETUP-GUIDE.md](./DOCKER-SETUP-GUIDE.md) | [ENABLE-VIRTUALIZATION-GUIDE.md](./ENABLE-VIRTUALIZATION-GUIDE.md)
 
 ### Backend
 ```bash
@@ -115,9 +130,9 @@ Multi-layer middleware (headers, validation, DDoS, rate limiting 100/hr) | JWT (
 
 **Services** (separate terminals):
 ```bash
-# 1. Backend: uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-# 2. Frontend: npx expo start --web
-# 3. Redis: redis-server (optional)
+# 1. Redis (Docker): docker-compose up -d redis
+# 2. Backend: cd cooin-backend && python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+# 3. Frontend: cd cooin-frontend && npx expo start --web --port 8083
 ```
 
 ## 🌐 Public Access
@@ -148,9 +163,10 @@ ngrok http 8083   # Frontend
 ## 📖 Documentation
 
 **Setup**: [LAUNCH-WEB-APP.md](./HOW-TO-LAUNCH-WEB-APP.md) | [TECH_STACK.md](./TECH_STACK.md)
+**Docker/Redis**: [DOCKER-SETUP-GUIDE.md](./DOCKER-SETUP-GUIDE.md) | [ENABLE-VIRTUALIZATION-GUIDE.md](./ENABLE-VIRTUALIZATION-GUIDE.md) | [REDIS_SETUP.md](./REDIS_SETUP.md)
 **Tunnels**: [Cloudflare Quick](./CLOUDFLARE-QUICKSTART.md) | [Cloudflare Full](./CLOUDFLARE-TUNNEL-SETUP.md) | [Ngrok Quick](./NGROK-QUICKSTART.md) | [Ngrok Full](./NGROK-SETUP.md)
 **Troubleshooting**: [PERMISSION-FIX.md](./PERMISSION-FIX.md) | [HISTORY.md](./HISTORY.md) | [TODO.md](./TODO.md)
-**Contributing**: [DOCUMENTATION_PROCESS.md](./DOCUMENTATION_PROCESS.md) - How to maintain project documentation
+**Contributing**: [DP.md](./DP.md) - Documentation Process guide
 
 ---
 

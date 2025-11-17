@@ -97,24 +97,53 @@ class CacheService:
         self.use_redis = True
 
     async def connect(self) -> bool:
-        """Connect to Redis server."""
-        try:
-            self.redis_client = redis.from_url(
-                settings.REDIS_URL,
-                encoding="utf-8",
-                decode_responses=False  # We handle encoding manually
-            )
-            # Test connection
-            await self.redis_client.ping()
-            self.connected = True
-            self.use_redis = True
-            logger.info("Connected to Redis cache server")
-            return True
-        except (RedisConnectionError, RedisError) as e:
-            logger.warning(f"Failed to connect to Redis: {e}. Using in-memory cache fallback.")
-            self.connected = False
-            self.use_redis = False
-            return False
+        """Connect to Redis server with connection pooling and retry logic."""
+        max_retries = 3
+        retry_delay = 1  # seconds
+
+        for attempt in range(max_retries):
+            try:
+                # Create connection pool for better performance and resource management
+                pool = redis.ConnectionPool.from_url(
+                    settings.REDIS_URL,
+                    encoding="utf-8",
+                    decode_responses=False,  # We handle encoding manually
+                    max_connections=50,  # Maximum connections in pool
+                    socket_timeout=5,  # Socket timeout in seconds
+                    socket_connect_timeout=5,  # Connection timeout
+                    socket_keepalive=True,  # Enable TCP keepalive
+                    socket_keepalive_options={
+                        1: 1,  # TCP_KEEPIDLE
+                        2: 1,  # TCP_KEEPINTVL
+                        3: 3,  # TCP_KEEPCNT
+                    },
+                    retry_on_timeout=True,  # Retry on timeout
+                    health_check_interval=30,  # Check connection health every 30s
+                )
+
+                self.redis_client = redis.Redis(connection_pool=pool)
+
+                # Test connection
+                await self.redis_client.ping()
+                self.connected = True
+                self.use_redis = True
+                logger.info(f"Connected to Redis cache server (attempt {attempt + 1}/{max_retries})")
+                return True
+
+            except (RedisConnectionError, RedisError) as e:
+                logger.warning(
+                    f"Failed to connect to Redis (attempt {attempt + 1}/{max_retries}): {e}"
+                )
+                if attempt < max_retries - 1:
+                    await asyncio.sleep(retry_delay)
+                    retry_delay *= 2  # Exponential backoff
+                else:
+                    logger.warning("All Redis connection attempts failed. Using in-memory cache fallback.")
+                    self.connected = False
+                    self.use_redis = False
+                    return False
+
+        return False
 
     async def disconnect(self):
         """Disconnect from Redis server."""
