@@ -11,6 +11,9 @@ class Settings(BaseSettings):
     PROJECT_VERSION: str = "1.0.0"
     DEBUG: bool = False
 
+    # Environment Configuration
+    ENVIRONMENT: str = "development"  # development, staging, production
+
     # Security Configuration
     SECRET_KEY: str = secrets.token_urlsafe(32)
     ALGORITHM: str = "HS256"
@@ -74,6 +77,28 @@ class Settings(BaseSettings):
     # Rate Limiting Configuration
     RATE_LIMIT_REQUESTS: int = 100
     RATE_LIMIT_WINDOW: int = 3600  # 1 hour in seconds
+
+    # Security Middleware Configuration (Environment-aware)
+    ENABLE_SECURITY_HEADERS: bool = True
+    ENABLE_RATE_LIMITING: bool = True
+    ENABLE_DDOS_PROTECTION: bool = True
+    ENABLE_REQUEST_VALIDATION: bool = True
+    ENABLE_SECURITY_LOGGING: bool = True
+
+    @property
+    def is_production(self) -> bool:
+        """Check if running in production environment."""
+        return self.ENVIRONMENT == "production"
+
+    @property
+    def is_development(self) -> bool:
+        """Check if running in development environment."""
+        return self.ENVIRONMENT == "development"
+
+    @property
+    def security_enabled(self) -> bool:
+        """Security features should be fully enabled in production."""
+        return self.is_production or self.ENVIRONMENT == "staging"
 
     # External API Configuration
     EXTERNAL_API_KEY: str = ""

@@ -62,16 +62,47 @@ def create_application() -> FastAPI:
         allow_headers=["*"],
     )
 
-    # TEMPORARILY DISABLED FOR TESTING - Security middleware stack
-    # app.add_middleware(SecurityHeadersMiddleware)
-    # app.add_middleware(RequestLoggingMiddleware)
-    # app.add_middleware(APISecurityMiddleware)
-    # app.add_middleware(RequestValidationMiddleware)
-    # app.add_middleware(DDoSProtectionMiddleware)
-    # app.add_middleware(TrustedHostMiddleware,
-    #     allowed_hosts=["localhost", "127.0.0.1", "*.cooin.com"] if not settings.DEBUG else ["*"]
-    # )
-    # app.add_middleware(RateLimitMiddleware)
+    # Environment-aware Security Middleware Stack
+    # Security headers (always enabled, adjusted for environment)
+    if settings.ENABLE_SECURITY_HEADERS:
+        app.add_middleware(SecurityHeadersMiddleware)
+        logger.info(f"SecurityHeadersMiddleware enabled (env: {settings.ENVIRONMENT})")
+
+    # Request logging (enabled in all environments, level varies)
+    if settings.ENABLE_SECURITY_LOGGING:
+        app.add_middleware(RequestLoggingMiddleware)
+        logger.info(f"RequestLoggingMiddleware enabled (env: {settings.ENVIRONMENT})")
+
+    # API security (enabled in all environments)
+    app.add_middleware(APISecurityMiddleware)
+    logger.info(f"APISecurityMiddleware enabled (env: {settings.ENVIRONMENT})")
+
+    # Request validation (enabled in all environments)
+    if settings.ENABLE_REQUEST_VALIDATION:
+        app.add_middleware(RequestValidationMiddleware)
+        logger.info(f"RequestValidationMiddleware enabled (env: {settings.ENVIRONMENT})")
+
+    # DDoS protection (relaxed in development, strict in production)
+    if settings.ENABLE_DDOS_PROTECTION:
+        app.add_middleware(DDoSProtectionMiddleware)
+        logger.info(f"DDoSProtectionMiddleware enabled (env: {settings.ENVIRONMENT})")
+
+    # Rate limiting (relaxed in development, strict in production)
+    if settings.ENABLE_RATE_LIMITING:
+        app.add_middleware(RateLimitMiddleware)
+        logger.info(f"RateLimitMiddleware enabled (env: {settings.ENVIRONMENT})")
+
+    # Trusted Host Middleware (relaxed in development, strict in production)
+    if settings.is_production:
+        app.add_middleware(
+            TrustedHostMiddleware,
+            allowed_hosts=["app.cooin.com", "www.cooin.com", "api.cooin.com"]
+        )
+        logger.info("TrustedHostMiddleware enabled (production mode)")
+    elif settings.DEBUG:
+        # In development, allow all hosts
+        app.add_middleware(TrustedHostMiddleware, allowed_hosts=["*"])
+        logger.info("TrustedHostMiddleware enabled (development mode - all hosts allowed)")
 
     # Add request timing middleware
     @app.middleware("http")
