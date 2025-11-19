@@ -245,7 +245,7 @@ class ActiveSession(BaseModel):
 
     class Config:
         from_attributes = True
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "token_id": 1,
                 "device_info": "iPhone 12 - iOS",

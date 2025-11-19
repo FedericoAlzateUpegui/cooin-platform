@@ -1,5 +1,93 @@
 # Cooin Web App - Change History
 
+## 2025-11-19 (Session 15) - Pydantic V2 Migration & Full App Testing
+
+**Goal**: Complete Pydantic V2 migration and verify full application functionality with Docker Redis integration.
+
+**Changes/Fixes**:
+
+### Pydantic V2 Migration - COMPLETED
+
+1. **Schema Update (app/schemas/auth.py:248)**
+   - Updated deprecated `schema_extra` to `json_schema_extra` in SessionInfo class
+   - Eliminated Pydantic V2 deprecation warning
+   - All 4 schema files now fully compliant with Pydantic V2
+
+### Full Application Testing - PASSED ✅
+
+2. **Backend Startup Verification**
+   - Backend started successfully with no Pydantic warnings
+   - Redis connection established on first attempt (redis://localhost:6379)
+   - All services initialized correctly
+
+3. **Frontend Integration Testing**
+   - User registration flow: ✅ Working
+   - User login flow: ✅ Working
+   - Profile setup workflow (4 steps): ✅ Working
+   - System notifications: ✅ Working
+   - Welcome message delivery: ✅ Working
+   - Form validation on blur: ✅ Working
+   - Internationalization (EN/ES): ✅ Working
+   - Duplicate email error handling: ✅ Working (clear error message displayed)
+
+### Security Hardening & Production Preparation - COMPLETED ✅
+
+4. **Security Audit Completed**
+   - Comprehensive security review of entire application stack
+   - Identified critical issues: secrets management, disabled middleware, HTTPS
+   - Created detailed security scoring (current: 4.7/10, target: 10/10)
+   - Documented all OWASP Top 10 vulnerabilities and mitigations
+
+5. **Security Documentation Created**
+   - `SECURITY-AUDIT.md`: Complete security assessment and findings
+   - `PRODUCTION-SECURITY-GUIDE.md`: Step-by-step production deployment guide
+   - Verified `.env` in `.gitignore` (secured ✅)
+   - Confirmed `.env.example` template exists and is comprehensive
+
+6. **Environment-Aware Security Implemented**
+   - Added `ENVIRONMENT` configuration (development/staging/production)
+   - Enabled ALL security middleware conditionally based on environment
+   - Development mode: Relaxed security for easy development
+   - Production mode: Full security enforcement
+   - Created `.env.production.template` for production deployment
+
+7. **Security Middleware Now Active**
+   - SecurityHeadersMiddleware: ✅ Enabled (environment-aware)
+   - RequestLoggingMiddleware: ✅ Enabled
+   - APISecurityMiddleware: ✅ Enabled
+   - RequestValidationMiddleware: ✅ Enabled
+   - DDoSProtectionMiddleware: ✅ Enabled
+   - RateLimitMiddleware: ✅ Enabled
+   - TrustedHostMiddleware: ✅ Enabled (relaxed in dev, strict in prod)
+
+8. **Environment Switching Guide Created**
+   - `ENVIRONMENT-GUIDE.md`: Complete guide for switching environments
+   - Documented security differences by environment
+   - Testing procedures for each environment
+   - Troubleshooting common issues
+
+**Files Changed**:
+- `cooin-backend/app/schemas/auth.py` - Updated line 248: schema_extra → json_schema_extra
+- `cooin-backend/app/core/config.py` - Added environment-aware security configuration
+- `cooin-backend/app/main.py` - Enabled all security middleware conditionally
+- `cooin-backend/.env` - Added ENVIRONMENT and security flags
+- `cooin-backend/.gitignore` - Added production environment files
+- `SECURITY-AUDIT.md` - Created comprehensive security audit document
+- `PRODUCTION-SECURITY-GUIDE.md` - Created production deployment guide
+- `ENVIRONMENT-GUIDE.md` - Created environment switching guide
+- `.env.production.template` - Created production environment template
+
+**Status**: Core functionality working perfectly ✅, Security hardening IMPLEMENTED and ACTIVE ✅
+
+**Key Learning**:
+- Pydantic V2 migration was straightforward - only one instance needed updating
+- Docker + Local hybrid setup works smoothly for development
+- Full application stack (Docker Redis + Python Backend + React Frontend) integrates seamlessly
+- Environment-aware security allows development freedom while maintaining production readiness
+- All security middleware can be enabled without disrupting development workflow
+
+---
+
 ## 2025-11-17 (Session 14) - Docker Setup Complete & Redis Running
 
 **Goal**: Set up Docker Desktop with Redis containerization and prepare infrastructure for production deployment.
