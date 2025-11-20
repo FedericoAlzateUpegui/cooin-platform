@@ -4,15 +4,93 @@
 
 ---
 
+## 🖥️ MULTI-MACHINE DOCUMENTATION (IMPORTANT!)
+
+**This project is developed on TWO computers simultaneously:**
+- 💻 **Windows** - Primary development machine
+- 🍎 **Mac** - Secondary development machine
+
+### 🚨 Critical Rule: Machine-Specific Files
+
+To avoid conflicts and data loss, each machine has **dedicated documentation files**:
+
+#### Windows Files (Windows ✍️ WRITES, Mac 👀 READS)
+- `HISTORY.md` - Windows session history
+- `TODO.md` - Windows tasks and status
+- `README.md` - Windows setup guide
+- `HOW-TO-LAUNCH-WEB-APP.md` - Windows launch instructions
+
+#### Mac Files (Mac ✍️ WRITES, Windows 👀 READS)
+- `HISTORY_MAC.md` - Mac session history
+- `TODO_MAC.md` - Mac tasks and status
+- `README_MAC.md` - Mac setup guide
+- `HOW-TO-LAUNCH-WEB-APP_MAC.md` - Mac launch instructions
+
+#### Shared Files (Both machines can read, edit carefully)
+- `DP.md` - This documentation process guide
+- `TECH_STACK.md` - Technology stack documentation
+- Code files in `cooin-backend/`, `cooin-frontend/`, `cooin-ios/`
+
+### 📝 Claude's Workflow
+
+**EVERY session, Claude MUST:**
+
+1. **Ask the user**: "¿Estás en Mac o Windows?"
+   - If Mac 🍎 → Document in `*_MAC.md` files
+   - If Windows 💻 → Document in regular files (`HISTORY.md`, `TODO.md`, etc.)
+
+2. **Read context from both machines**:
+   - Claude can READ all files for context
+   - Only WRITE to machine-specific files
+
+3. **Never edit the other machine's files**:
+   - Mac Claude: Never edit `HISTORY.md`, `TODO.md`, `README.md`
+   - Windows Claude: Never edit `HISTORY_MAC.md`, `TODO_MAC.md`, `README_MAC.md`
+
+### 🔄 Sync Strategy
+
+Both machines use **Git** to stay synchronized:
+
+```bash
+# Before starting work (any machine)
+git pull origin main
+
+# After finishing work (Mac)
+git add HISTORY_MAC.md TODO_MAC.md README_MAC.md
+git commit -m "docs: Session X on Mac 🍎"
+git push origin main
+
+# After finishing work (Windows)
+git add HISTORY.md TODO.md README.md
+git commit -m "docs: Session X on Windows 💻"
+git push origin main
+```
+
+---
+
 ## 📋 Documentation Files Overview
 
-| File | Purpose | Update Frequency |
-|------|---------|-----------------|
-| **HISTORY.md** | Session-by-session changelog | After each session |
-| **TODO.md** | Current tasks and roadmap | Daily/per session |
-| **README.md** | Project overview and setup | As features change |
-| **HOW-TO-LAUNCH-WEB-APP.md** | Launch instructions | When setup changes |
-| **TECH_STACK.md** | Technology documentation | When stack changes |
+### Windows Files 💻
+| File | Purpose | Update Frequency | Edited By |
+|------|---------|-----------------|-----------|
+| **HISTORY.md** | Windows session changelog | After each Windows session | Windows ✍️ |
+| **TODO.md** | Windows tasks and roadmap | Per Windows session | Windows ✍️ |
+| **README.md** | Windows setup guide | As features change | Windows ✍️ |
+| **HOW-TO-LAUNCH-WEB-APP.md** | Windows launch instructions | When setup changes | Windows ✍️ |
+
+### Mac Files 🍎
+| File | Purpose | Update Frequency | Edited By |
+|------|---------|-----------------|-----------|
+| **HISTORY_MAC.md** | Mac session changelog | After each Mac session | Mac ✍️ |
+| **TODO_MAC.md** | Mac tasks and roadmap | Per Mac session | Mac ✍️ |
+| **README_MAC.md** | Mac setup guide | As features change | Mac ✍️ |
+| **HOW-TO-LAUNCH-WEB-APP_MAC.md** | Mac launch instructions | When setup changes | Mac ✍️ |
+
+### Shared Files 🔄
+| File | Purpose | Update Frequency | Edited By |
+|------|---------|-----------------|-----------|
+| **DP.md** | Documentation process guide | When process changes | Both (carefully) |
+| **TECH_STACK.md** | Technology documentation | When stack changes | Both (carefully) |
 
 ---
 
@@ -671,6 +749,22 @@ git commit -m "docs: update session X documentation"
 
 ---
 
-**Last Updated**: 2025-11-05 (Session 8)
-**Maintained By**: Development Team
+**Last Updated**: 2025-11-19 (Session 15 - Mac 🍎)
+**Maintained By**: Development Team (Mac & Windows)
 **Review Cycle**: Per session + weekly review
+
+---
+
+## 🎯 Quick Reference: Mac vs Windows
+
+**If you're on Mac 🍎:**
+- Edit: `HISTORY_MAC.md`, `TODO_MAC.md`, `README_MAC.md`, `HOW-TO-LAUNCH-WEB-APP_MAC.md`
+- Read: All Windows files for context
+- Commands: Use `bash` scripts and Mac paths
+
+**If you're on Windows 💻:**
+- Edit: `HISTORY.md`, `TODO.md`, `README.md`, `HOW-TO-LAUNCH-WEB-APP.md`
+- Read: All Mac files for context
+- Commands: Use `.bat` scripts and Windows paths
+
+**Claude MUST ask every session:** "¿Estás en Mac o Windows?"
