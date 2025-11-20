@@ -1,27 +1,27 @@
 # Cooin Web App - TODO
 
-## 🚀 Current Session (Session 15) - Pydantic V2 Migration, Full Testing & Security Hardening Complete ✅
+## 🚀 Current Session (Session 16) - Tickets Marketplace & Cloudflare Tunnel ✅
 
 ### ✅ Completed This Session
+- [x] **Validation Error Display** - Added visible error messages to CreateTicketModal (web-compatible)
+- [x] **Ticket Type Defaulting** - Fixed role-based ticket type defaulting with toLowerCase()
+- [x] **My Tickets Endpoint** - Corrected API URL from /tickets/me to /tickets/my-tickets
+- [x] **Cloudflare Tunnel Setup** - Started tunnel for backend (https://switched-appointments-accepted-advert.trycloudflare.com)
+- [x] **Frontend Configuration** - Updated .env to use Cloudflare tunnel URL
+- [x] **Backend CORS Configuration** - Added tunnel URL to allowed origins
+- [x] **CORS Resolution** - Resolved cross-origin blocking between frontend and backend
+- [x] **Documentation** - Updated HISTORY.md with Session 16 entry
+
+### ✅ Completed Previous Session (Session 15)
 - [x] **Pydantic V2 Migration** - Updated schema_extra to json_schema_extra in auth.py:248
 - [x] **Schema Verification** - Verified all 4 schema files (auth, user, profile, connection) are Pydantic V2 compliant
 - [x] **Backend Startup Test** - Confirmed no Pydantic warnings on startup
 - [x] **Redis Connection Verified** - Backend connected to Docker Redis on first attempt
 - [x] **Full Application Testing** - Tested complete workflow: registration, login, profile setup, notifications
-- [x] **User Registration Flow** - Working perfectly with proper error handling
-- [x] **User Login Flow** - Authentication working correctly
-- [x] **Profile Setup (4 steps)** - All steps functional with validation
-- [x] **System Notifications** - Welcome messages and notification center working
-- [x] **Internationalization** - English/Spanish translations verified
-- [x] **Duplicate Email Error Handling** - Verified working with clear error messages
 - [x] **Security Audit** - Comprehensive review completed (SECURITY-AUDIT.md)
 - [x] **Production Security Guide** - Complete deployment guide created (PRODUCTION-SECURITY-GUIDE.md)
-- [x] **Environment Security** - Verified .env in .gitignore, .env.example exists
 - [x] **Environment-Aware Security** - Implemented conditional security based on ENVIRONMENT setting
 - [x] **Security Middleware Enabled** - All 7 security middleware now active (development mode)
-- [x] **Production Environment Template** - Created .env.production.template
-- [x] **Environment Switching Guide** - Created comprehensive ENVIRONMENT-GUIDE.md
-- [x] **Documentation Updated** - HISTORY.md and TODO.md updated with all security changes
 
 ### 📝 Pending Work - Production Deployment (When Ready)
 **Future Tasks** (Not urgent - for actual production deployment):
@@ -75,7 +75,31 @@
 - [x] **authStore Error Handling** - Explicitly set `isAuthenticated: false` on registration start and error
 - [x] **authService Try-Catch** - Added error handling to preserve error.detail as error.message
 
-### 🌐 Local Development (Current Mode)
+### 🌐 Development with Cloudflare Tunnel (Current Mode)
+```cmd
+# Terminal 1 - Backend
+cd C:\Windows\System32\cooin-app\cooin-backend
+python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+
+# Terminal 2 - Backend Tunnel
+cloudflared tunnel --url http://localhost:8000
+# Note the tunnel URL (e.g., https://switched-appointments-accepted-advert.trycloudflare.com)
+
+# Terminal 3 - Frontend
+cd C:\Windows\System32\cooin-app\cooin-frontend
+npx expo start --web --port 8083 --clear
+
+# Access at: http://localhost:8083
+# Backend API via: Cloudflare tunnel URL
+```
+
+### 📝 Current Configuration
+- **Frontend**: http://localhost:8083
+- **Backend Tunnel**: https://switched-appointments-accepted-advert.trycloudflare.com
+- **Frontend API URL**: Configured in `cooin-frontend/.env`
+- **Backend CORS**: Tunnel URL added to `cooin-backend/.env`
+
+### 🔄 Alternative: Local Development Only (No Tunnel)
 ```cmd
 # Terminal 1 - Backend
 cd C:\Windows\System32\cooin-app\cooin-backend
@@ -84,17 +108,9 @@ python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 # Terminal 2 - Frontend
 cd C:\Windows\System32\cooin-app\cooin-frontend
 npx expo start --web --port 8083 --clear
-```
 
-### 🌍 Public Sharing Setup (When Needed)
-```cmd
-# Terminal 3 - Backend Tunnel
-cloudflared tunnel --url http://localhost:8000
-
-# Terminal 4 - Frontend Tunnel
-cloudflared tunnel --url http://localhost:8083
-
-# Then update config.ts and .env with new tunnel URLs
+# Note: Update cooin-frontend/.env to:
+# EXPO_PUBLIC_API_URL=http://localhost:8000/api/v1
 ```
 
 ---
@@ -234,6 +250,6 @@ docker ps
 
 ---
 
-**Last Updated**: 2025-11-19 (Session 15)
+**Last Updated**: 2025-11-20 (Session 16)
 
 **Quick Links**: [HISTORY.md](./HISTORY.md) | [README.md](./README.md) | [HOW-TO-LAUNCH-WEB-APP.md](./HOW-TO-LAUNCH-WEB-APP.md)

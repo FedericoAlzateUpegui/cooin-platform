@@ -416,6 +416,7 @@
   },
   "navigation": {
     "home": "Home",
+    "tickets": "Tickets",
     "matching": "Matching",
     "connections": "Connections",
     "messages": "Messages",

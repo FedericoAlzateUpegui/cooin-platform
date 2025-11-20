@@ -11,7 +11,7 @@ from app.schemas.auth import (
     Token, TokenRefresh, AccessToken, LogoutRequest, LogoutResponse,
     ActiveSession, SessionsResponse
 )
-from app.schemas.user import UserResponse, UserCreate, PasswordReset, PasswordResetConfirm, EmailVerification
+from app.schemas.user import UserResponse, UserCreate, UserUpdate, PasswordReset, PasswordResetConfirm, EmailVerification
 from app.services.user_service import UserService
 from app.core.deps import get_current_active_user, get_database
 from app.core.security import jwt_handler
@@ -443,4 +443,39 @@ async def revoke_session(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Could not revoke session"
+        )
+
+
+@router.put("/me", response_model=UserResponse)
+async def update_my_settings(
+    user_update: UserUpdate,
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_database)
+):
+    """
+    Update current user's settings.
+
+    Allows users to update:
+    - Email (will require re-verification)
+    - Username
+    - Role (lender, borrower, both)
+
+    Only provided fields will be updated.
+    """
+    try:
+        updated_user = UserService.update_user(db, current_user.id, user_update)
+
+        logger.info(f"User settings updated for {current_user.email}")
+        if user_update.role:
+            logger.info(f"User role changed to {user_update.role} for user {current_user.id}")
+
+        return UserResponse.from_orm(updated_user)
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"User settings update error: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Could not update user settings"
         )

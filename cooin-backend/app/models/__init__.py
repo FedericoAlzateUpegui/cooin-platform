@@ -25,6 +25,15 @@ from app.models.profile import (
     LoanPurpose
 )
 
+# Import ticket models
+from app.models.ticket import (
+    Ticket,
+    TicketType,
+    TicketStatus,
+    LoanType,
+    WarrantyType
+)
+
 # Import connection models
 from app.models.connection import (
     Connection,
@@ -60,6 +69,13 @@ __all__ = [
     "IncomeRange",
     "EmploymentStatus",
     "LoanPurpose",
+
+    # Ticket models
+    "Ticket",
+    "TicketType",
+    "TicketStatus",
+    "LoanType",
+    "WarrantyType",
 
     # Connection models
     "Connection",

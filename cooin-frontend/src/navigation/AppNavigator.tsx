@@ -15,6 +15,7 @@ import { ProfileSetupScreen } from '../screens/profile/ProfileSetupScreen';
 import { HomeScreen } from '../screens/home/HomeScreen';
 import { SettingsScreen } from '../screens/settings/SettingsScreen';
 import { VerificationScreen } from '../screens/verification/VerificationScreen';
+import { TicketsScreen } from '../screens/tickets/TicketsScreen';
 import { COLORS } from '../constants/config';
 
 const Tab = createBottomTabNavigator();
@@ -26,6 +27,7 @@ const DESKTOP_BREAKPOINT = 768;
 // Navigation items configuration
 const navigationItems = [
   { name: 'Home', component: HomeScreen, iconFocused: 'home', iconOutline: 'home-outline', labelKey: 'navigation.home' },
+  { name: 'Tickets', component: TicketsScreen, iconFocused: 'ticket', iconOutline: 'ticket-outline', labelKey: 'navigation.tickets' },
   { name: 'Matching', component: MatchingScreen, iconFocused: 'people', iconOutline: 'people-outline', labelKey: 'navigation.matching' },
   { name: 'Connections', component: ConnectionsScreen, iconFocused: 'link', iconOutline: 'link-outline', labelKey: 'navigation.connections' },
   { name: 'Notifications', component: NotificationsScreen, iconFocused: 'notifications', iconOutline: 'notifications-outline', labelKey: 'navigation.notifications' },

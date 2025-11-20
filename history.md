@@ -1,8 +1,60 @@
 # Cooin Web App - Change History
 
-## 2025-11-19 (Session 15) - Pydantic V2 Migration & Full App Testing
+## 2025-11-20 (Session 16) - Tickets Marketplace & Cloudflare Tunnel Setup
 
-**Goal**: Complete Pydantic V2 migration and verify full application functionality with Docker Redis integration.
+**Goal**: Fix tickets marketplace loading, implement Cloudflare tunnel for development, and resolve CORS issues.
+
+**Changes/Fixes**:
+
+### Validation Error Display - COMPLETED ✅
+
+1. **CreateTicketModal Validation UI (cooin-frontend/src/screens/tickets/CreateTicketModal.tsx)**
+   - Added `validationError` state variable for displaying errors to users
+   - Updated `validateStep1`, `validateStep2`, `validateStep3` to set descriptive error messages
+   - Added error display component (lines 652-657) with red styling and alert icon
+   - Replaced Alert.alert() with visible on-screen error messages (web-compatible)
+   - Added error clearing in `resetForm` and Back button click
+
+### Ticket Type Defaulting Fix - COMPLETED ✅
+
+2. **Role-Based Ticket Type (cooin-frontend/src/screens/tickets/CreateTicketModal.tsx)**
+   - Fixed ticket type defaulting by adding `.toLowerCase()` to handle uppercase role values (line 44)
+   - Added useEffect hook (lines 67-73) to reset ticketType when modal opens
+   - Lenders now see "Create Lending Offer" and borrowers see "Create Borrowing Request" by default
+
+### My Tickets Endpoint Fix - COMPLETED ✅
+
+3. **API Endpoint Correction (cooin-frontend/src/services/ticketService.ts:36)**
+   - Fixed incorrect endpoint URL from `/tickets/me` to `/tickets/my-tickets`
+   - My Tickets page now loads successfully
+
+### Cloudflare Tunnel Setup - COMPLETED ✅
+
+4. **Development Infrastructure**
+   - Started Cloudflare tunnel for backend: `https://switched-appointments-accepted-advert.trycloudflare.com`
+   - Updated frontend .env (cooin-frontend/.env:1) to use tunnel URL instead of localhost
+   - Added tunnel URL to backend CORS origins (cooin-backend/.env:25)
+   - Resolved CORS blocking issues between frontend and backend
+
+**Files Changed**:
+- `cooin-frontend/src/screens/tickets/CreateTicketModal.tsx` - Validation display, ticket type defaulting
+- `cooin-frontend/src/services/ticketService.ts` - Fixed My Tickets endpoint URL
+- `cooin-frontend/.env` - Updated API URL to Cloudflare tunnel
+- `cooin-backend/.env` - Added tunnel URL to CORS origins
+
+**Status**: All ticket functionality working ✅, Cloudflare tunnel active ✅, CORS resolved ✅
+
+**Key Learning**:
+- Web-based React Native needs visible error components instead of Alert.alert()
+- Backend auto-reload picks up .env changes but sometimes needs manual restart
+- Cloudflare tunnels provide reliable development HTTPS endpoints
+- Role values from backend can be uppercase, always normalize with `.toLowerCase()`
+
+---
+
+## 2025-11-19 (Session 15) - Pydantic V2 Migration, Full Testing & Security Hardening
+
+**Goal**: Complete Pydantic V2 migration, verify full application functionality with Docker Redis integration, and implement production-ready security hardening.
 
 **Changes/Fixes**:
 

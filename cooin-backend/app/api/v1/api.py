@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from app.api.v1 import auth, profiles, connections, ratings, email, uploads, cache, security
+from app.api.v1 import auth, profiles, connections, ratings, email, uploads, cache, security, tickets
 # mobile, matching, analytics, search temporarily disabled due to missing models
 
 # Create main API router
@@ -60,6 +60,13 @@ api_router.include_router(
     security.router,
     prefix="/security",
     tags=["security-management"]
+)
+
+# Include tickets routes
+api_router.include_router(
+    tickets.router,
+    prefix="/tickets",
+    tags=["tickets"]
 )
 
 # Temporarily disabled due to missing LoanRequest and LendingOffer models

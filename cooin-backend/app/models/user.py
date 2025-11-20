@@ -61,6 +61,7 @@ class User(Base):
     profile = relationship("UserProfile", back_populates="user", uselist=False, cascade="all, delete-orphan")
     sent_connections = relationship("Connection", foreign_keys="Connection.requester_id", back_populates="requester")
     received_connections = relationship("Connection", foreign_keys="Connection.receiver_id", back_populates="receiver")
+    tickets = relationship("Ticket", back_populates="user", cascade="all, delete-orphan")
     given_ratings = relationship("Rating", foreign_keys="Rating.rater_id", back_populates="rater")
     received_ratings = relationship("Rating", foreign_keys="Rating.rated_user_id", back_populates="rated_user")
     refresh_tokens = relationship("RefreshToken", back_populates="user", cascade="all, delete-orphan")

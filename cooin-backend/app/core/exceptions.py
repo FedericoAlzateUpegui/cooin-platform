@@ -223,6 +223,19 @@ class ErrorMessages:
     CANNOT_RATE_SELF = "You cannot rate yourself"
     RATING_ALREADY_EXISTS = "You have already rated this user"
 
+    # Tickets
+    TICKET_NOT_FOUND = "Ticket not found"
+    TICKET_INACTIVE = "This ticket is no longer active"
+    TICKET_EXPIRED = "This ticket has expired"
+    CANNOT_CREATE_DEAL_WITH_OWN_TICKET = "You cannot create a deal with your own ticket"
+    DEAL_ALREADY_EXISTS = "A deal already exists for this ticket between you and this user"
+
+    # Ticket Role Restrictions
+    ONLY_LENDERS_CREATE_LENDING_OFFERS = "Only lenders can create lending offers. Your account role is set to 'Borrower'. To create lending offers, please update your account role to 'Lender' or 'Both' in your profile settings."
+    ONLY_BORROWERS_CREATE_BORROWING_REQUESTS = "Only borrowers can create borrowing requests. Your account role is set to 'Lender'. To create borrowing requests, please update your account role to 'Borrower' or 'Both' in your profile settings."
+    ONLY_BORROWERS_RESPOND_TO_LENDING_OFFERS = "Only borrowers can respond to lending offers. Your account role is set to 'Lender'. To respond to lending offers, please update your account role to 'Borrower' or 'Both' in your profile settings."
+    ONLY_LENDERS_RESPOND_TO_BORROWING_REQUESTS = "Only lenders can respond to borrowing requests. Your account role is set to 'Borrower'. To respond to borrowing requests, please update your account role to 'Lender' or 'Both' in your profile settings."
+
 
 def create_error_response(
     error_code: str,

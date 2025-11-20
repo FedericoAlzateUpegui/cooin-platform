@@ -17,17 +17,58 @@ import { useAuthStore } from '../../store/authStore';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { Button } from '../../components/Button';
 import { COLORS, SPACING, FONTS } from '../../constants/config';
+import { apiClient } from '../../services/api';
 
 interface SettingsScreenProps {
   navigation: any;
 }
 
 export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
-  const { user, logout } = useAuthStore();
+  const { user, logout, updateUser } = useAuthStore();
   const { currentLanguage, changeLanguage, t } = useLanguage();
   const [notifications, setNotifications] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
   const [showLanguageModal, setShowLanguageModal] = useState(false);
+  const [showRoleModal, setShowRoleModal] = useState(false);
+  const [updatingRole, setUpdatingRole] = useState(false);
+
+  const handleRoleChange = async (newRole: string) => {
+    try {
+      setUpdatingRole(true);
+      console.log('Updating role to:', newRole);
+
+      // Call API to update user role
+      const response = await apiClient.put('/auth/me', {
+        role: newRole,
+      });
+
+      console.log('Role update response:', response);
+
+      // Update local user data
+      if (updateUser) {
+        updateUser({ ...user, role: newRole });
+      }
+
+      setShowRoleModal(false);
+
+      if (Platform.OS === 'web') {
+        window.alert(`Role updated to ${newRole.toUpperCase()} successfully!`);
+      } else {
+        Alert.alert('Success', `Role updated to ${newRole.toUpperCase()} successfully!`);
+      }
+    } catch (error: any) {
+      console.error('Error updating role:', error);
+      const errorMessage = error.response?.data?.detail || 'Failed to update role';
+
+      if (Platform.OS === 'web') {
+        window.alert('Error: ' + errorMessage);
+      } else {
+        Alert.alert('Error', errorMessage);
+      }
+    } finally {
+      setUpdatingRole(false);
+    }
+  };
 
   const handleLogout = async () => {
     console.log('Logout button pressed');
@@ -181,9 +222,13 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
           <View style={styles.userInfo}>
             <Text style={styles.userName}>{user?.email?.split('@')[0] || 'User'}</Text>
             <Text style={styles.userEmail}>{user?.email}</Text>
-            <View style={styles.roleBadge}>
+            <TouchableOpacity
+              style={styles.roleBadge}
+              onPress={() => setShowRoleModal(true)}
+            >
               <Text style={styles.roleText}>{user?.role || 'User'}</Text>
-            </View>
+              <Ionicons name="create-outline" size={14} color={COLORS.primary} style={{ marginLeft: 4 }} />
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -320,6 +365,110 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
           </View>
         </TouchableOpacity>
       </Modal>
+
+      {/* Role Selection Modal */}
+      <Modal
+        visible={showRoleModal}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => !updatingRole && setShowRoleModal(false)}
+      >
+        <TouchableOpacity
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPress={() => !updatingRole && setShowRoleModal(false)}
+          disabled={updatingRole}
+        >
+          <View style={styles.modalContent} onStartShouldSetResponder={() => true}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Change Role</Text>
+              <TouchableOpacity
+                onPress={() => !updatingRole && setShowRoleModal(false)}
+                disabled={updatingRole}
+              >
+                <Ionicons name="close" size={24} color={COLORS.text} />
+              </TouchableOpacity>
+            </View>
+
+            <Text style={styles.modalDescription}>
+              Choose your role to enable appropriate features. This determines what types of tickets you can create.
+            </Text>
+
+            {/* Role Options */}
+            <TouchableOpacity
+              style={[
+                styles.languageOption,
+                user?.role === 'lender' && styles.languageOptionSelected
+              ]}
+              onPress={() => !updatingRole && handleRoleChange('lender')}
+              disabled={updatingRole}
+            >
+              <View style={styles.languageOptionContent}>
+                <View style={styles.languageFlag}>
+                  <Ionicons name="cash" size={28} color={COLORS.success} />
+                </View>
+                <View style={styles.languageInfo}>
+                  <Text style={styles.languageName}>Lender</Text>
+                  <Text style={styles.languageNative}>I want to lend money</Text>
+                </View>
+              </View>
+              {user?.role === 'lender' && (
+                <Ionicons name="checkmark-circle" size={24} color={COLORS.primary} />
+              )}
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.languageOption,
+                user?.role === 'borrower' && styles.languageOptionSelected
+              ]}
+              onPress={() => !updatingRole && handleRoleChange('borrower')}
+              disabled={updatingRole}
+            >
+              <View style={styles.languageOptionContent}>
+                <View style={styles.languageFlag}>
+                  <Ionicons name="wallet" size={28} color={COLORS.info} />
+                </View>
+                <View style={styles.languageInfo}>
+                  <Text style={styles.languageName}>Borrower</Text>
+                  <Text style={styles.languageNative}>I need to borrow money</Text>
+                </View>
+              </View>
+              {user?.role === 'borrower' && (
+                <Ionicons name="checkmark-circle" size={24} color={COLORS.primary} />
+              )}
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.languageOption,
+                user?.role === 'both' && styles.languageOptionSelected
+              ]}
+              onPress={() => !updatingRole && handleRoleChange('both')}
+              disabled={updatingRole}
+            >
+              <View style={styles.languageOptionContent}>
+                <View style={styles.languageFlag}>
+                  <Ionicons name="swap-horizontal" size={28} color={COLORS.warning} />
+                </View>
+                <View style={styles.languageInfo}>
+                  <Text style={styles.languageName}>Both</Text>
+                  <Text style={styles.languageNative}>I want to lend and borrow</Text>
+                </View>
+              </View>
+              {user?.role === 'both' && (
+                <Ionicons name="checkmark-circle" size={24} color={COLORS.primary} />
+              )}
+            </TouchableOpacity>
+
+            {updatingRole && (
+              <View style={{ marginTop: SPACING.md, alignItems: 'center' }}>
+                <Text style={{ color: COLORS.textSecondary }}>Updating role...</Text>
+              </View>
+            )}
+          </View>
+        </TouchableOpacity>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -367,11 +516,15 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.sm,
   },
   roleBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
     alignSelf: 'flex-start',
     backgroundColor: `${COLORS.primary}15`,
     paddingHorizontal: SPACING.sm,
     paddingVertical: SPACING.xs / 2,
     borderRadius: 12,
+    borderWidth: 1,
+    borderColor: `${COLORS.primary}30`,
   },
   roleText: {
     fontSize: 12,
