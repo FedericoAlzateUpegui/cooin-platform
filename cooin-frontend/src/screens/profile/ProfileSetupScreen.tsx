@@ -21,6 +21,7 @@ import { Input } from '../../components/Input';
 import { Button } from '../../components/Button';
 import { ProgressBar } from '../../components/ProgressBar';
 import { COLORS, SPACING, FONTS } from '../../constants/config';
+import { useColors } from '../../hooks/useColors';
 import { useLanguage } from '../../contexts/LanguageContext';
 
 type ProfileFormData = {
@@ -38,6 +39,8 @@ type ProfileFormData = {
 };
 
 export const ProfileSetupScreen: React.FC = () => {
+  const colors = useColors();
+  const styles = createStyles(colors);
   const navigation = useNavigation();
   const [currentStep, setCurrentStep] = useState(1);
   const [profileImage, setProfileImage] = useState<string | null>(null);
@@ -233,7 +236,7 @@ export const ProfileSetupScreen: React.FC = () => {
                   <Text style={styles.imagePickerText}>{t('profile_setup.photo_selected')}</Text>
                 ) : (
                   <>
-                    <Ionicons name="camera" size={32} color={COLORS.textSecondary} />
+                    <Ionicons name="camera" size={32} color={colors.textSecondary} />
                     <Text style={styles.imagePickerText}>{t('profile_setup.tap_to_add_photo')}</Text>
                   </>
                 )}
@@ -401,7 +404,7 @@ export const ProfileSetupScreen: React.FC = () => {
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color={COLORS.text} />
+          <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{t('profile_setup.title')}</Text>
         <View style={styles.headerRight} />
@@ -463,10 +466,10 @@ export const ProfileSetupScreen: React.FC = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ReturnType<typeof useColors>) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: colors.background,
     ...Platform.select({
       web: {
         height: '100vh' as any,
@@ -484,8 +487,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.lg,
     paddingVertical: SPACING.md,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
-    backgroundColor: COLORS.surface,
+    borderBottomColor: colors.border,
+    backgroundColor: colors.surface,
   },
   backButton: {
     padding: SPACING.xs,
@@ -493,7 +496,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontFamily: FONTS.bold,
-    color: COLORS.text,
+    color: colors.text,
   },
   headerRight: {
     width: 40,
@@ -501,7 +504,7 @@ const styles = StyleSheet.create({
   progressSection: {
     paddingHorizontal: SPACING.lg,
     paddingVertical: SPACING.md,
-    backgroundColor: COLORS.surface,
+    backgroundColor: colors.surface,
   },
   content: {
     flex: 1,
@@ -525,13 +528,13 @@ const styles = StyleSheet.create({
   stepTitle: {
     fontSize: 24,
     fontFamily: FONTS.bold,
-    color: COLORS.text,
+    color: colors.text,
     marginBottom: SPACING.sm,
   },
   stepDescription: {
     fontSize: 16,
     fontFamily: FONTS.regular,
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
     lineHeight: 24,
     marginBottom: SPACING.xl,
   },
@@ -541,23 +544,23 @@ const styles = StyleSheet.create({
   inputLabel: {
     fontSize: 16,
     fontFamily: FONTS.medium,
-    color: COLORS.text,
+    color: colors.text,
     marginBottom: SPACING.xs,
   },
   imagePicker: {
     height: 120,
     borderWidth: 2,
-    borderColor: COLORS.border,
+    borderColor: colors.border,
     borderStyle: 'dashed',
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: COLORS.background,
+    backgroundColor: colors.background,
   },
   imagePickerText: {
     fontSize: 16,
     fontFamily: FONTS.regular,
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
     marginTop: SPACING.sm,
   },
   fieldContainer: {
@@ -572,21 +575,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.md,
     paddingVertical: SPACING.sm,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: colors.border,
     borderRadius: 8,
-    backgroundColor: COLORS.surface,
+    backgroundColor: colors.surface,
   },
   optionButtonSelected: {
-    borderColor: COLORS.primary,
-    backgroundColor: `${COLORS.primary}10`,
+    borderColor: colors.primary,
+    backgroundColor: `${colors.primary}10`,
   },
   optionText: {
     fontSize: 14,
     fontFamily: FONTS.regular,
-    color: COLORS.text,
+    color: colors.text,
   },
   optionTextSelected: {
-    color: COLORS.primary,
+    color: colors.primary,
     fontFamily: FONTS.medium,
   },
   errorContainer: {
@@ -595,15 +598,15 @@ const styles = StyleSheet.create({
   errorText: {
     fontSize: 14,
     fontFamily: FONTS.regular,
-    color: COLORS.error,
+    color: colors.error,
     textAlign: 'center',
   },
   footer: {
     paddingHorizontal: SPACING.lg,
     paddingVertical: SPACING.md,
-    backgroundColor: COLORS.surface,
+    backgroundColor: colors.surface,
     borderTopWidth: 1,
-    borderTopColor: COLORS.border,
+    borderTopColor: colors.border,
   },
   buttonRow: {
     flexDirection: 'row',

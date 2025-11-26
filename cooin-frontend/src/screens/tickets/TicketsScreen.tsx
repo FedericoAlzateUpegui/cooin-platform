@@ -18,9 +18,12 @@ import { COLORS } from '../../constants/config';
 import { ticketService } from '../../services/ticketService';
 import { Ticket } from '../../types/api';
 import { CreateTicketModal } from './CreateTicketModal';
+import { useColors } from '../../hooks/useColors';
 
+import { logger } from '../../utils/logger';
 export const TicketsScreen: React.FC = () => {
   const { token, user } = useAuthStore();
+  const colors = useColors();
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -65,8 +68,8 @@ export const TicketsScreen: React.FC = () => {
         setTickets(response.data || []);
         setTotalCount(response.total_count || 0);
       }
-    } catch (error: any) {
-      console.error('Error loading tickets:', error);
+    } catch (error: unknown) {
+      logger.error('Error loading tickets:', error);
       const errorMessage = error.response?.data?.detail || error.message || 'Failed to load tickets';
       if (Platform.OS === 'web') {
         window.alert(`Error: ${errorMessage}`);
@@ -101,8 +104,8 @@ export const TicketsScreen: React.FC = () => {
         window.alert('Success! Deal created successfully! Check your connections.');
         setDetailsModalVisible(false);
         loadTickets();
-      } catch (error: any) {
-        console.error('Error creating deal:', error);
+      } catch (error: unknown) {
+        logger.error('Error creating deal:', error);
         const errorMessage = error.response?.data?.detail || error.response?.data?.error?.message || error.message || 'Failed to create deal';
         window.alert(`Error: ${errorMessage}`);
       }
@@ -125,8 +128,8 @@ export const TicketsScreen: React.FC = () => {
             Alert.alert('Success', 'Deal created successfully! Check your connections.');
             setDetailsModalVisible(false);
             loadTickets();
-          } catch (error: any) {
-            console.error('Error creating deal:', error);
+          } catch (error: unknown) {
+            logger.error('Error creating deal:', error);
             const errorMessage = error.response?.data?.detail || error.message || 'Failed to create deal';
             Alert.alert('Error', errorMessage);
           }
@@ -148,13 +151,13 @@ export const TicketsScreen: React.FC = () => {
         }}
       >
         <View style={styles.ticketHeader}>
-          <View style={[styles.ticketTypeBadge, { backgroundColor: isLendingOffer ? COLORS.success + '20' : COLORS.primary + '20' }]}>
+          <View style={[styles.ticketTypeBadge, { backgroundColor: isLendingOffer ? colors.success + '20' : colors.primary + '20' }]}>
             <Ionicons
               name={isLendingOffer ? 'cash-outline' : 'wallet-outline'}
               size={16}
-              color={isLendingOffer ? COLORS.success : COLORS.primary}
+              color={isLendingOffer ? colors.success : colors.primary}
             />
-            <Text style={[styles.ticketTypeText, { color: isLendingOffer ? COLORS.success : COLORS.primary }]}>
+            <Text style={[styles.ticketTypeText, { color: isLendingOffer ? colors.success : colors.primary }]}>
               {isLendingOffer ? 'Lending Offer' : 'Borrowing Request'}
             </Text>
           </View>
@@ -170,24 +173,24 @@ export const TicketsScreen: React.FC = () => {
 
         <View style={styles.ticketDetails}>
           <View style={styles.detailRow}>
-            <Ionicons name="cash-outline" size={16} color={COLORS.textSecondary} />
+            <Ionicons name="cash-outline" size={16} color={colors.textSecondary} />
             <Text style={styles.detailText}>${item.amount.toLocaleString()}</Text>
           </View>
           <View style={styles.detailRow}>
-            <Ionicons name="trending-up-outline" size={16} color={COLORS.textSecondary} />
+            <Ionicons name="trending-up-outline" size={16} color={colors.textSecondary} />
             <Text style={styles.detailText}>{item.interest_rate}% APR</Text>
           </View>
           <View style={styles.detailRow}>
-            <Ionicons name="time-outline" size={16} color={COLORS.textSecondary} />
+            <Ionicons name="time-outline" size={16} color={colors.textSecondary} />
             <Text style={styles.detailText}>{item.term_months} months</Text>
           </View>
         </View>
 
         <View style={styles.ticketFooter}>
           <View style={styles.statsRow}>
-            <Ionicons name="eye-outline" size={14} color={COLORS.textSecondary} />
+            <Ionicons name="eye-outline" size={14} color={colors.textSecondary} />
             <Text style={styles.statText}>{item.views_count || 0} views</Text>
-            <Ionicons name="chatbubble-outline" size={14} color={COLORS.textSecondary} style={{ marginLeft: 12 }} />
+            <Ionicons name="chatbubble-outline" size={14} color={colors.textSecondary} style={{ marginLeft: 12 }} />
             <Text style={styles.statText}>{item.responses_count || 0} responses</Text>
           </View>
           <Text style={styles.loanTypeText}>{item.loan_type}</Text>
@@ -212,18 +215,18 @@ export const TicketsScreen: React.FC = () => {
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Ticket Details</Text>
               <TouchableOpacity onPress={() => setDetailsModalVisible(false)}>
-                <Ionicons name="close" size={24} color={COLORS.text} />
+                <Ionicons name="close" size={24} color={colors.text} />
               </TouchableOpacity>
             </View>
 
             <ScrollView style={styles.modalBody}>
-              <View style={[styles.ticketTypeBadge, { backgroundColor: isLendingOffer ? COLORS.success + '20' : COLORS.primary + '20' }]}>
+              <View style={[styles.ticketTypeBadge, { backgroundColor: isLendingOffer ? colors.success + '20' : colors.primary + '20' }]}>
                 <Ionicons
                   name={isLendingOffer ? 'cash-outline' : 'wallet-outline'}
                   size={20}
-                  color={isLendingOffer ? COLORS.success : COLORS.primary}
+                  color={isLendingOffer ? colors.success : colors.primary}
                 />
-                <Text style={[styles.ticketTypeText, { color: isLendingOffer ? COLORS.success : COLORS.primary }]}>
+                <Text style={[styles.ticketTypeText, { color: isLendingOffer ? colors.success : colors.primary }]}>
                   {isLendingOffer ? 'Lending Offer' : 'Borrowing Request'}
                 </Text>
               </View>
@@ -275,6 +278,8 @@ export const TicketsScreen: React.FC = () => {
     );
   };
 
+  const styles = createStyles(colors);
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -284,7 +289,7 @@ export const TicketsScreen: React.FC = () => {
             style={styles.iconButton}
             onPress={() => setFilterModalVisible(true)}
           >
-            <Ionicons name="filter-outline" size={24} color={COLORS.text} />
+            <Ionicons name="filter-outline" size={24} color={colors.text} />
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.createButton}
@@ -325,7 +330,7 @@ export const TicketsScreen: React.FC = () => {
 
       {loading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={COLORS.primary} />
+          <ActivityIndicator size="large" color={colors.primary} />
         </View>
       ) : (
         <FlatList
@@ -337,7 +342,7 @@ export const TicketsScreen: React.FC = () => {
           onRefresh={handleRefresh}
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
-              <Ionicons name="document-text-outline" size={64} color={COLORS.textSecondary} />
+              <Ionicons name="document-text-outline" size={64} color={colors.textSecondary} />
               <Text style={styles.emptyText}>No tickets available</Text>
               <Text style={styles.emptySubtext}>
                 {selectedTab === 'MY_TICKETS'
@@ -361,24 +366,24 @@ export const TicketsScreen: React.FC = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ReturnType<typeof useColors>) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: colors.background,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 16,
-    backgroundColor: COLORS.surface,
+    backgroundColor: colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: colors.border,
   },
   headerTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: COLORS.text,
+    color: colors.text,
   },
   headerActions: {
     flexDirection: 'row',
@@ -391,7 +396,7 @@ const styles = StyleSheet.create({
   createButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.primary,
+    backgroundColor: colors.primary,
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 8,
@@ -404,9 +409,9 @@ const styles = StyleSheet.create({
   },
   tabContainer: {
     flexDirection: 'row',
-    backgroundColor: COLORS.surface,
+    backgroundColor: colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: colors.border,
   },
   tab: {
     flex: 1,
@@ -416,15 +421,15 @@ const styles = StyleSheet.create({
     borderBottomColor: 'transparent',
   },
   activeTab: {
-    borderBottomColor: COLORS.primary,
+    borderBottomColor: colors.primary,
   },
   tabText: {
     fontSize: 14,
     fontWeight: '500',
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
   },
   activeTabText: {
-    color: COLORS.primary,
+    color: colors.primary,
     fontWeight: '600',
   },
   listContainer: {
@@ -436,12 +441,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   ticketCard: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: colors.surface,
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: colors.border,
   },
   ticketHeader: {
     flexDirection: 'row',
@@ -462,7 +467,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   flexibleBadge: {
-    backgroundColor: COLORS.warning + '20',
+    backgroundColor: colors.warning + '20',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 4,
@@ -470,17 +475,17 @@ const styles = StyleSheet.create({
   flexibleText: {
     fontSize: 11,
     fontWeight: '600',
-    color: COLORS.warning,
+    color: colors.warning,
   },
   ticketTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: COLORS.text,
+    color: colors.text,
     marginBottom: 8,
   },
   ticketDescription: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
     marginBottom: 12,
     lineHeight: 20,
   },
@@ -491,7 +496,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderTopWidth: 1,
     borderBottomWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: colors.border,
   },
   detailRow: {
     flexDirection: 'row',
@@ -501,7 +506,7 @@ const styles = StyleSheet.create({
   detailText: {
     fontSize: 14,
     fontWeight: '500',
-    color: COLORS.text,
+    color: colors.text,
   },
   ticketFooter: {
     flexDirection: 'row',
@@ -515,12 +520,12 @@ const styles = StyleSheet.create({
   },
   statText: {
     fontSize: 12,
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
   },
   loanTypeText: {
     fontSize: 12,
     fontWeight: '500',
-    color: COLORS.primary,
+    color: colors.primary,
     textTransform: 'capitalize',
   },
   emptyContainer: {
@@ -532,12 +537,12 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 18,
     fontWeight: '600',
-    color: COLORS.text,
+    color: colors.text,
     marginTop: 16,
   },
   emptySubtext: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
     marginTop: 8,
     textAlign: 'center',
   },
@@ -547,7 +552,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   modalContent: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: colors.surface,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     maxHeight: '90%',
@@ -558,12 +563,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: colors.border,
   },
   modalTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: COLORS.text,
+    color: colors.text,
   },
   modalBody: {
     padding: 20,
@@ -571,13 +576,13 @@ const styles = StyleSheet.create({
   detailsTitle: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: COLORS.text,
+    color: colors.text,
     marginTop: 16,
     marginBottom: 12,
   },
   detailsDescription: {
     fontSize: 15,
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
     lineHeight: 22,
     marginBottom: 24,
   },
@@ -587,7 +592,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.text,
+    color: colors.text,
     marginBottom: 12,
   },
   detailsGrid: {
@@ -598,25 +603,25 @@ const styles = StyleSheet.create({
   detailItem: {
     flex: 1,
     minWidth: '45%',
-    backgroundColor: COLORS.background,
+    backgroundColor: colors.background,
     padding: 12,
     borderRadius: 8,
   },
   detailLabel: {
     fontSize: 12,
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
     marginBottom: 4,
   },
   detailValue: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.text,
+    color: colors.text,
   },
   createDealButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: COLORS.primary,
+    backgroundColor: colors.primary,
     paddingVertical: 14,
     borderRadius: 8,
     gap: 8,

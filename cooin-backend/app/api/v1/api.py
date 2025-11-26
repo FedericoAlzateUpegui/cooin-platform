@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from app.api.v1 import auth, profiles, connections, ratings, email, uploads, cache, security, tickets
+from app.api.v1 import auth, profiles, connections, ratings, email, uploads, cache, security, tickets, system_messages
 # mobile, matching, analytics, search temporarily disabled due to missing models
 
 # Create main API router
@@ -69,7 +69,25 @@ api_router.include_router(
     tags=["tickets"]
 )
 
-# Temporarily disabled due to missing LoanRequest and LendingOffer models
+# Include system messages routes
+api_router.include_router(
+    system_messages.router,
+    prefix="/system-messages",
+    tags=["system-messages"]
+)
+
+# ========================================================================
+# DISABLED ROUTES - Replaced by Tickets System (Session 12+)
+# ========================================================================
+# The following routes are disabled because they depend on the old
+# LoanRequest and LendingOffer models which were replaced by the
+# unified Tickets system in Session 12.
+#
+# Status: Kept for reference, may be removed or refactored in future
+# Date Disabled: 2023-11 (Session 12)
+# Alternative: Use /tickets endpoints for lending/borrowing functionality
+# ========================================================================
+#
 # api_router.include_router(
 #     mobile.mobile_router,
 #     prefix="/mobile",

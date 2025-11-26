@@ -12,22 +12,24 @@ import {
   Modal,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 
 import { useAuthStore } from '../../store/authStore';
+import { useThemeStore } from '../../store/themeStore';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { Button } from '../../components/Button';
 import { COLORS, SPACING, FONTS } from '../../constants/config';
 import { apiClient } from '../../services/api';
+import { useColors } from '../../hooks/useColors';
 
-interface SettingsScreenProps {
-  navigation: any;
-}
-
-export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
+import { logger } from '../../utils/logger';
+export const SettingsScreen: React.FC = () => {
+  const navigation = useNavigation();
   const { user, logout, updateUser } = useAuthStore();
   const { currentLanguage, changeLanguage, t } = useLanguage();
+  const { mode: themeMode, toggleMode: toggleTheme } = useThemeStore();
+  const colors = useColors();
   const [notifications, setNotifications] = useState(true);
-  const [darkMode, setDarkMode] = useState(false);
   const [showLanguageModal, setShowLanguageModal] = useState(false);
   const [showRoleModal, setShowRoleModal] = useState(false);
   const [updatingRole, setUpdatingRole] = useState(false);
@@ -35,14 +37,14 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
   const handleRoleChange = async (newRole: string) => {
     try {
       setUpdatingRole(true);
-      console.log('Updating role to:', newRole);
+      logger.debug('Updating role to:', newRole);
 
       // Call API to update user role
       const response = await apiClient.put('/auth/me', {
         role: newRole,
       });
 
-      console.log('Role update response:', response);
+      logger.debug('Role update response:', response);
 
       // Update local user data
       if (updateUser) {
@@ -56,8 +58,8 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
       } else {
         Alert.alert('Success', `Role updated to ${newRole.toUpperCase()} successfully!`);
       }
-    } catch (error: any) {
-      console.error('Error updating role:', error);
+    } catch (error: unknown) {
+      logger.error('Error updating role:', error);
       const errorMessage = error.response?.data?.detail || 'Failed to update role';
 
       if (Platform.OS === 'web') {
@@ -71,7 +73,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
   };
 
   const handleLogout = async () => {
-    console.log('Logout button pressed');
+    logger.debug('Logout button pressed');
 
     if (Platform.OS === 'web') {
       // Use window.confirm for web
@@ -79,7 +81,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
         `${t('settings.logout_confirm_title')}\n\n${t('settings.logout_confirm_message')}`
       );
       if (confirmed) {
-        console.log('Logout confirmed');
+        logger.debug('Logout confirmed');
         logout();
       }
     } else {
@@ -93,7 +95,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
             text: t('settings.logout'),
             style: 'destructive',
             onPress: () => {
-              console.log('Logout confirmed');
+              logger.debug('Logout confirmed');
               logout();
             },
           },
@@ -113,7 +115,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
           value: currentLanguage === 'en' ? t('settings.english') : currentLanguage === 'es' ? t('settings.spanish') : currentLanguage,
           type: 'select' as const,
           onPress: () => {
-            console.log('Language selector pressed');
+            logger.debug('Language selector pressed');
             setShowLanguageModal(true);
           },
         },
@@ -130,8 +132,8 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
           icon: 'moon' as const,
           label: t('settings.dark_mode'),
           type: 'toggle' as const,
-          value: darkMode,
-          onToggle: setDarkMode,
+          value: themeMode === 'dark',
+          onToggle: toggleTheme,
         },
       ],
     },
@@ -143,7 +145,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
           icon: 'person' as const,
           label: t('settings.edit_profile'),
           type: 'navigation' as const,
-          onPress: () => navigation.navigate('Profile'),
+          onPress: () => navigation.navigate('EditProfile'),
         },
         {
           id: 'verification',
@@ -167,7 +169,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
           label: t('settings.privacy_settings'),
           type: 'navigation' as const,
           onPress: () => {
-            Alert.alert(t('settings.coming_soon_title'), t('settings.coming_soon_message'));
+            navigation.navigate('PrivacySettings');
           },
         },
       ],
@@ -206,6 +208,8 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
     },
   ];
 
+  const styles = createStyles(colors);
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView
@@ -217,7 +221,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
         {/* User Info */}
         <View style={styles.userCard}>
           <View style={styles.avatar}>
-            <Ionicons name="person" size={40} color={COLORS.primary} />
+            <Ionicons name="person" size={40} color={colors.primary} />
           </View>
           <View style={styles.userInfo}>
             <Text style={styles.userName}>{user?.email?.split('@')[0] || 'User'}</Text>
@@ -227,7 +231,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
               onPress={() => setShowRoleModal(true)}
             >
               <Text style={styles.roleText}>{user?.role || 'User'}</Text>
-              <Ionicons name="create-outline" size={14} color={COLORS.primary} style={{ marginLeft: 4 }} />
+              <Ionicons name="create-outline" size={14} color={colors.primary} style={{ marginLeft: 4 }} />
             </TouchableOpacity>
           </View>
         </View>
@@ -246,7 +250,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
                   >
                     <View style={styles.settingLeft}>
                       <View style={styles.iconContainer}>
-                        <Ionicons name={item.icon} size={20} color={COLORS.primary} />
+                        <Ionicons name={item.icon} size={20} color={colors.primary} />
                       </View>
                       <Text style={styles.settingLabel}>{item.label}</Text>
                     </View>
@@ -254,18 +258,18 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
                       {item.type === 'select' && (
                         <>
                           <Text style={styles.settingValue}>{item.value}</Text>
-                          <Ionicons name="chevron-forward" size={20} color={COLORS.textSecondary} />
+                          <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
                         </>
                       )}
                       {item.type === 'navigation' && (
-                        <Ionicons name="chevron-forward" size={20} color={COLORS.textSecondary} />
+                        <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
                       )}
                       {item.type === 'toggle' && (
                         <Switch
                           value={item.value}
                           onValueChange={item.onToggle}
-                          trackColor={{ false: COLORS.border, true: COLORS.primary }}
-                          thumbColor={COLORS.surface}
+                          trackColor={{ false: colors.border, true: colors.primary }}
+                          thumbColor={colors.surface}
                         />
                       )}
                     </View>
@@ -308,7 +312,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>{t('settings.select_language')}</Text>
               <TouchableOpacity onPress={() => setShowLanguageModal(false)}>
-                <Ionicons name="close" size={24} color={COLORS.text} />
+                <Ionicons name="close" size={24} color={colors.text} />
               </TouchableOpacity>
             </View>
 
@@ -335,7 +339,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
                 </View>
               </View>
               {currentLanguage === 'en' && (
-                <Ionicons name="checkmark-circle" size={24} color={COLORS.primary} />
+                <Ionicons name="checkmark-circle" size={24} color={colors.primary} />
               )}
             </TouchableOpacity>
 
@@ -359,7 +363,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
                 </View>
               </View>
               {currentLanguage === 'es' && (
-                <Ionicons name="checkmark-circle" size={24} color={COLORS.primary} />
+                <Ionicons name="checkmark-circle" size={24} color={colors.primary} />
               )}
             </TouchableOpacity>
           </View>
@@ -386,7 +390,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
                 onPress={() => !updatingRole && setShowRoleModal(false)}
                 disabled={updatingRole}
               >
-                <Ionicons name="close" size={24} color={COLORS.text} />
+                <Ionicons name="close" size={24} color={colors.text} />
               </TouchableOpacity>
             </View>
 
@@ -405,7 +409,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
             >
               <View style={styles.languageOptionContent}>
                 <View style={styles.languageFlag}>
-                  <Ionicons name="cash" size={28} color={COLORS.success} />
+                  <Ionicons name="cash" size={28} color={colors.success} />
                 </View>
                 <View style={styles.languageInfo}>
                   <Text style={styles.languageName}>Lender</Text>
@@ -413,7 +417,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
                 </View>
               </View>
               {user?.role === 'lender' && (
-                <Ionicons name="checkmark-circle" size={24} color={COLORS.primary} />
+                <Ionicons name="checkmark-circle" size={24} color={colors.primary} />
               )}
             </TouchableOpacity>
 
@@ -427,7 +431,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
             >
               <View style={styles.languageOptionContent}>
                 <View style={styles.languageFlag}>
-                  <Ionicons name="wallet" size={28} color={COLORS.info} />
+                  <Ionicons name="wallet" size={28} color={colors.info} />
                 </View>
                 <View style={styles.languageInfo}>
                   <Text style={styles.languageName}>Borrower</Text>
@@ -435,7 +439,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
                 </View>
               </View>
               {user?.role === 'borrower' && (
-                <Ionicons name="checkmark-circle" size={24} color={COLORS.primary} />
+                <Ionicons name="checkmark-circle" size={24} color={colors.primary} />
               )}
             </TouchableOpacity>
 
@@ -449,7 +453,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
             >
               <View style={styles.languageOptionContent}>
                 <View style={styles.languageFlag}>
-                  <Ionicons name="swap-horizontal" size={28} color={COLORS.warning} />
+                  <Ionicons name="swap-horizontal" size={28} color={colors.warning} />
                 </View>
                 <View style={styles.languageInfo}>
                   <Text style={styles.languageName}>Both</Text>
@@ -457,13 +461,13 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
                 </View>
               </View>
               {user?.role === 'both' && (
-                <Ionicons name="checkmark-circle" size={24} color={COLORS.primary} />
+                <Ionicons name="checkmark-circle" size={24} color={colors.primary} />
               )}
             </TouchableOpacity>
 
             {updatingRole && (
               <View style={{ marginTop: SPACING.md, alignItems: 'center' }}>
-                <Text style={{ color: COLORS.textSecondary }}>Updating role...</Text>
+                <Text style={{ color: colors.textSecondary }}>Updating role...</Text>
               </View>
             )}
           </View>
@@ -473,10 +477,10 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ReturnType<typeof useColors>) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: colors.background,
   },
   content: {
     padding: SPACING.lg,
@@ -484,18 +488,18 @@ const styles = StyleSheet.create({
   userCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.surface,
+    backgroundColor: colors.surface,
     borderRadius: 16,
     padding: SPACING.lg,
     marginBottom: SPACING.lg,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: colors.border,
   },
   avatar: {
     width: 70,
     height: 70,
     borderRadius: 35,
-    backgroundColor: `${COLORS.primary}15`,
+    backgroundColor: `${colors.primary}15`,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: SPACING.md,
@@ -506,30 +510,30 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: 20,
     fontFamily: FONTS.bold,
-    color: COLORS.text,
+    color: colors.text,
     marginBottom: SPACING.xs,
   },
   userEmail: {
     fontSize: 14,
     fontFamily: FONTS.regular,
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
     marginBottom: SPACING.sm,
   },
   roleBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     alignSelf: 'flex-start',
-    backgroundColor: `${COLORS.primary}15`,
+    backgroundColor: `${colors.primary}15`,
     paddingHorizontal: SPACING.sm,
     paddingVertical: SPACING.xs / 2,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: `${COLORS.primary}30`,
+    borderColor: `${colors.primary}30`,
   },
   roleText: {
     fontSize: 12,
     fontFamily: FONTS.medium,
-    color: COLORS.primary,
+    color: colors.primary,
     textTransform: 'capitalize',
   },
   section: {
@@ -538,16 +542,16 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 14,
     fontFamily: FONTS.bold,
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
     marginBottom: SPACING.sm,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
   settingsCard: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: colors.surface,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: colors.border,
     overflow: 'hidden',
   },
   settingItem: {
@@ -565,7 +569,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: `${COLORS.primary}10`,
+    backgroundColor: `${colors.primary}10`,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: SPACING.md,
@@ -573,7 +577,7 @@ const styles = StyleSheet.create({
   settingLabel: {
     fontSize: 16,
     fontFamily: FONTS.medium,
-    color: COLORS.text,
+    color: colors.text,
   },
   settingRight: {
     flexDirection: 'row',
@@ -582,12 +586,12 @@ const styles = StyleSheet.create({
   settingValue: {
     fontSize: 14,
     fontFamily: FONTS.regular,
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
     marginRight: SPACING.sm,
   },
   divider: {
     height: 1,
-    backgroundColor: COLORS.border,
+    backgroundColor: colors.border,
     marginLeft: SPACING.lg + 36 + SPACING.md,
   },
   appInfo: {
@@ -597,7 +601,7 @@ const styles = StyleSheet.create({
   appInfoText: {
     fontSize: 12,
     fontFamily: FONTS.regular,
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
     marginBottom: SPACING.xs,
   },
   logoutButton: {
@@ -612,13 +616,13 @@ const styles = StyleSheet.create({
     padding: SPACING.lg,
   },
   modalContent: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: colors.surface,
     borderRadius: 20,
     padding: SPACING.xl,
     width: '100%',
     maxWidth: 400,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: colors.border,
   },
   modalHeader: {
     flexDirection: 'row',
@@ -629,12 +633,12 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 24,
     fontFamily: FONTS.bold,
-    color: COLORS.text,
+    color: colors.text,
   },
   modalDescription: {
     fontSize: 14,
     fontFamily: FONTS.regular,
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
     marginBottom: SPACING.lg,
   },
   languageOption: {
@@ -644,13 +648,13 @@ const styles = StyleSheet.create({
     padding: SPACING.lg,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: COLORS.border,
+    borderColor: colors.border,
     marginBottom: SPACING.md,
-    backgroundColor: COLORS.background,
+    backgroundColor: colors.background,
   },
   languageOptionSelected: {
-    borderColor: COLORS.primary,
-    backgroundColor: `${COLORS.primary}08`,
+    borderColor: colors.primary,
+    backgroundColor: `${colors.primary}08`,
   },
   languageOptionContent: {
     flexDirection: 'row',
@@ -661,12 +665,12 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: COLORS.surface,
+    backgroundColor: colors.surface,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: SPACING.md,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: colors.border,
   },
   flagEmoji: {
     fontSize: 28,
@@ -677,12 +681,12 @@ const styles = StyleSheet.create({
   languageName: {
     fontSize: 16,
     fontFamily: FONTS.bold,
-    color: COLORS.text,
+    color: colors.text,
     marginBottom: 2,
   },
   languageNative: {
     fontSize: 14,
     fontFamily: FONTS.regular,
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
   },
 });

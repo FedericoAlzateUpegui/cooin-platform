@@ -19,7 +19,9 @@ import { Button } from '../../components/Button';
 import { LanguageSwitcher } from '../../components/LanguageSwitcher';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { COLORS, SPACING, FONTS } from '../../constants/config';
+import { useColors } from '../../hooks/useColors';
 
+import { logger } from '../../utils/logger';
 // Type for form data (will be inferred from schema)
 type RegisterFormData = {
   email: string;
@@ -33,6 +35,8 @@ interface RegisterScreenProps {
 }
 
 export const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) => {
+  const colors = useColors();
+  const styles = createStyles(colors);
   const [selectedRole, setSelectedRole] = useState<'lender' | 'borrower' | 'both'>('borrower');
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
@@ -62,7 +66,7 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) =>
   // Safety check: if there's a local error, make sure we're not authenticated
   useEffect(() => {
     if (localError && isAuthenticated) {
-      console.log('ERROR: User authenticated despite error! Forcing logout...');
+      logger.debug('ERROR: User authenticated despite error! Forcing logout...');
       logout();
     }
   }, [localError, isAuthenticated, logout]);
@@ -85,10 +89,10 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) =>
 
   // Helper function to map backend errors to translated messages
   const getTranslatedErrorMessage = (error: any): string => {
-    console.error('Registration error FULL OBJECT:', JSON.stringify(error, null, 2));
-    console.error('Registration error detail:', error.detail);
-    console.error('Registration error message:', error.message);
-    console.error('Registration error status_code:', error.status_code);
+    logger.error('Registration error FULL OBJECT:', JSON.stringify(error, null, 2));
+    logger.error('Registration error detail:', error.detail);
+    logger.error('Registration error message:', error.message);
+    logger.error('Registration error status_code:', error.status_code);
 
     // Extract the raw error message
     const rawError = error.detail || error.message || '';
@@ -145,7 +149,7 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) =>
       // Attempt registration
       await register(data.email, data.username, data.password, data.confirmPassword, selectedRole, agreedToTerms);
       // If successful, navigation will be handled by the auth flow
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Get translated error message
       const translatedError = getTranslatedErrorMessage(error);
 
@@ -340,7 +344,7 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) =>
           {localError && (
             <View style={styles.errorContainer}>
               <View style={styles.errorIconContainer}>
-                <Ionicons name="alert-circle" size={20} color={COLORS.error} />
+                <Ionicons name="alert-circle" size={20} color={colors.error} />
               </View>
               <Text style={styles.errorText}>{localError}</Text>
             </View>
@@ -365,10 +369,10 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) =>
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ReturnType<typeof useColors>) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: colors.background,
     ...Platform.select({
       web: {
         height: '100vh' as any,
@@ -410,14 +414,14 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontFamily: FONTS.bold,
-    color: COLORS.text,
+    color: colors.text,
     marginBottom: SPACING.sm,
     textAlign: 'center',
   },
   subtitle: {
     fontSize: 16,
     fontFamily: FONTS.regular,
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
     textAlign: 'center',
     lineHeight: 24,
   },
@@ -430,20 +434,20 @@ const styles = StyleSheet.create({
   roleLabel: {
     fontSize: 16,
     fontFamily: FONTS.medium,
-    color: COLORS.text,
+    color: colors.text,
     marginBottom: SPACING.md,
   },
   roleOption: {
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: colors.border,
     borderRadius: 12,
     padding: SPACING.md,
     marginBottom: SPACING.sm,
-    backgroundColor: COLORS.surface,
+    backgroundColor: colors.surface,
   },
   roleOptionSelected: {
-    borderColor: COLORS.primary,
-    backgroundColor: `${COLORS.primary}10`,
+    borderColor: colors.primary,
+    backgroundColor: `${colors.primary}10`,
   },
   roleOptionContent: {
     flexDirection: 'row',
@@ -454,19 +458,19 @@ const styles = StyleSheet.create({
     height: 20,
     borderRadius: 10,
     borderWidth: 2,
-    borderColor: COLORS.border,
+    borderColor: colors.border,
     marginRight: SPACING.md,
     justifyContent: 'center',
     alignItems: 'center',
   },
   radioButtonSelected: {
-    borderColor: COLORS.primary,
+    borderColor: colors.primary,
   },
   radioButtonInner: {
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: COLORS.primary,
+    backgroundColor: colors.primary,
   },
   roleText: {
     flex: 1,
@@ -474,19 +478,19 @@ const styles = StyleSheet.create({
   roleTitle: {
     fontSize: 16,
     fontFamily: FONTS.medium,
-    color: COLORS.text,
+    color: colors.text,
     marginBottom: 2,
   },
   roleTextSelected: {
-    color: COLORS.primary,
+    color: colors.primary,
   },
   roleDescription: {
     fontSize: 14,
     fontFamily: FONTS.regular,
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
   },
   roleDescriptionSelected: {
-    color: COLORS.primary,
+    color: colors.primary,
   },
   termsContainer: {
     flexDirection: 'row',
@@ -497,7 +501,7 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     borderWidth: 2,
-    borderColor: COLORS.border,
+    borderColor: colors.border,
     borderRadius: 4,
     marginRight: SPACING.sm,
     marginTop: 2,
@@ -505,11 +509,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   checkboxChecked: {
-    backgroundColor: COLORS.primary,
-    borderColor: COLORS.primary,
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
   },
   checkmark: {
-    color: COLORS.surface,
+    color: colors.surface,
     fontSize: 12,
     fontFamily: FONTS.bold,
   },
@@ -517,19 +521,19 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 14,
     fontFamily: FONTS.regular,
-    color: COLORS.text,
+    color: colors.text,
     lineHeight: 20,
   },
   termsLink: {
-    color: COLORS.primary,
+    color: colors.primary,
     fontFamily: FONTS.medium,
   },
   errorContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: `${COLORS.error}15`,
+    backgroundColor: `${colors.error}15`,
     borderWidth: 1,
-    borderColor: COLORS.error,
+    borderColor: colors.error,
     borderRadius: 8,
     padding: SPACING.md,
     marginBottom: SPACING.md,
@@ -541,7 +545,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 14,
     fontFamily: FONTS.medium,
-    color: COLORS.error,
+    color: colors.error,
     lineHeight: 20,
   },
   registerButton: {
@@ -556,11 +560,11 @@ const styles = StyleSheet.create({
   loginText: {
     fontSize: 16,
     fontFamily: FONTS.regular,
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
   },
   loginLink: {
     fontSize: 16,
     fontFamily: FONTS.medium,
-    color: COLORS.primary,
+    color: colors.primary,
   },
 });

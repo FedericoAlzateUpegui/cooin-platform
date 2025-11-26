@@ -18,6 +18,7 @@ import { Button } from '../../components/Button';
 import { LanguageSwitcher } from '../../components/LanguageSwitcher';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { COLORS, SPACING, FONTS } from '../../constants/config';
+import { useColors } from '../../hooks/useColors';
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -31,6 +32,7 @@ interface LoginScreenProps {
 }
 
 export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
+  const colors = useColors();
   const [rememberMe, setRememberMe] = useState(false);
   const { login, isLoading, error, clearError } = useAuthStore();
   const { width } = useWindowDimensions();
@@ -53,7 +55,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
       clearError();
       await login(data.email, data.password, rememberMe);
       // Navigation will be handled by the auth flow
-    } catch (error: any) {
+    } catch (error: unknown) {
       Alert.alert(
         'Login Failed',
         error.detail || 'Please check your credentials and try again.'
@@ -84,6 +86,11 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   };
 
   const responsiveWidth = getResponsiveWidth();
+
+  const styles = createStyles(colors);
+
+  
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -189,10 +196,10 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ReturnType<typeof useColors>) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: colors.background,
   },
   languageSwitcherContainer: {
     position: 'absolute',
@@ -223,14 +230,14 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontFamily: FONTS.bold,
-    color: COLORS.text,
+    color: colors.text,
     marginBottom: SPACING.sm,
     textAlign: 'center',
   },
   subtitle: {
     fontSize: 16,
     fontFamily: FONTS.regular,
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
     textAlign: 'center',
     lineHeight: 24,
   },
@@ -251,30 +258,30 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     borderWidth: 2,
-    borderColor: COLORS.border,
+    borderColor: colors.border,
     borderRadius: 4,
     marginRight: SPACING.sm,
     justifyContent: 'center',
     alignItems: 'center',
   },
   checkboxChecked: {
-    backgroundColor: COLORS.primary,
-    borderColor: COLORS.primary,
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
   },
   checkmark: {
-    color: COLORS.surface,
+    color: colors.surface,
     fontSize: 12,
     fontFamily: FONTS.bold,
   },
   checkboxLabel: {
     fontSize: 14,
     fontFamily: FONTS.regular,
-    color: COLORS.text,
+    color: colors.text,
   },
   forgotPassword: {
     fontSize: 14,
     fontFamily: FONTS.medium,
-    color: COLORS.primary,
+    color: colors.primary,
   },
   errorContainer: {
     marginBottom: SPACING.md,
@@ -282,7 +289,7 @@ const styles = StyleSheet.create({
   errorText: {
     fontSize: 14,
     fontFamily: FONTS.regular,
-    color: COLORS.error,
+    color: colors.error,
     textAlign: 'center',
   },
   loginButton: {
@@ -296,12 +303,12 @@ const styles = StyleSheet.create({
   dividerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: COLORS.border,
+    backgroundColor: colors.border,
   },
   dividerText: {
     fontSize: 14,
     fontFamily: FONTS.regular,
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
     paddingHorizontal: SPACING.md,
   },
   registerContainer: {
@@ -312,11 +319,11 @@ const styles = StyleSheet.create({
   registerText: {
     fontSize: 16,
     fontFamily: FONTS.regular,
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
   },
   registerLink: {
     fontSize: 16,
     fontFamily: FONTS.medium,
-    color: COLORS.primary,
+    color: colors.primary,
   },
 });

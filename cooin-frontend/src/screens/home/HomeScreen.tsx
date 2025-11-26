@@ -16,6 +16,7 @@ import { useProfileStore } from '../../store/profileStore';
 import { Button } from '../../components/Button';
 import { COLORS, SPACING, FONTS } from '../../constants/config';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useColors } from '../../hooks/useColors';
 
 export const HomeScreen: React.FC = () => {
   const navigation = useNavigation();
@@ -23,6 +24,7 @@ export const HomeScreen: React.FC = () => {
   const { user } = useAuthStore();
   const { profile, loadProfile, isProfileComplete, profileCompletion } = useProfileStore();
   const { t } = useLanguage();
+  const colors = useColors();
 
   useEffect(() => {
     loadProfile();
@@ -46,31 +48,33 @@ export const HomeScreen: React.FC = () => {
       id: 'discover',
       title: t('home.discover_matches'),
       icon: 'people' as const,
-      color: COLORS.primary,
+      color: colors.primary,
       onPress: () => navigation.navigate('Matching'),
     },
     {
       id: 'connections',
       title: t('home.my_connections'),
       icon: 'link' as const,
-      color: COLORS.accent,
+      color: colors.accent,
       onPress: () => navigation.navigate('Connections'),
     },
     {
       id: 'messages',
       title: t('home.messages'),
       icon: 'chatbubbles' as const,
-      color: COLORS.success,
+      color: colors.success,
       onPress: () => navigation.navigate('Messages'),
     },
     {
       id: 'profile',
       title: t('home.complete_profile'),
       icon: 'person' as const,
-      color: COLORS.secondary,
+      color: colors.secondary,
       onPress: () => navigation.navigate('Profile'),
     },
   ];
+
+  const styles = createStyles(colors);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -93,7 +97,7 @@ export const HomeScreen: React.FC = () => {
             style={styles.notificationButton}
             onPress={() => {}}
           >
-            <Ionicons name="notifications-outline" size={24} color={COLORS.text} />
+            <Ionicons name="notifications-outline" size={24} color={colors.text} />
           </TouchableOpacity>
         </View>
 
@@ -101,7 +105,7 @@ export const HomeScreen: React.FC = () => {
         {profileCompletion !== undefined && profileCompletion < 100 && (
           <View style={styles.completionCard}>
             <View style={styles.completionHeader}>
-              <Ionicons name="information-circle" size={24} color={COLORS.primary} />
+              <Ionicons name="information-circle" size={24} color={colors.primary} />
               <Text style={styles.completionTitle}>{t('home.complete_your_profile')}</Text>
             </View>
             <Text style={styles.completionDescription}>
@@ -121,7 +125,7 @@ export const HomeScreen: React.FC = () => {
 
         {/* Welcome Message */}
         <View style={styles.welcomeCard}>
-          <Ionicons name="rocket" size={32} color={COLORS.primary} />
+          <Ionicons name="rocket" size={32} color={colors.primary} />
           <Text style={styles.welcomeTitle}>{t('home.welcome_title')}</Text>
           <Text style={styles.welcomeDescription}>
             {t('home.welcome_description', {
@@ -247,10 +251,10 @@ export const HomeScreen: React.FC = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ReturnType<typeof useColors>) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: colors.background,
   },
   content: {
     padding: SPACING.lg,
@@ -264,31 +268,31 @@ const styles = StyleSheet.create({
   greeting: {
     fontSize: 16,
     fontFamily: FONTS.regular,
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
   },
   userName: {
     fontSize: 28,
     fontFamily: FONTS.bold,
-    color: COLORS.text,
+    color: colors.text,
     marginTop: SPACING.xs,
   },
   notificationButton: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: COLORS.surface,
+    backgroundColor: colors.surface,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: colors.border,
   },
   completionCard: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: colors.surface,
     borderRadius: 16,
     padding: SPACING.lg,
     marginBottom: SPACING.lg,
     borderWidth: 1,
-    borderColor: COLORS.primary,
+    borderColor: colors.primary,
   },
   completionHeader: {
     flexDirection: 'row',
@@ -298,50 +302,50 @@ const styles = StyleSheet.create({
   completionTitle: {
     fontSize: 18,
     fontFamily: FONTS.bold,
-    color: COLORS.text,
+    color: colors.text,
     marginLeft: SPACING.sm,
   },
   completionDescription: {
     fontSize: 14,
     fontFamily: FONTS.regular,
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
     marginBottom: SPACING.md,
   },
   progressBar: {
     height: 8,
-    backgroundColor: COLORS.background,
+    backgroundColor: colors.background,
     borderRadius: 4,
     marginBottom: SPACING.md,
     overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
-    backgroundColor: COLORS.primary,
+    backgroundColor: colors.primary,
     borderRadius: 4,
   },
   completeButton: {
     alignSelf: 'flex-start',
   },
   welcomeCard: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: colors.surface,
     borderRadius: 16,
     padding: SPACING.xl,
     marginBottom: SPACING.lg,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: colors.border,
   },
   welcomeTitle: {
     fontSize: 24,
     fontFamily: FONTS.bold,
-    color: COLORS.text,
+    color: colors.text,
     marginTop: SPACING.md,
     marginBottom: SPACING.sm,
   },
   welcomeDescription: {
     fontSize: 16,
     fontFamily: FONTS.regular,
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
     textAlign: 'center',
     lineHeight: 24,
   },
@@ -351,7 +355,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontFamily: FONTS.bold,
-    color: COLORS.text,
+    color: colors.text,
     marginBottom: SPACING.md,
   },
   quickActionsGrid: {
@@ -362,12 +366,12 @@ const styles = StyleSheet.create({
   quickActionCard: {
     flex: 1,
     minWidth: '45%',
-    backgroundColor: COLORS.surface,
+    backgroundColor: colors.surface,
     borderRadius: 12,
     padding: SPACING.lg,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: colors.border,
   },
   quickActionIcon: {
     width: 60,
@@ -380,15 +384,15 @@ const styles = StyleSheet.create({
   quickActionTitle: {
     fontSize: 14,
     fontFamily: FONTS.medium,
-    color: COLORS.text,
+    color: colors.text,
     textAlign: 'center',
   },
   guideCard: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: colors.surface,
     borderRadius: 16,
     padding: SPACING.lg,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: colors.border,
   },
   guideStep: {
     flexDirection: 'row',
@@ -398,7 +402,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: COLORS.primary,
+    backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: SPACING.md,
@@ -406,7 +410,7 @@ const styles = StyleSheet.create({
   stepNumberText: {
     fontSize: 16,
     fontFamily: FONTS.bold,
-    color: COLORS.surface,
+    color: colors.surface,
   },
   stepContent: {
     flex: 1,
@@ -414,26 +418,26 @@ const styles = StyleSheet.create({
   stepTitle: {
     fontSize: 16,
     fontFamily: FONTS.bold,
-    color: COLORS.text,
+    color: colors.text,
     marginBottom: SPACING.xs,
   },
   stepDescription: {
     fontSize: 14,
     fontFamily: FONTS.regular,
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
     lineHeight: 20,
   },
   tipsCard: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: colors.surface,
     borderRadius: 16,
     padding: SPACING.lg,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: colors.border,
   },
   tipText: {
     fontSize: 14,
     fontFamily: FONTS.regular,
-    color: COLORS.text,
+    color: colors.text,
     marginBottom: SPACING.sm,
     lineHeight: 22,
   },

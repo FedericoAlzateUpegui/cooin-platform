@@ -93,27 +93,56 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         super().__init__(app)
         self.rate_limiter = rate_limiter or InMemoryRateLimiter()
 
+        # Check if we're in development mode
+        from app.core.config import settings
+        is_dev = settings.DEBUG or settings.ENVIRONMENT == 'development'
+
         # Define rate limits for different endpoint categories
-        self.rate_limits = {
-            # Authentication endpoints - strict limits
-            'auth_register': {'limit': 5, 'window': 3600, 'block': 1800},  # 5 per hour, block 30min
-            'auth_login': {'limit': 10, 'window': 900, 'block': 600},      # 10 per 15min, block 10min
-            'auth_refresh': {'limit': 20, 'window': 3600, 'block': 300},   # 20 per hour, block 5min
+        # In development: Use generous limits to avoid blocking legitimate testing
+        # In production: Use strict limits for security
+        if is_dev:
+            self.rate_limits = {
+                # Authentication endpoints - relaxed for testing
+                'auth_register': {'limit': 20, 'window': 3600, 'block': 600},   # 20 per hour, block 10min
+                'auth_login': {'limit': 50, 'window': 900, 'block': 300},       # 50 per 15min, block 5min
+                'auth_refresh': {'limit': 100, 'window': 3600, 'block': 180},   # 100 per hour, block 3min
 
-            # Profile endpoints - moderate limits
-            'profile_write': {'limit': 30, 'window': 3600, 'block': 300},  # 30 per hour
-            'profile_read': {'limit': 100, 'window': 3600, 'block': 60},   # 100 per hour
+                # Profile endpoints - generous for development
+                'profile_write': {'limit': 100, 'window': 3600, 'block': 180},  # 100 per hour
+                'profile_read': {'limit': 300, 'window': 3600, 'block': 60},    # 300 per hour
 
-            # Search endpoints - higher limits but still controlled
-            'search': {'limit': 60, 'window': 3600, 'block': 180},         # 60 per hour
+                # Search endpoints - high limits for testing
+                'search': {'limit': 200, 'window': 3600, 'block': 120},         # 200 per hour
 
-            # Connection and messaging - moderate limits
-            'connections': {'limit': 50, 'window': 3600, 'block': 300},    # 50 per hour
-            'messages': {'limit': 100, 'window': 3600, 'block': 180},      # 100 per hour
+                # Connection and messaging - very generous for development workflow
+                'connections': {'limit': 500, 'window': 3600, 'block': 180},    # 500 per hour (dev)
+                'messages': {'limit': 300, 'window': 3600, 'block': 120},       # 300 per hour
 
-            # Default for other endpoints
-            'default': {'limit': 200, 'window': 3600, 'block': 60},        # 200 per hour
-        }
+                # Default for other endpoints - very generous
+                'default': {'limit': 1000, 'window': 3600, 'block': 60},        # 1000 per hour
+            }
+        else:
+            # Production limits - strict for security
+            self.rate_limits = {
+                # Authentication endpoints - strict limits
+                'auth_register': {'limit': 5, 'window': 3600, 'block': 1800},  # 5 per hour, block 30min
+                'auth_login': {'limit': 10, 'window': 900, 'block': 600},      # 10 per 15min, block 10min
+                'auth_refresh': {'limit': 20, 'window': 3600, 'block': 300},   # 20 per hour, block 5min
+
+                # Profile endpoints - moderate limits
+                'profile_write': {'limit': 30, 'window': 3600, 'block': 300},  # 30 per hour
+                'profile_read': {'limit': 100, 'window': 3600, 'block': 60},   # 100 per hour
+
+                # Search endpoints - higher limits but still controlled
+                'search': {'limit': 60, 'window': 3600, 'block': 180},         # 60 per hour
+
+                # Connection and messaging - moderate limits
+                'connections': {'limit': 50, 'window': 3600, 'block': 300},    # 50 per hour
+                'messages': {'limit': 100, 'window': 3600, 'block': 180},      # 100 per hour
+
+                # Default for other endpoints
+                'default': {'limit': 200, 'window': 3600, 'block': 60},        # 200 per hour
+            }
 
     async def dispatch(self, request: Request, call_next: Callable) -> Response:
         """Process request through rate limiting."""

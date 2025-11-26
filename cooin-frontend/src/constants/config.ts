@@ -28,7 +28,7 @@ export const ROUTES = {
   SETTINGS: "Settings",
 } as const;
 
-export const COLORS = {
+export const LIGHT_COLORS = {
   primary: "#2563eb",
   primaryDark: "#1e40af",
   secondary: "#10b981",
@@ -43,6 +43,25 @@ export const COLORS = {
   warning: "#f59e0b",
   info: "#3b82f6",
 } as const;
+
+export const DARK_COLORS = {
+  primary: "#3b82f6",
+  primaryDark: "#2563eb",
+  secondary: "#10b981",
+  accent: "#f59e0b",
+  background: "#0f172a",
+  surface: "#1e293b",
+  text: "#f1f5f9",
+  textSecondary: "#94a3b8",
+  border: "#334155",
+  error: "#ef4444",
+  success: "#10b981",
+  warning: "#f59e0b",
+  info: "#3b82f6",
+} as const;
+
+// Default export for backward compatibility
+export const COLORS = LIGHT_COLORS;
 
 export const FONTS = {
   regular: "System",

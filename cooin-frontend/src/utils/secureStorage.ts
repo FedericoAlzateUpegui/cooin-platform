@@ -1,6 +1,7 @@
 import { Platform } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 
+import { logger } from '../utils/logger';
 /**
  * Cross-platform secure storage utility
  * Uses SecureStore on native platforms and localStorage on web
@@ -12,7 +13,7 @@ class SecureStorage {
       try {
         localStorage.setItem(key, value);
       } catch (error) {
-        console.error('Error setting item in localStorage:', error);
+        logger.error('Error setting item in localStorage:', error);
         throw error;
       }
     } else {
@@ -29,14 +30,14 @@ class SecureStorage {
 
         // Check if the value is corrupted (e.g., "[object Object]")
         if (value && value.startsWith('[object') && value.endsWith(']')) {
-          console.warn(`Corrupted data found for key "${key}". Clearing it.`);
+          logger.warn(`Corrupted data found for key "${key}". Clearing it.`);
           localStorage.removeItem(key);
           return null;
         }
 
         return value;
       } catch (error) {
-        console.error('Error getting item from localStorage:', error);
+        logger.error('Error getting item from localStorage:', error);
         return null;
       }
     } else {
@@ -51,7 +52,7 @@ class SecureStorage {
       try {
         localStorage.removeItem(key);
       } catch (error) {
-        console.error('Error deleting item from localStorage:', error);
+        logger.error('Error deleting item from localStorage:', error);
       }
     } else {
       // Use SecureStore on native platforms

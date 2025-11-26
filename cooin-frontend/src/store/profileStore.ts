@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { UserProfile, ProfileUpdateRequest } from '../types/api';
 import { profileService } from '../services/profileService';
 
+import { logger } from '../utils/logger';
 interface ProfileState {
   profile: UserProfile | null;
   isLoading: boolean;
@@ -34,8 +35,8 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
         error: null
       });
       get().checkProfileCompletion();
-    } catch (error: any) {
-      console.log('[ProfileStore] loadProfile error:', error);
+    } catch (error: unknown) {
+      logger.debug('[ProfileStore] loadProfile error:', error);
 
       // Don't show error for "profile not found" - this is expected for first-time setup
       const isProfileNotFound = error.status_code === 404 ||
@@ -68,7 +69,7 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
         error: null
       });
       get().checkProfileCompletion();
-    } catch (error: any) {
+    } catch (error: unknown) {
       set({
         isLoading: false,
         error: error.detail || 'Failed to update profile',
@@ -92,7 +93,7 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
           error: null,
         });
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       set({
         isLoading: false,
         error: error.detail || 'Failed to upload image',

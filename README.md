@@ -4,7 +4,7 @@ Peer-to-peer lending/borrowing platform with web, iOS, and mobile apps.
 
 ## 🌟 Features
 
-- Multi-language (English/Spanish) | Intelligent matching | JWT auth | Real-time messaging
+- Multi-language (English/Spanish) | Dark mode 🌙 | Intelligent matching | JWT auth | Real-time messaging
 - Cross-platform (Web/iOS/Mobile) | Advanced security & rate limiting | Redis caching
 
 ## 📁 Project Structure
@@ -21,7 +21,22 @@ cooin-platform/
 
 **Prerequisites**: Python 3.10+, PostgreSQL 14+, Node.js 18+, Docker Desktop (for Redis)
 
-### Docker & Redis (Recommended)
+### ⭐ One-Command Startup (Windows)
+
+```cmd
+start-all.bat
+```
+
+This starts everything in separate windows:
+- Backend server (port 8000) with virtual environment
+- Frontend web app (port 8083)
+- Optional Cloudflare tunnel for external access
+
+→ See [QUICK-START-SCRIPTS.md](./QUICK-START-SCRIPTS.md) for details
+
+### Manual Setup
+
+#### Docker & Redis (Recommended)
 ```bash
 # Start Redis container (runs in background)
 docker-compose up -d redis
@@ -36,7 +51,7 @@ docker-compose down
 
 → See [DOCKER-SETUP-GUIDE.md](./DOCKER-SETUP-GUIDE.md) | [ENABLE-VIRTUALIZATION-GUIDE.md](./ENABLE-VIRTUALIZATION-GUIDE.md)
 
-### Backend
+#### Backend
 ```bash
 cd cooin-backend
 python3 -m venv venv && source venv/bin/activate  # Windows: venv\Scripts\activate
@@ -45,17 +60,18 @@ cp .env.example .env  # Edit with DB credentials + generate SECRET_KEY
 createdb cooin_db && alembic upgrade head
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
-**Windows**: If `ModuleNotFoundError`, use full path: `"C:\Users\USERNAME\AppData\Local\Microsoft\WindowsApps\python.exe" -m uvicorn...`
+**Windows Shortcut**: `cd cooin-backend && start-backend.bat`
 
 → `http://localhost:8000` | API docs: `/api/v1/docs` | Health: `/health`
 
-### Frontend
+#### Frontend
 ```bash
 cd cooin-frontend && npm install
 npx expo start --web          # Web: http://localhost:8081
 npx expo start --ios          # iOS simulator
 npx expo start --android      # Android
 ```
+**Windows Shortcut**: `cd cooin-frontend && start-frontend.bat`
 
 ### iOS Native
 ```bash
@@ -99,6 +115,15 @@ cd cooin-ios/CooinNew && xcodebuild test ...    # iOS
 
 **Languages**: English, Spanish (275+ keys)
 **Add Language**: Create `src/i18n/locales/{code}.json`, copy `en.json` structure, add to `config.ts`
+
+## 🌙 Dark Mode
+
+**Fully Implemented**: All screens and navigation components support dark mode
+**Toggle**: Settings screen → Theme toggle (persists across app)
+**Architecture**: Zustand theme store + `useColors()` hook + dynamic `createStyles()` functions
+**Coverage**: 17 components (12 screens + navigation + loading)
+
+→ See [DP.md - Dark Mode Implementation Guide](./DP.md#-dark-mode-implementation-guide) for implementation details
 
 ## 📱 Platform Status
 
@@ -162,9 +187,10 @@ ngrok http 8083   # Frontend
 
 ## 📖 Documentation
 
+**Quick Start**: [QUICK-START-SCRIPTS.md](./QUICK-START-SCRIPTS.md) - Automated startup scripts ⭐
 **Setup**: [LAUNCH-WEB-APP.md](./HOW-TO-LAUNCH-WEB-APP.md) | [TECH_STACK.md](./TECH_STACK.md)
 **Docker/Redis**: [DOCKER-SETUP-GUIDE.md](./DOCKER-SETUP-GUIDE.md) | [ENABLE-VIRTUALIZATION-GUIDE.md](./ENABLE-VIRTUALIZATION-GUIDE.md) | [REDIS_SETUP.md](./REDIS_SETUP.md)
-**Tunnels**: [Cloudflare Quick](./CLOUDFLARE-QUICKSTART.md) | [Cloudflare Full](./CLOUDFLARE-TUNNEL-SETUP.md) | [Ngrok Quick](./NGROK-QUICKSTART.md) | [Ngrok Full](./NGROK-SETUP.md)
+**Tunnels**: [Named Tunnels](./SETUP-NAMED-TUNNEL.md) | [Cloudflare Quick](./CLOUDFLARE-QUICKSTART.md) | [Cloudflare Full](./CLOUDFLARE-TUNNEL-SETUP.md)
 **Troubleshooting**: [PERMISSION-FIX.md](./PERMISSION-FIX.md) | [HISTORY.md](./HISTORY.md) | [TODO.md](./TODO.md)
 **Contributing**: [DP.md](./DP.md) - Documentation Process guide
 

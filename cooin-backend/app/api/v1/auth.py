@@ -120,6 +120,9 @@ async def login(
     - Returns user data and tokens
     """
     try:
+        # DEBUG: Log login attempt details
+        logger.info(f"Login attempt - Email: {login_data.email}, Password length: {len(login_data.password)}")
+
         # Authenticate user
         user = UserService.authenticate_user(db, login_data.email, login_data.password)
 

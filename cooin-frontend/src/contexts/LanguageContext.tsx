@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import i18n from '../i18n/i18n.config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import { logger } from '../utils/logger';
 const LANGUAGE_KEY = '@cooin_language';
 
 interface LanguageContextType {
@@ -32,7 +33,7 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
 
     // Listen for language changes
     const handleLanguageChange = (lng: string) => {
-      console.log('Language changed to:', lng);
+      logger.debug('Language changed to:', lng);
       setCurrentLanguage(lng);
     };
 
@@ -45,19 +46,19 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
 
   const changeLanguage = async (language: string) => {
     try {
-      console.log('Changing language to:', language);
+      logger.debug('Changing language to:', language);
       await i18n.changeLanguage(language);
       await AsyncStorage.setItem(LANGUAGE_KEY, language);
       setCurrentLanguage(language);
-      console.log('Language changed successfully to:', language);
+      logger.debug('Language changed successfully to:', language);
     } catch (error) {
-      console.error('Error changing language:', error);
+      logger.error('Error changing language:', error);
     }
   };
 
   const t = (key: string, options?: any): string => {
     if (!isI18nInitialized) {
-      console.warn('i18n not initialized yet, returning key:', key);
+      logger.warn('i18n not initialized yet, returning key:', key);
       return key;
     }
     return i18n.t(key, options);
@@ -65,7 +66,7 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
 
   // Show loading or return null while i18n initializes
   if (!isI18nInitialized) {
-    console.log('Waiting for i18n initialization...');
+    logger.debug('Waiting for i18n initialization...');
     return null;
   }
 
