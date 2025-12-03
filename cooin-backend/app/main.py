@@ -196,8 +196,13 @@ async def startup_event():
     logger.info("Starting up Cooin API...")
 
     # Initialize cache service (will fall back to in-memory if Redis unavailable)
-    await init_cache()
-    logger.info("Cache service initialized")
+    try:
+        await asyncio.wait_for(init_cache(), timeout=5.0)
+        logger.info("Cache service initialized successfully with Redis")
+    except asyncio.TimeoutError:
+        logger.warning("Cache initialization timed out (5s), using in-memory cache fallback")
+    except Exception as e:
+        logger.error(f"Cache initialization failed: {e}, using in-memory cache fallback")
 
 
 @app.on_event("shutdown")

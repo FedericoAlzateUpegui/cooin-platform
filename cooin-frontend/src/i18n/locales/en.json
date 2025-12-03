@@ -262,8 +262,9 @@
   "validation": {
     "required_field": "This field is required",
     "invalid_email": "Please enter a valid email address",
-    "email_required": "Email is required",
+    "email_required": "Please enter your email",
     "email_invalid": "Please enter a valid email address",
+    "password_min_length": "Password must be at least 6 characters",
     "username_required": "Username is required",
     "username_min": "Username must be at least 3 characters",
     "username_max": "Username must be at most 30 characters",

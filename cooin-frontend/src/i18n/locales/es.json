@@ -262,8 +262,9 @@
   "validation": {
     "required_field": "Este campo es obligatorio",
     "invalid_email": "Por favor ingresa un correo electrónico válido",
-    "email_required": "El correo electrónico es obligatorio",
+    "email_required": "Por favor ingresa tu correo electrónico",
     "email_invalid": "Por favor ingresa un correo electrónico válido",
+    "password_min_length": "La contraseña debe tener al menos 6 caracteres",
     "username_required": "El nombre de usuario es obligatorio",
     "username_min": "El nombre de usuario debe tener al menos 3 caracteres",
     "username_max": "El nombre de usuario debe tener como máximo 30 caracteres",

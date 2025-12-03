@@ -19,12 +19,10 @@ import { LanguageSwitcher } from '../../components/LanguageSwitcher';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { COLORS, SPACING, FONTS } from '../../constants/config';
 
-const loginSchema = z.object({
-  email: z.string().email('Please enter a valid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
-});
-
-type LoginFormData = z.infer<typeof loginSchema>;
+type LoginFormData = {
+  email: string;
+  password: string;
+};
 
 interface LoginScreenProps {
   navigation: any;
@@ -35,6 +33,14 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const { login, isLoading, error, clearError } = useAuthStore();
   const { width } = useWindowDimensions();
   const { t } = useLanguage();
+
+  // Create dynamic schema with translated messages
+  const loginSchema = React.useMemo(() => z.object({
+    email: z.string()
+      .min(1, t('validation.email_required'))
+      .email(t('validation.email_invalid')),
+    password: z.string().min(6, t('validation.password_min_length')),
+  }), [t]);
 
   const {
     control,
