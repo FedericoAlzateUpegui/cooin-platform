@@ -80,7 +80,6 @@ psql -l | grep cooin_db
 ```bash
 # Navigate to backend directory
 cd /Users/mariajimenez/Desktop/cooin-platform/cooin-backend
-
 # Create Python virtual environment
 python3 -m venv venv
 

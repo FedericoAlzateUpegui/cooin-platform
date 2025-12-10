@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
@@ -15,6 +15,7 @@ import { ProfileSetupScreen } from '../screens/profile/ProfileSetupScreen';
 import { HomeScreen } from '../screens/home/HomeScreen';
 import { SettingsScreen } from '../screens/settings/SettingsScreen';
 import { VerificationScreen } from '../screens/verification/VerificationScreen';
+import { ChangePasswordScreen } from '../screens/settings/ChangePasswordScreen';
 import { COLORS } from '../constants/config';
 
 const Tab = createBottomTabNavigator();
@@ -59,6 +60,7 @@ const SidebarNavItem: React.FC<{
 // Desktop Sidebar Navigator
 const DesktopSidebarNavigator = () => {
   const { t } = useLanguage();
+  const navigation = useNavigation();
   const [activeScreen, setActiveScreen] = useState('Home');
 
   const ActiveComponent = navigationItems.find(item => item.name === activeScreen)?.component || HomeScreen;
@@ -86,7 +88,7 @@ const DesktopSidebarNavigator = () => {
       {/* Main Content */}
       <View style={styles.mainContent}>
         <View style={styles.screenContainer}>
-          <ActiveComponent />
+          <ActiveComponent navigation={navigation} />
         </View>
       </View>
     </View>
@@ -170,6 +172,7 @@ export const AppNavigator: React.FC = () => {
             <Stack.Screen name="Main" component={MainTabNavigator} />
             <Stack.Screen name="Profile" component={ProfileSetupScreen} />
             <Stack.Screen name="Verification" component={VerificationScreen} />
+            <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} />
           </>
         ) : (
           <Stack.Screen name="Auth" component={AuthNavigator} />
@@ -250,6 +253,7 @@ const styles = StyleSheet.create({
       web: {
         width: '100%',
         height: '100%',
+        overflow: 'auto' as any,
       },
       default: {
         flex: 1,

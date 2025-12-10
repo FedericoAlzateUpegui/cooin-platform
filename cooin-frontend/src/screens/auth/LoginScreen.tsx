@@ -39,7 +39,8 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
     email: z.string()
       .min(1, t('validation.email_required'))
       .email(t('validation.email_invalid')),
-    password: z.string().min(6, t('validation.password_min_length')),
+    password: z.string()
+      .min(1, t('validation.password_required')),
   }), [t]);
 
   const {

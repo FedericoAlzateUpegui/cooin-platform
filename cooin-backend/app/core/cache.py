@@ -109,15 +109,10 @@ class CacheService:
                     encoding="utf-8",
                     decode_responses=False,  # We handle encoding manually
                     max_connections=50,  # Maximum connections in pool
-                    socket_timeout=5,  # Socket timeout in seconds
-                    socket_connect_timeout=5,  # Connection timeout
-                    socket_keepalive=True,  # Enable TCP keepalive
-                    socket_keepalive_options={
-                        1: 1,  # TCP_KEEPIDLE
-                        2: 1,  # TCP_KEEPINTVL
-                        3: 3,  # TCP_KEEPCNT
-                    },
-                    retry_on_timeout=True,  # Retry on timeout
+                    socket_timeout=2,  # Socket timeout in seconds
+                    socket_connect_timeout=2,  # Connection timeout
+                    socket_keepalive=False,  # Disable TCP keepalive for faster failure
+                    retry_on_timeout=False,  # Don't retry on timeout
                     health_check_interval=30,  # Check connection health every 30s
                 )
 

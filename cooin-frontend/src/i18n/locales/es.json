@@ -264,11 +264,14 @@
     "invalid_email": "Por favor ingresa un correo electrónico válido",
     "email_required": "Por favor ingresa tu correo electrónico",
     "email_invalid": "Por favor ingresa un correo electrónico válido",
+    "password_required": "Por favor ingresa tu contraseña",
     "password_min_length": "La contraseña debe tener al menos 6 caracteres",
     "username_required": "El nombre de usuario es obligatorio",
     "username_min": "El nombre de usuario debe tener al menos 3 caracteres",
     "username_max": "El nombre de usuario debe tener como máximo 30 caracteres",
     "username_invalid": "El nombre de usuario solo puede contener letras, números, guiones bajos y guiones",
+    "username_no_spaces": "El nombre de usuario no puede contener espacios",
+    "username_no_at_start": "El nombre de usuario no puede comenzar con @",
     "password_required": "La contraseña es obligatoria",
     "password_too_short": "La contraseña debe tener al menos 8 caracteres",
     "password_weak": "La contraseña debe contener al menos una letra mayúscula, una letra minúscula y un número",
@@ -482,5 +485,23 @@
     "borrower_tip2": "• Sé claro acerca de tus necesidades de préstamo",
     "borrower_tip3": "• Responde rápidamente a las solicitudes de conexión",
     "borrower_tip4": "• Sé honesto acerca de tu capacidad de pago"
+  },
+  "change_password": {
+    "title": "Cambiar Contraseña",
+    "subtitle": "Actualiza tu contraseña para mantener tu cuenta segura",
+    "current_password": "Contraseña Actual",
+    "current_password_placeholder": "Ingresa tu contraseña actual",
+    "new_password": "Nueva Contraseña",
+    "new_password_placeholder": "Ingresa tu nueva contraseña",
+    "confirm_new_password": "Confirmar Nueva Contraseña",
+    "confirm_new_password_placeholder": "Confirma tu nueva contraseña",
+    "submit_button": "Cambiar Contraseña",
+    "success_title": "Éxito",
+    "success_message": "¡Tu contraseña ha sido cambiada exitosamente!",
+    "error_title": "Error",
+    "error_message": "Error al cambiar la contraseña. Por favor intenta de nuevo.",
+    "strength_weak": "Débil",
+    "strength_medium": "Media",
+    "strength_strong": "Fuerte"
   }
 }

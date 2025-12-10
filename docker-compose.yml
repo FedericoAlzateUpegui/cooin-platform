@@ -4,49 +4,38 @@ services:
   redis:
     image: redis:7-alpine
     container_name: cooin-redis
-    restart: unless-stopped
     ports:
       - "6379:6379"
     volumes:
       - redis-data:/data
-      - ./redis.conf:/usr/local/etc/redis/redis.conf
-    command: redis-server /usr/local/etc/redis/redis.conf
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 3s
-      retries: 3
-    networks:
-      - cooin-network
-    # Resource limits for production
-    deploy:
-      resources:
-        limits:
-          cpus: '0.50'
-          memory: 512M
-        reservations:
-          cpus: '0.25'
-          memory: 256M
-
-  # Optional: Redis Commander for GUI management (development only)
-  redis-commander:
-    image: rediscommander/redis-commander:latest
-    container_name: cooin-redis-commander
+      retries: 5
     restart: unless-stopped
-    environment:
-      - REDIS_HOSTS=local:redis:6379
-    ports:
-      - "8081:8081"
     networks:
       - cooin-network
-    depends_on:
-      - redis
-    profiles:
-      - dev  # Only start in dev mode: docker-compose --profile dev up
+
+  # Opcional: PostgreSQL también en Docker para consistencia
+  # postgres:
+  #   image: postgres:15-alpine
+  #   container_name: cooin-postgres
+  #   environment:
+  #     POSTGRES_DB: cooin_db
+  #     POSTGRES_USER: cooin_user
+  #     POSTGRES_PASSWORD: cooin_pass
+  #   ports:
+  #     - "5432:5432"
+  #   volumes:
+  #     - postgres-data:/var/lib/postgresql/data
+  #   networks:
+  #     - cooin-network
 
 volumes:
   redis-data:
-    driver: local
+  # postgres-data:
 
 networks:
   cooin-network:

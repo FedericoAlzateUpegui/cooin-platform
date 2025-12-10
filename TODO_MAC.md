@@ -2,76 +2,94 @@
 
 **Purpose**: Track tasks, progress, and issues specific to Mac development environment.
 
-**Note**: This file is ONLY edited by Claude on Mac. Windows can READ for context.
-
 ---
 
-## 🚀 Current Session (Session 15) - Docker & Redis Running ✅
+## 🚀 Current Session (Session 19) - Backend Troubleshooting & System Verification ✅
 
 ### ✅ Completed This Session
-- [x] **Frontend Dependencies Installed** - All npm packages installed successfully
-- [x] **Metro Bundler Started** - Web server running on port 8083
-- [x] **Backend Verified** - FastAPI healthy on port 8000
-- [x] **Docker Desktop Started** - Daemon running (v25.0.3)
-- [x] **Redis Container Running** - Healthy on port 6379
-- [x] **Multi-Machine Documentation Created** - Mac-specific files created
+- [x] **Backend Startup Issues Resolved**
+  - Fixed Docker not running issue (started Docker Desktop with `open -a Docker`)
+  - Fixed port 8000 conflict (killed old Python processes: PIDs 2323, 4541)
+  - Backend now running successfully with all middleware enabled
+  - Redis cache connected and healthy
 
-### 📝 Pending Work (Mac)
-- [ ] **Restart Backend with Redis** - Backend currently running without Redis connection
-- [ ] **Test Full Application** - Test complete app workflow with all services
-- [ ] **Verify Frontend-Backend Connection** - Fix "Cannot connect to server" error if persists
+- [x] **Technical Education: Workers Optimization**
+  - Explained `--max-workers 2` flag in detail
+  - Covered context switching, memory pressure, I/O bottlenecks
+  - Demonstrated cross-platform nature (Mac/Windows/Linux)
+  - Explained Amdahl's Law and why 2 workers optimal
 
-### 🔄 Context from Windows
-- Windows is on Session 14
-- Latest Windows work: System notifications, Redis setup, Docker configuration
-- See `TODO.md` for Windows-specific pending tasks
+- [x] **System Verification Complete**
+  - Backend API tested successfully (created user99999, 201 Created)
+  - Frontend running at http://localhost:8083 (bundled in 662ms)
+  - Password strength translations verified (EN & ES)
+  - All services operational and ready for manual testing
+
+### ✅ Completed Last Session (Session 18)
+- [x] **Password Strength Indicator in RegisterScreen** - Matches ChangePasswordScreen
+  - Added real-time password strength calculation (weak/medium/strong)
+  - Visual 3-bar indicator with color-coded feedback
+  - Uses existing translations (changePassword.strength_*)
+  - Optimized with useMemo to prevent re-renders
+  - File: `src/screens/auth/RegisterScreen.tsx`
+
+### ✅ Completed Session 17
+- [x] **Documentation Optimization Complete** - All 9 files condensed (Mac + Windows)
+  - Mac files: 2,095 → 829 lines (62% reduction)
+  - Windows files: 1,718 → 791 lines (54% reduction)
+  - **Total**: ~2,193 lines saved (58% overall)
+
+- [x] **Frontend Performance Optimization** - ~50% faster startup
+  - Created `metro.config.js` with bundler optimizations
+  - Added fast launch scripts: `npm run web:fast` (2 workers)
+  - Optimized package.json scripts with EXPO_NO_DOTENV=1
+  - Startup time: ~60-90s → ~30-45s
+  - Memory usage: ~800MB → ~500MB (38% reduction)
+  - Created `FRONTEND-PERFORMANCE.md` guide
+
+### 📝 Pending Work
+- [ ] **Test Registration Flow** - Verify password strength indicator works correctly
+- [ ] **Test Change Password Flow** - ⚠️ Requires fresh login (tokens expired)
+  - Issue: 401/403 errors due to JWT token expiration
+  - Solution: Re-login to get fresh tokens
+
+### ⚠️ Known Warnings (Safe to Ignore)
+- Package version mismatches: react-native-screens, jest, @types/jest
+- Package.json export warnings: merge-options, zustand, react-hook-form
+- Update when ready: `npx expo install --fix`
 
 ---
 
 ## 🌐 Mac Local Development
 
-### Current Services Running
+### Quick Start Commands
 ```bash
-# Frontend - Already Running
-# Port: 8083
-# Status: ✅ Running (PID in background Bash 90f140)
+# 1. Start Docker & Redis
+open -a Docker && docker-compose up -d redis
 
-# Backend - Already Running
-# Port: 8000
-# Status: ✅ Running (PID 56223, 56228)
-
-# Redis - Docker Container
-docker ps  # Check status
-# Port: 6379
-# Container: cooin-redis
-# Status: ✅ HEALTHY
-```
-
-### Quick Start Commands (Mac)
-```bash
-# Terminal 1 - Frontend (if not running)
-cd /Users/mariajimenez/Desktop/cooin-platform/cooin-frontend
-npx expo start --web --port 8083
-
-# Terminal 2 - Backend (if not running)
+# 2. Backend (Terminal 1)
 cd /Users/mariajimenez/Desktop/cooin-platform/cooin-backend
 source venv/bin/activate
 python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
-# Terminal 3 - Redis (Docker)
-cd /Users/mariajimenez/Desktop/cooin-platform
-docker-compose up -d redis
-
-# Check Redis status
-docker ps
+# 3. Frontend (Terminal 2) - FAST MODE ⚡
+cd /Users/mariajimenez/Desktop/cooin-platform/cooin-frontend
+npm run web:fast
+# Or standard: npm run web
+# Or clean cache first: npm run clean && npm run web:fast
 ```
+
+### Access Points
+- Frontend: http://localhost:8083
+- Backend API: http://localhost:8000
+- API Docs: http://localhost:8000/api/v1/docs
 
 ### Stop Services
 ```bash
 # Stop Redis
 docker-compose down
 
-# Stop frontend/backend: Ctrl+C in their terminals
+# Stop frontend/backend: Ctrl+C in terminals
 ```
 
 ---
@@ -79,84 +97,55 @@ docker-compose down
 ## 🐛 Known Issues (Mac)
 
 ### Active Issues
-- ⚠️ **Frontend "Cannot connect to server"** - May need browser refresh or backend restart
-  - Frontend is on port 8083
-  - Backend is on port 8000
-  - CORS configured for localhost:8083
-  - Next: Restart backend to ensure Redis connection
+- ⚠️ **JWT Token Expiration** - Tokens expire after ~15-30 min
+  - Solution: Re-login to refresh tokens
+
+- ⚠️ **Port 8000 Conflict** - Backend fails with "Address already in use"
+  - Cause: Old Python/uvicorn processes not properly terminated
+  - Diagnosis: `lsof -i :8000` to find process IDs
+  - Solution: `kill -9 <PID>` to terminate zombie processes
 
 ### Resolved Issues
-- ✅ **Docker Installation** - Was already installed, just needed to start
-- ✅ **npm Dependencies** - Fixed by running `npm install`
-- ✅ **Redis Setup** - Successfully running via Docker
+- ✅ Docker Installation - Already installed
+- ✅ npm Dependencies - Fixed with clean reinstall
+- ✅ Redis Setup - Running via Docker
+- ✅ node_modules Corruption - Fixed with `npm install --legacy-peer-deps`
+- ✅ Docker Not Starting - Use `open -a Docker` to start Docker Desktop
 
 ---
 
-## 📋 Mac-Specific Technical Notes
+## 📋 Environment Info
 
-### Environment Setup
-- **Python**: 3.12.1 (via venv in cooin-backend)
-- **Node/npm**: Installed and working
-- **Docker**: 25.0.3 (Docker Desktop)
-- **Homebrew**: /usr/local/bin/brew
+- **Python**: 3.12.1 (venv in cooin-backend)
+- **Node/npm**: Installed
+- **Docker**: 25.0.3
 - **Architecture**: Intel (x86_64)
-
-### File Paths
-- Project: `/Users/mariajimenez/Desktop/cooin-platform`
-- Frontend: `/Users/mariajimenez/Desktop/cooin-platform/cooin-frontend`
-- Backend: `/Users/mariajimenez/Desktop/cooin-platform/cooin-backend`
-
-### Package Versions (Mac)
-- expo: 54.0.23
-- @types/jest: 30.0.0 (warning: expects 29.5.14)
-- jest: 30.2.0 (warning: expects ~29.7.0)
-- Total npm packages: 1499
+- **Project**: `/Users/mariajimenez/Desktop/cooin-platform`
 
 ---
 
-## 🔧 Future Enhancements (Mac-Specific)
+## 🔧 Future Enhancements
 
-### Development Environment
+### Development
 - [ ] Update Expo packages to recommended versions
-- [ ] Configure VS Code settings for Mac
-- [ ] Set up git aliases for Mac terminal
-
-### Testing
 - [ ] Run full test suite on Mac
 - [ ] Test iOS simulator integration
-- [ ] Verify cross-platform compatibility
 
 ---
 
-## 📚 Key Commands Reference (Mac)
+## 📚 Key Commands Reference
 
 ### Docker
 ```bash
-# Start Docker Desktop
-open -a Docker
-
-# Check Docker status
-docker ps
-
-# Start Redis
-docker-compose up -d redis
-
-# Stop all containers
-docker-compose down
-
-# View Redis logs
-docker logs cooin-redis
-
-# Connect to Redis CLI
-docker exec -it cooin-redis redis-cli
+docker ps                          # Check status
+docker-compose up -d redis         # Start Redis
+docker logs cooin-redis            # View logs
+docker exec -it cooin-redis redis-cli  # Connect to Redis CLI
 ```
 
 ### Git (Mac)
 ```bash
-# Pull latest changes from Windows
-git pull origin main
-
-# Commit Mac documentation
+git pull origin main               # Pull latest
 git add HISTORY_MAC.md TODO_MAC.md README_MAC.md
 git commit -m "docs: Session X on Mac 🍎"
 git push origin main
@@ -164,35 +153,19 @@ git push origin main
 
 ### Backend
 ```bash
-# Activate venv
-source venv/bin/activate
-
-# Start backend
-python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-
-# Check backend health
-curl http://localhost:8000/health
+source venv/bin/activate           # Activate venv
+curl http://localhost:8000/health  # Check health
+lsof -i :8000                      # Check what's using port 8000
+kill -9 <PID>                      # Kill process by ID
 ```
 
 ### Frontend
 ```bash
-# Install dependencies
-npm install
-
-# Start web
-npx expo start --web --port 8083
-
-# Clear cache
-npx expo start --web --port 8083 --clear
+npm install                        # Install deps
+npx expo start --web --port 8083 --clear  # Start with cache clear
 ```
 
 ---
 
-**Last Updated**: 2025-11-19 (Session 15)
-
-**Quick Links**:
-- [Mac History](./HISTORY_MAC.md)
-- [Mac README](./README_MAC.md)
-- [Mac Launch Guide](./HOW-TO-LAUNCH-WEB-APP_MAC.md)
-- [Windows TODO](./TODO.md) (Read Only)
-- [Windows History](./HISTORY.md) (Read Only)
+**Last Updated**: 2025-12-10 (Session 19)
+**Quick Links**: [Mac History](./HISTORY_MAC.md) | [Mac README](./README_MAC.md) | [Mac Launch Guide](./HOW-TO-LAUNCH-WEB-APP_MAC.md)

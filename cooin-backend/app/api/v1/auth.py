@@ -11,7 +11,7 @@ from app.schemas.auth import (
     Token, TokenRefresh, AccessToken, LogoutRequest, LogoutResponse,
     ActiveSession, SessionsResponse
 )
-from app.schemas.user import UserResponse, UserCreate, PasswordReset, PasswordResetConfirm, EmailVerification
+from app.schemas.user import UserResponse, UserCreate, PasswordReset, PasswordResetConfirm, EmailVerification, PasswordChange
 from app.services.user_service import UserService
 from app.core.deps import get_current_active_user, get_database
 from app.core.security import jwt_handler
@@ -94,7 +94,7 @@ async def register(
     try:
         EducationalMessageSender.send_welcome_message(db, user.id)
     except Exception as e:
-        logger.error(f"Failed to send welcome message to user {user.id}: {e}")
+        logger.error(f"Failed to send welcome message: {e}")
         # Don't fail registration if message sending fails
 
     logger.info(f"New user registered: {user.email}")
@@ -364,6 +364,54 @@ async def get_current_user_info(
     - Requires valid access token
     """
     return UserResponse.from_orm(current_user)
+
+
+@router.put("/change-password")
+async def change_password(
+    password_data: PasswordChange,
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_database)
+):
+    """
+    Change password for authenticated user.
+
+    - Requires current password verification
+    - New password must meet strength requirements
+    - Requires valid access token
+    """
+    try:
+        # Validate that new passwords match
+        if password_data.new_password != password_data.confirm_new_password:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="New passwords do not match"
+            )
+
+        # Change password using UserService
+        success = UserService.change_password(
+            db=db,
+            user_id=current_user.id,
+            current_password=password_data.current_password,
+            new_password=password_data.new_password
+        )
+
+        if not success:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Failed to change password"
+            )
+
+        logger.info(f"Password changed successfully for user {current_user.email}")
+        return {"message": "Password changed successfully"}
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Password change failed for user {current_user.email}: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Password change failed"
+        )
 
 
 @router.get("/sessions", response_model=SessionsResponse)

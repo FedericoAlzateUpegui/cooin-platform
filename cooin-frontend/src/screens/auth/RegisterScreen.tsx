@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
   View,
   Text,
@@ -36,9 +36,11 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) =>
   const [selectedRole, setSelectedRole] = useState<'lender' | 'borrower' | 'both'>('borrower');
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
+  const [passwordStrength, setPasswordStrength] = useState<'weak' | 'medium' | 'strong' | null>(null);
   const { register, isLoading, isAuthenticated, logout } = useAuthStore();
   const { width } = useWindowDimensions();
   const { t } = useLanguage();
+  const scrollViewRef = useRef<ScrollView>(null);
 
   // Create schema with translated messages - recreates when language changes
   const registerSchema = useMemo(() => {
@@ -47,10 +49,24 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) =>
         .min(1, t('validation.email_required'))
         .email(t('validation.email_invalid')),
       username: z.string()
+        .min(1, t('validation.username_required'))
         .min(3, t('validation.username_min'))
-        .max(30, t('validation.username_max')),
+        .max(30, t('validation.username_max'))
+        .refine((val) => !/\s/.test(val), {
+          message: t('validation.username_no_spaces'),
+        })
+        .refine((val) => !val.startsWith('@'), {
+          message: t('validation.username_no_at_start'),
+        })
+        .refine((val) => /^[a-zA-Z0-9_-]+$/.test(val), {
+          message: t('validation.username_invalid'),
+        }),
       password: z.string()
-        .min(8, t('validation.password_too_short')),
+        .min(1, t('validation.password_required'))
+        .min(8, t('validation.password_too_short'))
+        .refine((val) => /[A-Z]/.test(val) && /[a-z]/.test(val) && /[0-9]/.test(val), {
+          message: t('validation.password_weak'),
+        }),
       confirmPassword: z.string()
         .min(1, t('validation.confirm_password_required')),
     }).refine((data) => data.password === data.confirmPassword, {
@@ -71,6 +87,7 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) =>
     control,
     handleSubmit,
     formState: { errors },
+    watch,
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
     mode: 'onBlur',
@@ -82,6 +99,43 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) =>
       confirmPassword: '',
     },
   });
+
+  // Watch password field for strength calculation
+  const password = watch('password');
+
+  // Calculate password strength
+  const calculatedStrength = useMemo(() => {
+    if (!password || password.length === 0) return null;
+
+    let strength = 0;
+
+    // Length checks
+    if (password.length >= 8) strength++;
+    if (password.length >= 12) strength++;
+
+    // Character variety checks
+    if (/[a-z]/.test(password)) strength++;
+    if (/[A-Z]/.test(password)) strength++;
+    if (/[0-9]/.test(password)) strength++;
+    if (/[^A-Za-z0-9]/.test(password)) strength++;
+
+    // Determine strength level
+    if (strength <= 2) return 'weak';
+    if (strength <= 4) return 'medium';
+    return 'strong';
+  }, [password]);
+
+  // Update password strength state
+  useEffect(() => {
+    setPasswordStrength(calculatedStrength);
+  }, [calculatedStrength]);
+
+  // Scroll to top when there's a validation error
+  useEffect(() => {
+    if (Object.keys(errors).length > 0 || localError) {
+      scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+    }
+  }, [errors, localError]);
 
   // Helper function to map backend errors to translated messages
   const getTranslatedErrorMessage = (error: any): string => {
@@ -201,6 +255,7 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) =>
         <LanguageSwitcher variant="button" />
       </View>
       <ScrollView
+        ref={scrollViewRef}
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
@@ -267,6 +322,46 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) =>
               />
             )}
           />
+
+          {/* Password Strength Indicator */}
+          {passwordStrength && password && password.length > 0 && (
+            <View style={styles.passwordStrengthContainer}>
+              <View style={styles.passwordStrengthBars}>
+                <View
+                  style={[
+                    styles.strengthBar,
+                    passwordStrength === 'weak' && styles.strengthBarWeak,
+                    passwordStrength === 'medium' && styles.strengthBarMedium,
+                    passwordStrength === 'strong' && styles.strengthBarStrong,
+                  ]}
+                />
+                <View
+                  style={[
+                    styles.strengthBar,
+                    (passwordStrength === 'medium' || passwordStrength === 'strong') &&
+                      styles.strengthBarMedium,
+                    passwordStrength === 'strong' && styles.strengthBarStrong,
+                  ]}
+                />
+                <View
+                  style={[
+                    styles.strengthBar,
+                    passwordStrength === 'strong' && styles.strengthBarStrong,
+                  ]}
+                />
+              </View>
+              <Text
+                style={[
+                  styles.passwordStrengthText,
+                  passwordStrength === 'weak' && styles.strengthTextWeak,
+                  passwordStrength === 'medium' && styles.strengthTextMedium,
+                  passwordStrength === 'strong' && styles.strengthTextStrong,
+                ]}
+              >
+                {t(`changePassword.strength_${passwordStrength}`)}
+              </Text>
+            </View>
+          )}
 
           <Controller
             control={control}
@@ -562,5 +657,43 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: FONTS.medium,
     color: COLORS.primary,
+  },
+  passwordStrengthContainer: {
+    marginTop: SPACING.sm,
+    marginBottom: SPACING.md,
+  },
+  passwordStrengthBars: {
+    flexDirection: 'row',
+    gap: SPACING.xs,
+    marginBottom: SPACING.xs,
+  },
+  strengthBar: {
+    flex: 1,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: COLORS.border,
+  },
+  strengthBarWeak: {
+    backgroundColor: '#EF4444',
+  },
+  strengthBarMedium: {
+    backgroundColor: '#F59E0B',
+  },
+  strengthBarStrong: {
+    backgroundColor: '#10B981',
+  },
+  passwordStrengthText: {
+    fontSize: 12,
+    fontFamily: FONTS.medium,
+    textAlign: 'right',
+  },
+  strengthTextWeak: {
+    color: '#EF4444',
+  },
+  strengthTextMedium: {
+    color: '#F59E0B',
+  },
+  strengthTextStrong: {
+    color: '#10B981',
   },
 });

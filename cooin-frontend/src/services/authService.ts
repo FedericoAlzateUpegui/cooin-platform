@@ -173,11 +173,12 @@ class AuthService {
     return await apiClient.post('/auth/resend-verification');
   }
 
-  async changePassword(currentPassword: string, newPassword: string): Promise<{ message: string }> {
-    return await apiClient.post('/auth/change-password', {
-      current_password: currentPassword,
-      new_password: newPassword,
-    });
+  async changePassword(data: {
+    current_password: string;
+    new_password: string;
+    confirm_new_password: string;
+  }): Promise<{ message: string }> {
+    return await apiClient.put('/auth/change-password', data);
   }
 }
 

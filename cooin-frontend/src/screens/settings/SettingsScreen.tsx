@@ -116,9 +116,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
           icon: 'lock-closed' as const,
           label: t('settings.change_password'),
           type: 'navigation' as const,
-          onPress: () => {
-            Alert.alert(t('settings.coming_soon_title'), t('settings.coming_soon_message'));
-          },
+          onPress: () => navigation.navigate('ChangePassword'),
         },
         {
           id: 'privacy',

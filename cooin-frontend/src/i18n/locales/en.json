@@ -264,11 +264,14 @@
     "invalid_email": "Please enter a valid email address",
     "email_required": "Please enter your email",
     "email_invalid": "Please enter a valid email address",
+    "password_required": "Please enter your password",
     "password_min_length": "Password must be at least 6 characters",
     "username_required": "Username is required",
     "username_min": "Username must be at least 3 characters",
     "username_max": "Username must be at most 30 characters",
     "username_invalid": "Username can only contain letters, numbers, underscores, and hyphens",
+    "username_no_spaces": "Username cannot contain spaces",
+    "username_no_at_start": "Username cannot start with @",
     "password_required": "Password is required",
     "password_too_short": "Password must be at least 8 characters",
     "password_weak": "Password must contain at least one uppercase letter, one lowercase letter, and one number",
@@ -482,5 +485,23 @@
     "borrower_tip2": "• Be clear about your borrowing needs",
     "borrower_tip3": "• Respond promptly to connection requests",
     "borrower_tip4": "• Be honest about your repayment ability"
+  },
+  "change_password": {
+    "title": "Change Password",
+    "subtitle": "Update your password to keep your account secure",
+    "current_password": "Current Password",
+    "current_password_placeholder": "Enter your current password",
+    "new_password": "New Password",
+    "new_password_placeholder": "Enter your new password",
+    "confirm_new_password": "Confirm New Password",
+    "confirm_new_password_placeholder": "Confirm your new password",
+    "submit_button": "Change Password",
+    "success_title": "Success",
+    "success_message": "Your password has been changed successfully!",
+    "error_title": "Error",
+    "error_message": "Failed to change password. Please try again.",
+    "strength_weak": "Weak",
+    "strength_medium": "Medium",
+    "strength_strong": "Strong"
   }
 }
