@@ -410,7 +410,28 @@
     "validation_bio_max": "Bio must be less than 500 characters",
     "validation_city": "City is required",
     "validation_state": "State/Province is required",
-    "validation_country": "Country is required"
+    "validation_country": "Country is required",
+    "phone_number": "Phone Number",
+    "date_of_birth": "Date of Birth",
+    "postal_code": "Postal Code",
+    "postal_code_placeholder": "Enter your postal code"
+  },
+  "edit_profile": {
+    "title": "Edit Profile",
+    "personal_info": "Personal Information",
+    "location_info": "Location Information",
+    "save_changes": "Save Changes",
+    "cancel": "Cancel",
+    "loading": "Loading profile...",
+    "success_title": "Success",
+    "success_message": "Your profile has been updated successfully!",
+    "error_title": "Error",
+    "error_message": "Failed to update profile. Please try again.",
+    "cancel_title": "Discard Changes?",
+    "cancel_message": "You have unsaved changes. Are you sure you want to discard them?",
+    "cancel_confirm": "You have unsaved changes. Are you sure you want to discard them?",
+    "stay": "Keep Editing",
+    "discard": "Discard Changes"
   },
   "password_strength": {
     "label": "Password Strength:",
@@ -420,6 +441,7 @@
   },
   "navigation": {
     "home": "Home",
+    "tickets": "Tickets",
     "matching": "Matching",
     "connections": "Connections",
     "messages": "Messages",

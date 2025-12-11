@@ -18,7 +18,9 @@ import { useAuthStore } from '../../store/authStore';
 import { Connection } from '../../types/api';
 import { COLORS, SPACING, FONTS } from '../../constants/config';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useColors } from '../../hooks/useColors';
 
+import { logger } from '../../utils/logger';
 interface ConnectionsScreenProps {
   navigation: any;
 }
@@ -42,6 +44,7 @@ export const ConnectionsScreen: React.FC<ConnectionsScreenProps> = ({ navigation
 
   const { user } = useAuthStore();
   const { t } = useLanguage();
+  const colors = useColors();
 
   useEffect(() => {
     loadData();
@@ -56,7 +59,7 @@ export const ConnectionsScreen: React.FC<ConnectionsScreenProps> = ({ navigation
         loadStats(),
       ]);
     } catch (error) {
-      console.error('Failed to load connections data:', error);
+      logger.error('Failed to load connections data:', error);
     } finally {
       setIsLoading(false);
     }
@@ -69,7 +72,7 @@ export const ConnectionsScreen: React.FC<ConnectionsScreenProps> = ({ navigation
         page_size: 50,
       });
       setConnections(response.data || []);
-    } catch (error: any) {
+    } catch (error: unknown) {
       Alert.alert(t('common.error'), error.detail || t('connections.error_loading'));
     }
   };
@@ -81,8 +84,8 @@ export const ConnectionsScreen: React.FC<ConnectionsScreenProps> = ({ navigation
         page_size: 20,
       });
       setPendingConnections(response.data || []);
-    } catch (error: any) {
-      console.error('Failed to load pending connections:', error);
+    } catch (error: unknown) {
+      logger.error('Failed to load pending connections:', error);
     }
   };
 
@@ -90,8 +93,8 @@ export const ConnectionsScreen: React.FC<ConnectionsScreenProps> = ({ navigation
     try {
       const response = await matchingService.getConnectionStats();
       setStats(response);
-    } catch (error: any) {
-      console.error('Failed to load stats:', error);
+    } catch (error: unknown) {
+      logger.error('Failed to load stats:', error);
     }
   };
 
@@ -116,7 +119,7 @@ export const ConnectionsScreen: React.FC<ConnectionsScreenProps> = ({ navigation
       );
 
       await loadData();
-    } catch (error: any) {
+    } catch (error: unknown) {
       Alert.alert(t('common.error'), error.detail || t('connections.error_accept'));
     } finally {
       setActionLoading(null);
@@ -141,7 +144,7 @@ export const ConnectionsScreen: React.FC<ConnectionsScreenProps> = ({ navigation
               });
 
               await loadData();
-            } catch (error: any) {
+            } catch (error: unknown) {
               Alert.alert(t('common.error'), error.detail || t('connections.error_reject'));
             } finally {
               setActionLoading(null);
@@ -193,19 +196,19 @@ export const ConnectionsScreen: React.FC<ConnectionsScreenProps> = ({ navigation
             <Text style={styles.statLabel}>{t('connections.total')}</Text>
           </View>
           <View style={styles.statItem}>
-            <Text style={[styles.statNumber, { color: COLORS.accent }]}>
+            <Text style={[styles.statNumber, { color: colors.accent }]}>
               {stats.pending_received}
             </Text>
             <Text style={styles.statLabel}>{t('connections.pending')}</Text>
           </View>
           <View style={styles.statItem}>
-            <Text style={[styles.statNumber, { color: COLORS.success }]}>
+            <Text style={[styles.statNumber, { color: colors.success }]}>
               {stats.accepted_connections}
             </Text>
             <Text style={styles.statLabel}>{t('connections.accepted')}</Text>
           </View>
           <View style={styles.statItem}>
-            <Text style={[styles.statNumber, { color: COLORS.primary }]}>
+            <Text style={[styles.statNumber, { color: colors.primary }]}>
               {stats.recent_activity}
             </Text>
             <Text style={styles.statLabel}>{t('connections.recent')}</Text>
@@ -261,7 +264,7 @@ export const ConnectionsScreen: React.FC<ConnectionsScreenProps> = ({ navigation
 
   const renderEmptyState = () => (
     <View style={styles.emptyState}>
-      <Ionicons name="link" size={64} color={COLORS.textSecondary} />
+      <Ionicons name="link" size={64} color={colors.textSecondary} />
       <Text style={styles.emptyTitle}>
         {activeTab === 'pending' && t('connections.no_pending_requests')}
         {activeTab === 'accepted' && t('connections.no_accepted_connections')}
@@ -305,6 +308,7 @@ export const ConnectionsScreen: React.FC<ConnectionsScreenProps> = ({ navigation
   );
 
   const filteredConnections = getFilteredConnections();
+  const styles = createStyles(colors);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -324,10 +328,10 @@ export const ConnectionsScreen: React.FC<ConnectionsScreenProps> = ({ navigation
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ReturnType<typeof useColors>) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: colors.background,
   },
   content: {
     padding: SPACING.lg,
@@ -339,21 +343,21 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontFamily: FONTS.bold,
-    color: COLORS.text,
+    color: colors.text,
     marginBottom: SPACING.lg,
   },
   statsCard: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: colors.surface,
     borderRadius: 16,
     padding: SPACING.lg,
     marginBottom: SPACING.lg,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: colors.border,
   },
   statsTitle: {
     fontSize: 18,
     fontFamily: FONTS.bold,
-    color: COLORS.text,
+    color: colors.text,
     marginBottom: SPACING.md,
   },
   statsGrid: {
@@ -367,17 +371,17 @@ const styles = StyleSheet.create({
   statNumber: {
     fontSize: 24,
     fontFamily: FONTS.bold,
-    color: COLORS.text,
+    color: colors.text,
     marginBottom: SPACING.xs,
   },
   statLabel: {
     fontSize: 12,
     fontFamily: FONTS.regular,
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
   },
   tabsContainer: {
     flexDirection: 'row',
-    backgroundColor: COLORS.surface,
+    backgroundColor: colors.surface,
     borderRadius: 12,
     padding: SPACING.xs,
     marginBottom: SPACING.md,
@@ -392,18 +396,18 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   activeTab: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: colors.primary,
   },
   tabText: {
     fontSize: 14,
     fontFamily: FONTS.medium,
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
   },
   activeTabText: {
-    color: COLORS.surface,
+    color: colors.surface,
   },
   tabBadge: {
-    backgroundColor: COLORS.border,
+    backgroundColor: colors.border,
     borderRadius: 10,
     minWidth: 20,
     height: 20,
@@ -412,15 +416,15 @@ const styles = StyleSheet.create({
     marginLeft: SPACING.xs,
   },
   activeTabBadge: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: colors.surface,
   },
   tabBadgeText: {
     fontSize: 12,
     fontFamily: FONTS.bold,
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
   },
   activeTabBadgeText: {
-    color: COLORS.primary,
+    color: colors.primary,
   },
   emptyState: {
     alignItems: 'center',
@@ -430,14 +434,14 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 20,
     fontFamily: FONTS.bold,
-    color: COLORS.text,
+    color: colors.text,
     marginTop: SPACING.md,
     marginBottom: SPACING.sm,
   },
   emptyDescription: {
     fontSize: 16,
     fontFamily: FONTS.regular,
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
     textAlign: 'center',
     lineHeight: 24,
     marginBottom: SPACING.lg,

@@ -68,8 +68,8 @@ class UserProfile(Base):
     timezone = Column(String(50), nullable=True)
 
     # Financial Information
-    income_range = Column(SQLEnum(IncomeRange), nullable=True)
-    employment_status = Column(SQLEnum(EmploymentStatus), nullable=True)
+    income_range = Column(SQLEnum(IncomeRange, values_callable=lambda x: [e.value for e in x]), nullable=True)
+    employment_status = Column(SQLEnum(EmploymentStatus, values_callable=lambda x: [e.value for e in x]), nullable=True)
     employer_name = Column(String(200), nullable=True)
     years_employed = Column(Float, nullable=True)
 
@@ -88,7 +88,7 @@ class UserProfile(Base):
     willing_to_lend_unsecured = Column(Boolean, default=False)
 
     # Borrowing Preferences (for borrowers)
-    loan_purpose = Column(SQLEnum(LoanPurpose), nullable=True)
+    loan_purpose = Column(SQLEnum(LoanPurpose, values_callable=lambda x: [e.value for e in x]), nullable=True)
     requested_loan_amount = Column(Float, nullable=True)
     preferred_loan_term = Column(Integer, nullable=True)  # in months
     max_acceptable_rate = Column(Float, nullable=True)

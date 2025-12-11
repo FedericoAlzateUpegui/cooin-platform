@@ -96,7 +96,7 @@ class RequestValidationMiddleware(BaseHTTPMiddleware):
     def __init__(self, app: ASGIApp):
         super().__init__(app)
 
-        # Suspicious patterns to detect
+        # Suspicious patterns to detect (for URL paths and headers)
         self.suspicious_patterns = [
             # SQL Injection patterns
             r"(\b(SELECT|INSERT|UPDATE|DELETE|DROP|UNION|ALTER)\b)",
@@ -113,12 +113,36 @@ class RequestValidationMiddleware(BaseHTTPMiddleware):
             r"[\\/]etc[\\/]passwd",
             r"[\\/]windows[\\/]system32",
 
-            # Command injection
-            r"[;&|`$()]",
-            r"\b(curl|wget|nc|netcat|ping)\b",
+            # Command injection (for paths/headers only, not query params)
+            r";\s*(curl|wget|nc|netcat|ping|bash|sh|cmd|powershell)\b",
+            r"\|\s*(curl|wget|nc|netcat|ping|bash|sh|cmd|powershell)\b",
+        ]
+
+        # Patterns specifically for query parameters (excluding normal URL characters like &, =, ())
+        self.query_param_patterns = [
+            # SQL Injection patterns (same as above)
+            r"(\b(SELECT|INSERT|UPDATE|DELETE|DROP|UNION|ALTER)\b)",
+            r"(\b(OR|AND)\s+\d+\s*=\s*\d+)",
+            r"('|\")(\s*;\s*)",
+
+            # XSS patterns (same as above)
+            r"<script[^>]*>.*?</script>",
+            r"javascript:",
+            r"on\w+\s*=",
+
+            # Path traversal (same as above)
+            r"\.\.[\\/]",
+            r"[\\/]etc[\\/]passwd",
+            r"[\\/]windows[\\/]system32",
+
+            # Command injection with actual commands (not just special chars)
+            r";\s*(curl|wget|nc|netcat|ping|bash|sh|cmd|powershell)\b",
+            r"\|\s*(curl|wget|nc|netcat|ping|bash|sh|cmd|powershell)\b",
+            r"`[^`]*\b(curl|wget|nc|netcat|ping|bash|sh|cmd|powershell)\b",
         ]
 
         self.compiled_patterns = [re.compile(pattern, re.IGNORECASE) for pattern in self.suspicious_patterns]
+        self.compiled_query_patterns = [re.compile(pattern, re.IGNORECASE) for pattern in self.query_param_patterns]
 
         # Rate limiting for suspicious requests
         self.suspicious_ips: Dict[str, list] = {}
@@ -150,15 +174,16 @@ class RequestValidationMiddleware(BaseHTTPMiddleware):
             if pattern.search(url_path):
                 return True, f"Suspicious URL pattern: {pattern.pattern}"
 
-        # Check query parameters
+        # Check query parameters (use query-specific patterns that don't flag normal URL chars)
         query_string = str(request.url.query)
-        for pattern in self.compiled_patterns:
-            if pattern.search(query_string):
-                return True, f"Suspicious query parameter: {pattern.pattern}"
+        if query_string:
+            for pattern in self.compiled_query_patterns:
+                if pattern.search(query_string):
+                    return True, f"Suspicious query parameter: {pattern.pattern}"
 
         # Check headers for injection attempts (excluding User-Agent which may contain special chars)
         # Only check for SQL injection, XSS, and path traversal in headers (first 9 patterns)
-        header_patterns = self.compiled_patterns[:9]  # Exclude command injection patterns (last 2)
+        header_patterns = self.compiled_patterns[:9]  # Exclude command injection patterns
         suspicious_headers = ["Referer", "X-Forwarded-For"]
         for header_name in suspicious_headers:
             if header_name in request.headers:

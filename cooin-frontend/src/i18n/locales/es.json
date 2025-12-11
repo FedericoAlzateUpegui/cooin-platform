@@ -410,7 +410,28 @@
     "validation_bio_max": "La biografía debe tener menos de 500 caracteres",
     "validation_city": "La ciudad es obligatoria",
     "validation_state": "El Estado/Provincia es obligatorio",
-    "validation_country": "El país es obligatorio"
+    "validation_country": "El país es obligatorio",
+    "phone_number": "Número de Teléfono",
+    "date_of_birth": "Fecha de Nacimiento",
+    "postal_code": "Código Postal",
+    "postal_code_placeholder": "Ingrese su código postal"
+  },
+  "edit_profile": {
+    "title": "Editar Perfil",
+    "personal_info": "Información Personal",
+    "location_info": "Información de Ubicación",
+    "save_changes": "Guardar Cambios",
+    "cancel": "Cancelar",
+    "loading": "Cargando perfil...",
+    "success_title": "Éxito",
+    "success_message": "¡Su perfil se ha actualizado correctamente!",
+    "error_title": "Error",
+    "error_message": "No se pudo actualizar el perfil. Por favor, inténtelo de nuevo.",
+    "cancel_title": "¿Descartar Cambios?",
+    "cancel_message": "Tiene cambios sin guardar. ¿Está seguro de que desea descartarlos?",
+    "cancel_confirm": "Tiene cambios sin guardar. ¿Está seguro de que desea descartarlos?",
+    "stay": "Seguir Editando",
+    "discard": "Descartar Cambios"
   },
   "password_strength": {
     "label": "Fortaleza de Contraseña:",
@@ -420,6 +441,7 @@
   },
   "navigation": {
     "home": "Inicio",
+    "tickets": "Tickets",
     "matching": "Coincidencias",
     "connections": "Conexiones",
     "messages": "Mensajes",

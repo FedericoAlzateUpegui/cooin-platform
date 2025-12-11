@@ -163,6 +163,7 @@ class UserService:
         try:
             user = db.query(User).filter(User.email == email).first()
             if not user:
+                logger.info(f"DEBUG: User not found for email: {email}")
                 return None
 
             # Check if account is locked
@@ -170,8 +171,13 @@ class UserService:
                 logger.warning(f"Login attempt on locked account: {email}")
                 return None
 
+            # DEBUG: Log password verification attempt
+            logger.info(f"DEBUG: Verifying password for {email}, password len: {len(password)}, hash: {user.hashed_password[:20]}...")
+            password_valid = password_handler.verify_password(password, user.hashed_password)
+            logger.info(f"DEBUG: Password verification result: {password_valid}")
+
             # Verify password
-            if not password_handler.verify_password(password, user.hashed_password):
+            if not password_valid:
                 # Increment failed login attempts
                 user.increment_failed_login()
                 db.commit()

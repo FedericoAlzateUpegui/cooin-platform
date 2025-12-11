@@ -16,8 +16,10 @@ import { useAuthStore } from '../../store/authStore';
 import { useProfileStore } from '../../store/profileStore';
 import { Button } from '../../components/Button';
 import { COLORS, SPACING, FONTS } from '../../constants/config';
+import { useColors } from '../../hooks/useColors';
 import { apiClient } from '../../services/api';
 
+import { logger } from '../../utils/logger';
 interface VerificationScreenProps {
   navigation: any;
 }
@@ -35,6 +37,7 @@ interface VerificationDocument {
 }
 
 export const VerificationScreen: React.FC<VerificationScreenProps> = ({ navigation }) => {
+  const colors = useColors();
   const { user } = useAuthStore();
   const { profile } = useProfileStore();
   const [uploading, setUploading] = useState<string | null>(null);
@@ -81,13 +84,13 @@ export const VerificationScreen: React.FC<VerificationScreenProps> = ({ navigati
   const getStatusColor = (status: VerificationStatus): string => {
     switch (status) {
       case 'verified':
-        return COLORS.success;
+        return colors.success;
       case 'pending':
-        return COLORS.warning;
+        return colors.warning;
       case 'rejected':
-        return COLORS.error;
+        return colors.error;
       default:
-        return COLORS.textSecondary;
+        return colors.textSecondary;
     }
   };
 
@@ -161,8 +164,8 @@ export const VerificationScreen: React.FC<VerificationScreenProps> = ({ navigati
       );
 
       setUploading(null);
-    } catch (error: any) {
-      console.error('Error uploading document:', error);
+    } catch (error: unknown) {
+      logger.error('Error uploading document:', error);
       Alert.alert(
         'Upload Failed',
         error?.detail || error?.message || 'Failed to upload document. Please try again.'
@@ -174,6 +177,11 @@ export const VerificationScreen: React.FC<VerificationScreenProps> = ({ navigati
   const verificationProgress = documents.filter(d => d.status === 'verified').length;
   const totalRequired = documents.filter(d => d.required).length;
   const progressPercentage = Math.round((verificationProgress / documents.length) * 100);
+
+  const styles = createStyles(colors);
+
+  
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -187,7 +195,7 @@ export const VerificationScreen: React.FC<VerificationScreenProps> = ({ navigati
             style={styles.backButton}
             onPress={() => navigation.goBack()}
           >
-            <Ionicons name="arrow-back" size={24} color={COLORS.text} />
+            <Ionicons name="arrow-back" size={24} color={colors.text} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Verification Center</Text>
           <View style={{ width: 44 }} />
@@ -196,7 +204,7 @@ export const VerificationScreen: React.FC<VerificationScreenProps> = ({ navigati
         {/* Progress Card */}
         <View style={styles.progressCard}>
           <View style={styles.progressHeader}>
-            <Ionicons name="shield-checkmark" size={32} color={COLORS.primary} />
+            <Ionicons name="shield-checkmark" size={32} color={colors.primary} />
             <View style={styles.progressInfo}>
               <Text style={styles.progressTitle}>Verification Progress</Text>
               <Text style={styles.progressSubtitle}>
@@ -212,7 +220,7 @@ export const VerificationScreen: React.FC<VerificationScreenProps> = ({ navigati
 
         {/* Info Banner */}
         <View style={styles.infoBanner}>
-          <Ionicons name="information-circle" size={20} color={COLORS.primary} />
+          <Ionicons name="information-circle" size={20} color={colors.primary} />
           <Text style={styles.infoText}>
             Verified accounts build trust and unlock premium features. All documents are securely encrypted.
           </Text>
@@ -225,7 +233,7 @@ export const VerificationScreen: React.FC<VerificationScreenProps> = ({ navigati
             <View key={document.id} style={styles.documentCard}>
               <View style={styles.documentHeader}>
                 <View style={styles.documentIcon}>
-                  <Ionicons name={document.icon} size={24} color={COLORS.primary} />
+                  <Ionicons name={document.icon} size={24} color={colors.primary} />
                 </View>
                 <View style={styles.documentInfo}>
                   <Text style={styles.documentTitle}>{document.title}</Text>
@@ -252,7 +260,7 @@ export const VerificationScreen: React.FC<VerificationScreenProps> = ({ navigati
                     <Ionicons
                       name={uploading === document.id ? 'hourglass' : 'cloud-upload'}
                       size={20}
-                      color={COLORS.primary}
+                      color={colors.primary}
                     />
                     <Text style={styles.uploadButtonText}>
                       {uploading === document.id ? 'Uploading...' : 'Upload'}
@@ -274,7 +282,7 @@ export const VerificationScreen: React.FC<VerificationScreenProps> = ({ navigati
             <View key={document.id} style={styles.documentCard}>
               <View style={styles.documentHeader}>
                 <View style={styles.documentIcon}>
-                  <Ionicons name={document.icon} size={24} color={COLORS.textSecondary} />
+                  <Ionicons name={document.icon} size={24} color={colors.textSecondary} />
                 </View>
                 <View style={styles.documentInfo}>
                   <Text style={styles.documentTitle}>{document.title}</Text>
@@ -301,7 +309,7 @@ export const VerificationScreen: React.FC<VerificationScreenProps> = ({ navigati
                     <Ionicons
                       name={uploading === document.id ? 'hourglass' : 'cloud-upload'}
                       size={20}
-                      color={COLORS.textSecondary}
+                      color={colors.textSecondary}
                     />
                     <Text style={styles.uploadButtonText}>
                       {uploading === document.id ? 'Uploading...' : 'Upload'}
@@ -315,7 +323,7 @@ export const VerificationScreen: React.FC<VerificationScreenProps> = ({ navigati
 
         {/* Help Section */}
         <View style={styles.helpCard}>
-          <Ionicons name="help-circle" size={24} color={COLORS.primary} />
+          <Ionicons name="help-circle" size={24} color={colors.primary} />
           <Text style={styles.helpTitle}>Need Help?</Text>
           <Text style={styles.helpText}>
             Documents are typically reviewed within 24-48 hours. Accepted formats: PDF, JPG, PNG, DOC.
@@ -333,10 +341,10 @@ export const VerificationScreen: React.FC<VerificationScreenProps> = ({ navigati
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ReturnType<typeof useColors>) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: colors.background,
   },
   content: {
     padding: SPACING.lg,
@@ -351,24 +359,24 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: COLORS.surface,
+    backgroundColor: colors.surface,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: colors.border,
   },
   headerTitle: {
     fontSize: 20,
     fontFamily: FONTS.bold,
-    color: COLORS.text,
+    color: colors.text,
   },
   progressCard: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: colors.surface,
     borderRadius: 16,
     padding: SPACING.lg,
     marginBottom: SPACING.lg,
     borderWidth: 1,
-    borderColor: COLORS.primary,
+    borderColor: colors.primary,
   },
   progressHeader: {
     flexDirection: 'row',
@@ -382,46 +390,46 @@ const styles = StyleSheet.create({
   progressTitle: {
     fontSize: 18,
     fontFamily: FONTS.bold,
-    color: COLORS.text,
+    color: colors.text,
   },
   progressSubtitle: {
     fontSize: 14,
     fontFamily: FONTS.regular,
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
     marginTop: SPACING.xs / 2,
   },
   progressBar: {
     height: 8,
-    backgroundColor: COLORS.background,
+    backgroundColor: colors.background,
     borderRadius: 4,
     marginBottom: SPACING.sm,
     overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
-    backgroundColor: COLORS.primary,
+    backgroundColor: colors.primary,
     borderRadius: 4,
   },
   progressPercentage: {
     fontSize: 14,
     fontFamily: FONTS.medium,
-    color: COLORS.primary,
+    color: colors.primary,
     textAlign: 'right',
   },
   infoBanner: {
     flexDirection: 'row',
-    backgroundColor: `${COLORS.primary}10`,
+    backgroundColor: `${colors.primary}10`,
     borderRadius: 12,
     padding: SPACING.md,
     marginBottom: SPACING.lg,
     borderLeftWidth: 3,
-    borderLeftColor: COLORS.primary,
+    borderLeftColor: colors.primary,
   },
   infoText: {
     flex: 1,
     fontSize: 14,
     fontFamily: FONTS.regular,
-    color: COLORS.text,
+    color: colors.text,
     marginLeft: SPACING.sm,
     lineHeight: 20,
   },
@@ -431,22 +439,22 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontFamily: FONTS.bold,
-    color: COLORS.text,
+    color: colors.text,
     marginBottom: SPACING.xs,
   },
   sectionSubtitle: {
     fontSize: 14,
     fontFamily: FONTS.regular,
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
     marginBottom: SPACING.md,
   },
   documentCard: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: colors.surface,
     borderRadius: 12,
     padding: SPACING.lg,
     marginBottom: SPACING.md,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: colors.border,
   },
   documentHeader: {
     flexDirection: 'row',
@@ -456,7 +464,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: `${COLORS.primary}10`,
+    backgroundColor: `${colors.primary}10`,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: SPACING.md,
@@ -467,13 +475,13 @@ const styles = StyleSheet.create({
   documentTitle: {
     fontSize: 16,
     fontFamily: FONTS.bold,
-    color: COLORS.text,
+    color: colors.text,
     marginBottom: SPACING.xs / 2,
   },
   documentDescription: {
     fontSize: 13,
     fontFamily: FONTS.regular,
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
     lineHeight: 18,
   },
   documentFooter: {
@@ -493,7 +501,7 @@ const styles = StyleSheet.create({
   uploadButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: `${COLORS.primary}10`,
+    backgroundColor: `${colors.primary}10`,
     paddingHorizontal: SPACING.md,
     paddingVertical: SPACING.sm,
     borderRadius: 8,
@@ -501,29 +509,29 @@ const styles = StyleSheet.create({
   uploadButtonText: {
     fontSize: 14,
     fontFamily: FONTS.medium,
-    color: COLORS.primary,
+    color: colors.primary,
     marginLeft: SPACING.xs,
   },
   helpCard: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: colors.surface,
     borderRadius: 16,
     padding: SPACING.xl,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: colors.border,
     marginBottom: SPACING.xl,
   },
   helpTitle: {
     fontSize: 18,
     fontFamily: FONTS.bold,
-    color: COLORS.text,
+    color: colors.text,
     marginTop: SPACING.sm,
     marginBottom: SPACING.sm,
   },
   helpText: {
     fontSize: 14,
     fontFamily: FONTS.regular,
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
     textAlign: 'center',
     lineHeight: 20,
     marginBottom: SPACING.md,

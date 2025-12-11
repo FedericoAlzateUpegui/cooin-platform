@@ -3,6 +3,7 @@ import { secureStorage } from '../utils/secureStorage';
 import { API_CONFIG, STORAGE_KEYS } from '../constants/config';
 import { ApiError } from '../types/api';
 
+import { logger } from '../utils/logger';
 class ApiClient {
   private client: AxiosInstance;
   private isRefreshing = false;
@@ -85,7 +86,7 @@ class ApiClient {
     try {
       return await secureStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     } catch (error) {
-      console.error('Error getting access token:', error);
+      logger.error('Error getting access token:', error);
       return null;
     }
   }
@@ -94,7 +95,7 @@ class ApiClient {
     try {
       return await secureStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN);
     } catch (error) {
-      console.error('Error getting refresh token:', error);
+      logger.error('Error getting refresh token:', error);
       return null;
     }
   }
@@ -120,7 +121,7 @@ class ApiClient {
       await secureStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, accessToken);
       await secureStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
     } catch (error) {
-      console.error('Error storing tokens:', error);
+      logger.error('Error storing tokens:', error);
       throw error;
     }
   }
@@ -131,7 +132,7 @@ class ApiClient {
       await secureStorage.deleteItem(STORAGE_KEYS.REFRESH_TOKEN);
       await secureStorage.deleteItem(STORAGE_KEYS.USER_DATA);
     } catch (error) {
-      console.error('Error clearing tokens:', error);
+      logger.error('Error clearing tokens:', error);
     }
   }
 

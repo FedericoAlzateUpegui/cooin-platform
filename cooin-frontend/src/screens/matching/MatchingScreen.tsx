@@ -20,6 +20,7 @@ import { matchingService } from '../../services/matchingService';
 import { useAuthStore } from '../../store/authStore';
 import { MatchingResult, MatchingCriteria } from '../../types/api';
 import { COLORS, SPACING, FONTS } from '../../constants/config';
+import { useColors } from '../../hooks/useColors';
 import { useLanguage } from '../../contexts/LanguageContext';
 
 interface MatchingScreenProps {
@@ -27,6 +28,8 @@ interface MatchingScreenProps {
 }
 
 export const MatchingScreen: React.FC<MatchingScreenProps> = ({ navigation }) => {
+  const colors = useColors();
+  const styles = createStyles(colors);
   const [matches, setMatches] = useState<MatchingResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -71,7 +74,7 @@ export const MatchingScreen: React.FC<MatchingScreenProps> = ({ navigation }) =>
         total_matches: response.total_matches,
         search_time_ms: response.search_time_ms,
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       Alert.alert(t('matching_screen.search_error_title'), error.detail || t('matching_screen.search_error_message'));
     } finally {
       setIsLoading(false);
@@ -106,7 +109,7 @@ export const MatchingScreen: React.FC<MatchingScreenProps> = ({ navigation }) =>
 
       // Remove the match from the list since connection was sent
       setMatches(prev => prev.filter(m => m.user_id !== match.user_id));
-    } catch (error: any) {
+    } catch (error: unknown) {
       Alert.alert(t('matching_screen.connection_failed_title'), error.detail || t('matching_screen.connection_failed_message'));
     } finally {
       setConnectingId(null);
@@ -134,7 +137,7 @@ export const MatchingScreen: React.FC<MatchingScreenProps> = ({ navigation }) =>
           <Ionicons
             name={showFilters ? 'close' : 'filter'}
             size={24}
-            color={COLORS.primary}
+            color={colors.primary}
           />
         </TouchableOpacity>
       </View>
@@ -227,7 +230,7 @@ export const MatchingScreen: React.FC<MatchingScreenProps> = ({ navigation }) =>
                 onPress={() => onChange(!value)}
               >
                 <View style={[styles.checkbox, value && styles.checkboxChecked]}>
-                  {value && <Ionicons name="checkmark" size={16} color={COLORS.surface} />}
+                  {value && <Ionicons name="checkmark" size={16} color={colors.surface} />}
                 </View>
                 <Text style={styles.checkboxLabel}>{t('matching_screen.verified_only')}</Text>
               </TouchableOpacity>
@@ -255,7 +258,7 @@ export const MatchingScreen: React.FC<MatchingScreenProps> = ({ navigation }) =>
 
   const renderEmptyState = () => (
     <View style={styles.emptyState}>
-      <Ionicons name="people" size={64} color={COLORS.textSecondary} />
+      <Ionicons name="people" size={64} color={colors.textSecondary} />
       <Text style={styles.emptyTitle}>{t('matching_screen.no_matches_found')}</Text>
       <Text style={styles.emptyDescription}>
         {t('matching_screen.try_adjusting')}
@@ -309,10 +312,10 @@ export const MatchingScreen: React.FC<MatchingScreenProps> = ({ navigation }) =>
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ReturnType<typeof useColors>) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: colors.background,
   },
   content: {
     padding: SPACING.lg,
@@ -330,30 +333,30 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontFamily: FONTS.bold,
-    color: COLORS.text,
+    color: colors.text,
   },
   filterButton: {
     padding: SPACING.sm,
     borderRadius: 8,
-    backgroundColor: `${COLORS.primary}10`,
+    backgroundColor: `${colors.primary}10`,
   },
   searchStats: {
     fontSize: 14,
     fontFamily: FONTS.regular,
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
     marginBottom: SPACING.md,
   },
   filtersContainer: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: colors.surface,
     borderRadius: 12,
     padding: SPACING.lg,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: colors.border,
   },
   filtersTitle: {
     fontSize: 18,
     fontFamily: FONTS.bold,
-    color: COLORS.text,
+    color: colors.text,
     marginBottom: SPACING.md,
   },
   amountRow: {
@@ -372,20 +375,20 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     borderWidth: 2,
-    borderColor: COLORS.border,
+    borderColor: colors.border,
     borderRadius: 6,
     marginRight: SPACING.md,
     justifyContent: 'center',
     alignItems: 'center',
   },
   checkboxChecked: {
-    backgroundColor: COLORS.primary,
-    borderColor: COLORS.primary,
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
   },
   checkboxLabel: {
     fontSize: 16,
     fontFamily: FONTS.regular,
-    color: COLORS.text,
+    color: colors.text,
   },
   filterActions: {
     flexDirection: 'row',
@@ -402,14 +405,14 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 20,
     fontFamily: FONTS.bold,
-    color: COLORS.text,
+    color: colors.text,
     marginTop: SPACING.md,
     marginBottom: SPACING.sm,
   },
   emptyDescription: {
     fontSize: 16,
     fontFamily: FONTS.regular,
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
     textAlign: 'center',
     lineHeight: 24,
     marginBottom: SPACING.lg,

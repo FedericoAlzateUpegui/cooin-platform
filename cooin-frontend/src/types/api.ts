@@ -97,6 +97,10 @@ export interface Connection {
   created_at: string;
   updated_at: string;
   responded_at?: string;
+  source_ticket_id?: number;
+  proposed_amount?: number;
+  proposed_interest_rate?: number;
+  proposed_term_months?: number;
 }
 
 export interface ConnectionCreateRequest {
@@ -195,4 +199,120 @@ export interface PaginatedResponse<T> {
 export interface ApiError {
   detail: string;
   status_code: number;
+}
+
+// Ticket types
+export interface Ticket {
+  id: number;
+  user_id: number;
+  ticket_type: 'lending_offer' | 'borrowing_request';
+  status: 'active' | 'paused' | 'completed' | 'cancelled' | 'expired';
+  title: string;
+  description: string;
+  amount?: number;
+  min_amount?: number;
+  max_amount?: number;
+  interest_rate?: number;
+  min_interest_rate?: number;
+  max_interest_rate?: number;
+  term_months?: number;
+  min_term_months?: number;
+  max_term_months?: number;
+  loan_type: 'personal' | 'business' | 'education' | 'home_improvement' | 'debt_consolidation' | 'other';
+  loan_purpose: string;
+  warranty_type: 'none' | 'property' | 'vehicle' | 'savings' | 'investments' | 'other';
+  warranty_description?: string;
+  warranty_value?: number;
+  requirements?: string;
+  preferred_location?: string;
+  flexible_terms: boolean;
+  is_public: boolean;
+  expires_at?: string;
+  views_count: number;
+  responses_count: number;
+  deals_created: number;
+  created_at: string;
+  updated_at: string;
+  last_viewed_at?: string;
+  is_active: boolean;
+  is_expired: boolean;
+  days_active: number;
+  is_lending_offer: boolean;
+  is_borrowing_request: boolean;
+  has_warranty: boolean;
+}
+
+export interface TicketCreateRequest {
+  ticket_type: 'lending_offer' | 'borrowing_request';
+  title: string;
+  description: string;
+  amount?: number;
+  min_amount?: number;
+  max_amount?: number;
+  interest_rate?: number;
+  min_interest_rate?: number;
+  max_interest_rate?: number;
+  term_months?: number;
+  min_term_months?: number;
+  max_term_months?: number;
+  loan_type: 'personal' | 'business' | 'education' | 'home_improvement' | 'debt_consolidation' | 'other';
+  loan_purpose: string;
+  warranty_type?: 'none' | 'property' | 'vehicle' | 'savings' | 'investments' | 'other';
+  warranty_description?: string;
+  warranty_value?: number;
+  requirements?: string;
+  preferred_location?: string;
+  flexible_terms?: boolean;
+  is_public?: boolean;
+  expires_at?: string;
+}
+
+export interface TicketUpdateRequest {
+  title?: string;
+  description?: string;
+  status?: 'active' | 'paused' | 'completed' | 'cancelled';
+  amount?: number;
+  min_amount?: number;
+  max_amount?: number;
+  interest_rate?: number;
+  min_interest_rate?: number;
+  max_interest_rate?: number;
+  term_months?: number;
+  min_term_months?: number;
+  max_term_months?: number;
+  loan_purpose?: string;
+  warranty_description?: string;
+  warranty_value?: number;
+  requirements?: string;
+  preferred_location?: string;
+  flexible_terms?: boolean;
+  is_public?: boolean;
+  expires_at?: string;
+}
+
+export interface TicketFilterParams {
+  ticket_type?: 'lending_offer' | 'borrowing_request';
+  status?: 'active' | 'paused' | 'completed' | 'cancelled' | 'expired';
+  loan_type?: 'personal' | 'business' | 'education' | 'home_improvement' | 'debt_consolidation' | 'other';
+  warranty_type?: 'none' | 'property' | 'vehicle' | 'savings' | 'investments' | 'other';
+  min_amount?: number;
+  max_amount?: number;
+  min_interest_rate?: number;
+  max_interest_rate?: number;
+  min_term_months?: number;
+  max_term_months?: number;
+  location?: string;
+  flexible_terms_only?: boolean;
+  sort_by?: 'created_at' | 'amount' | 'interest_rate' | 'views_count';
+  sort_order?: 'asc' | 'desc';
+  page?: number;
+  page_size?: number;
+}
+
+export interface CreateDealFromTicketRequest {
+  ticket_id: number;
+  message?: string;
+  proposed_amount?: number;
+  proposed_interest_rate?: number;
+  proposed_term_months?: number;
 }

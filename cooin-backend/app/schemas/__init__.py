@@ -49,6 +49,18 @@ from app.schemas.profile import (
     ProfileStats
 )
 
+from app.schemas.ticket import (
+    TicketBase,
+    TicketCreate,
+    TicketUpdate,
+    TicketResponse,
+    TicketWithUser,
+    TicketListResponse,
+    TicketFilter,
+    CreateDealFromTicket,
+    TicketStats
+)
+
 # Export all schemas
 __all__ = [
     # User schemas
@@ -97,4 +109,15 @@ __all__ = [
     "UserProfilePublicResponse",
     "ProfileCompletionResponse",
     "ProfileStats",
+
+    # Ticket schemas
+    "TicketBase",
+    "TicketCreate",
+    "TicketUpdate",
+    "TicketResponse",
+    "TicketWithUser",
+    "TicketListResponse",
+    "TicketFilter",
+    "CreateDealFromTicket",
+    "TicketStats",
 ]

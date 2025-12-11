@@ -1,12 +1,13 @@
 from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 from fastapi.exceptions import RequestValidationError
+from fastapi.staticfiles import StaticFiles
 import logging
 import time
 import re
-# Force reload for CORS configuration
+from pathlib import Path
 
 from app.core.config import settings
 from app.api.v1.api import api_router
@@ -49,18 +50,17 @@ def create_application() -> FastAPI:
     )
 
     # CORS middleware - MUST be added first to handle preflight OPTIONS requests
-    # Use regex to match origins with or without trailing slash
-    cors_origins_regex = '|'.join([
-        re.escape(str(origin).rstrip('/')) + '/?'
-        for origin in settings.BACKEND_CORS_ORIGINS
-    ])
-    
+    # For development, allow all origins from trycloudflare.com and localhost
+    cors_origins = [str(origin).rstrip('/') for origin in settings.BACKEND_CORS_ORIGINS]
+    logger.info(f"CORS origins configured: {cors_origins}")
+
     app.add_middleware(
         CORSMiddleware,
-        allow_origin_regex=cors_origins_regex,
+        allow_origin_regex=r"https://.*\.ngrok-free\.dev|https://.*\.trycloudflare\.com|http://localhost:\d+|http://192\.168\.\d+\.\d+:\d+",
         allow_credentials=True,
         allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
         allow_headers=["*"],
+        expose_headers=["*"],
     )
 
     # Environment-aware Security Middleware Stack
@@ -169,17 +169,6 @@ def create_application() -> FastAPI:
 app = create_application()
 
 
-@app.get("/")
-async def root():
-    """Root endpoint - health check."""
-    return {
-        "message": "Welcome to Cooin API",
-        "version": settings.PROJECT_VERSION,
-        "status": "healthy",
-        "docs_url": f"{settings.API_V1_STR}/docs" if settings.DEBUG else None
-    }
-
-
 @app.get("/health")
 async def health_check():
     """Health check endpoint."""
@@ -189,8 +178,41 @@ async def health_check():
         "version": settings.PROJECT_VERSION
     }
 
+@app.get("/api")
+async def api_root():
+    """API root endpoint - only for /api path."""
+    return {
+        "message": "Welcome to Cooin API",
+        "version": settings.PROJECT_VERSION,
+        "status": "healthy",
+        "docs_url": f"{settings.API_V1_STR}/docs" if settings.DEBUG else None
+    }
+
 
 # Startup and shutdown events
+# Serve frontend static files
+frontend_dist = Path(__file__).parent.parent.parent / "cooin-frontend" / "dist"
+if frontend_dist.exists():
+    # Mount static files for JS bundles
+    app.mount("/_expo", StaticFiles(directory=str(frontend_dist / "_expo")), name="expo")
+    logger.info(f"Frontend static files mounted from: {frontend_dist}")
+
+    # Serve index.html for all other routes (SPA fallback) - MUST be defined last
+    @app.get("/{full_path:path}")
+    async def serve_frontend(full_path: str):
+        # Don't serve frontend for API routes
+        if full_path.startswith("api/"):
+            return JSONResponse({"detail": "Not found"}, status_code=404)
+
+        # Serve index.html for root and all other paths
+        index_file = frontend_dist / "index.html"
+        if index_file.exists():
+            return FileResponse(index_file)
+        return JSONResponse({"detail": "Frontend not found"}, status_code=404)
+else:
+    logger.warning(f"Frontend dist folder not found at: {frontend_dist}")
+
+
 @app.on_event("startup")
 async def startup_event():
     """Initialize services on startup."""

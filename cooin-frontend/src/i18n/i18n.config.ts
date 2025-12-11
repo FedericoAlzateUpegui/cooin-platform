@@ -6,6 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import en from './locales/en.json';
 import es from './locales/es.json';
 
+import { logger } from '../utils/logger';
 const LANGUAGE_KEY = '@cooin_language';
 
 // Language detector for React Native/Expo
@@ -23,7 +24,7 @@ const languageDetector = {
       const deviceLanguage = Localization.locale.split('-')[0];
       callback(deviceLanguage);
     } catch (error) {
-      console.error('Error detecting language:', error);
+      logger.error('Error detecting language:', error);
       callback('en'); // fallback
     }
   },
@@ -32,7 +33,7 @@ const languageDetector = {
     try {
       await AsyncStorage.setItem(LANGUAGE_KEY, language);
     } catch (error) {
-      console.error('Error saving language:', error);
+      logger.error('Error saving language:', error);
     }
   },
 };

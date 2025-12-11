@@ -7,12 +7,14 @@ import {
   User
 } from '../types/api';
 import { STORAGE_KEYS } from '../constants/config';
+import { logger } from '../utils/logger';
+import { hasMessage, hasDetail } from '../utils/errorUtils';
 
 class AuthService {
   async login(credentials: LoginRequest): Promise<AuthResponse> {
     try {
       const response = await apiClient.post<any>('/auth/login', credentials);
-      console.log('Login response:', JSON.stringify(response, null, 2));
+      logger.debug('Login response received', response);
 
       // Backend returns tokens nested in {user, tokens, message}
       // Extract tokens from nested structure
@@ -20,11 +22,11 @@ class AuthService {
       const access_token = tokens.access_token;
       const refresh_token = tokens.refresh_token;
 
-      console.log('Extracted tokens:', { access_token: !!access_token, refresh_token: !!refresh_token });
+      logger.debug('Extracted tokens', { hasAccessToken: !!access_token, hasRefreshToken: !!refresh_token });
 
       if (!access_token || !refresh_token) {
         const debugInfo = `Response keys: ${Object.keys(response).join(', ')}\nTokens keys: ${Object.keys(tokens).join(', ')}`;
-        console.error('Missing tokens!', debugInfo);
+        logger.error('Missing tokens', { debugInfo });
         throw new Error(`Missing tokens. ${debugInfo}`);
       }
 
@@ -44,12 +46,8 @@ class AuthService {
         expires_in: tokens.expires_in,
         user: response.user
       };
-    } catch (error: any) {
-      console.error('Login error in authService:', error);
-      // Enhance error with more details for debugging
-      if (error.message) {
-        error.detail = error.detail || error.message;
-      }
+    } catch (error: unknown) {
+      logger.error('Login error in authService', error);
       throw error;
     }
   }
@@ -84,12 +82,8 @@ class AuthService {
         expires_in: tokens.expires_in,
         user: response.user
       };
-    } catch (error: any) {
-      console.error('Registration error in authService:', error);
-      // Make sure error detail is preserved
-      if (error.detail) {
-        error.message = error.detail;
-      }
+    } catch (error: unknown) {
+      logger.error('Registration error in authService', error);
       throw error;
     }
   }
@@ -100,7 +94,7 @@ class AuthService {
       await apiClient.post('/auth/logout');
     } catch (error) {
       // Continue with logout even if server call fails
-      console.warn('Server logout failed:', error);
+      logger.warn('Server logout failed', error);
     } finally {
       // Clear local storage
       await apiClient.clearTokens();
@@ -114,7 +108,7 @@ class AuthService {
         try {
           return JSON.parse(userData);
         } catch (parseError) {
-          console.error('Failed to parse user data, clearing corrupted data:', parseError);
+          logger.error('Failed to parse user data, clearing corrupted data', parseError);
           await secureStorage.deleteItem(STORAGE_KEYS.USER_DATA);
         }
       }
@@ -126,7 +120,7 @@ class AuthService {
       }
       return user;
     } catch (error) {
-      console.error('Error getting current user:', error);
+      logger.error('Error getting current user', error);
       return null;
     }
   }
@@ -148,7 +142,7 @@ class AuthService {
 
       await apiClient.storeTokens(response.access_token, response.refresh_token);
     } catch (error) {
-      console.error('Token refresh failed:', error);
+      logger.error('Token refresh failed', error);
       await this.logout();
       throw error;
     }

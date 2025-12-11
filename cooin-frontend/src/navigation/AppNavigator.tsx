@@ -7,16 +7,20 @@ import { View, ActivityIndicator, useWindowDimensions, TouchableOpacity, Text, S
 
 import { useAuthStore } from '../store/authStore';
 import { useLanguage } from '../contexts/LanguageContext';
+import { COLORS } from '../constants/config';
+import { useColors } from '../hooks/useColors';
 import { AuthNavigator } from './AuthNavigator';
 import { MatchingScreen } from '../screens/matching/MatchingScreen';
 import { ConnectionsScreen } from '../screens/connections/ConnectionsScreen';
 import { NotificationsScreen } from '../screens/notifications/NotificationsScreen';
 import { ProfileSetupScreen } from '../screens/profile/ProfileSetupScreen';
+import { EditProfileScreen } from '../screens/profile/EditProfileScreen';
 import { HomeScreen } from '../screens/home/HomeScreen';
 import { SettingsScreen } from '../screens/settings/SettingsScreen';
+import { PrivacySettingsScreen } from '../screens/settings/PrivacySettingsScreen';
 import { VerificationScreen } from '../screens/verification/VerificationScreen';
 import { ChangePasswordScreen } from '../screens/settings/ChangePasswordScreen';
-import { COLORS } from '../constants/config';
+import { TicketsScreen } from '../screens/tickets/TicketsScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -27,6 +31,7 @@ const DESKTOP_BREAKPOINT = 768;
 // Navigation items configuration
 const navigationItems = [
   { name: 'Home', component: HomeScreen, iconFocused: 'home', iconOutline: 'home-outline', labelKey: 'navigation.home' },
+  { name: 'Tickets', component: TicketsScreen, iconFocused: 'ticket', iconOutline: 'ticket-outline', labelKey: 'navigation.tickets' },
   { name: 'Matching', component: MatchingScreen, iconFocused: 'people', iconOutline: 'people-outline', labelKey: 'navigation.matching' },
   { name: 'Connections', component: ConnectionsScreen, iconFocused: 'link', iconOutline: 'link-outline', labelKey: 'navigation.connections' },
   { name: 'Notifications', component: NotificationsScreen, iconFocused: 'notifications', iconOutline: 'notifications-outline', labelKey: 'navigation.notifications' },
@@ -39,18 +44,41 @@ const SidebarNavItem: React.FC<{
   isActive: boolean;
   onPress: () => void;
   label: string;
-}> = ({ item, isActive, onPress, label }) => {
+  colors: ReturnType<typeof useColors>;
+}> = ({ item, isActive, onPress, label, colors }) => {
   return (
     <TouchableOpacity
-      style={[styles.sidebarItem, isActive && styles.sidebarItemActive]}
+      style={[
+        {
+          flexDirection: 'row',
+          alignItems: 'center',
+          paddingVertical: 14,
+          paddingHorizontal: 20,
+          marginHorizontal: 8,
+          marginVertical: 2,
+          borderRadius: 8,
+        },
+        isActive && { backgroundColor: colors.primary + '15' }
+      ]}
       onPress={onPress}
     >
       <Ionicons
         name={isActive ? item.iconFocused : item.iconOutline}
         size={24}
-        color={isActive ? COLORS.primary : COLORS.textSecondary}
+        color={isActive ? colors.primary : colors.textSecondary}
       />
-      <Text style={[styles.sidebarLabel, isActive && styles.sidebarLabelActive]}>
+      <Text style={[
+        {
+          marginLeft: 12,
+          fontSize: 16,
+          color: colors.textSecondary,
+          fontWeight: '500',
+        },
+        isActive && {
+          color: colors.primary,
+          fontWeight: '600',
+        }
+      ]}>
         {label}
       </Text>
     </TouchableOpacity>
@@ -61,16 +89,17 @@ const SidebarNavItem: React.FC<{
 const DesktopSidebarNavigator = () => {
   const { t } = useLanguage();
   const navigation = useNavigation();
+  const colors = useColors();
   const [activeScreen, setActiveScreen] = useState('Home');
 
   const ActiveComponent = navigationItems.find(item => item.name === activeScreen)?.component || HomeScreen;
 
   return (
-    <View style={styles.desktopContainer}>
+    <View style={[styles.desktopContainer, { backgroundColor: colors.background }]}>
       {/* Left Sidebar */}
-      <View style={styles.sidebar}>
-        <View style={styles.sidebarHeader}>
-          <Text style={styles.sidebarTitle}>Cooin</Text>
+      <View style={[styles.sidebar, { backgroundColor: colors.surface, borderRightColor: colors.border }]}>
+        <View style={[styles.sidebarHeader, { borderBottomColor: colors.border }]}>
+          <Text style={[styles.sidebarTitle, { color: colors.primary }]}>Cooin</Text>
         </View>
         <View style={styles.sidebarNav}>
           {navigationItems.map((item) => (
@@ -80,13 +109,14 @@ const DesktopSidebarNavigator = () => {
               isActive={activeScreen === item.name}
               onPress={() => setActiveScreen(item.name)}
               label={t(item.labelKey)}
+              colors={colors}
             />
           ))}
         </View>
       </View>
 
       {/* Main Content */}
-      <View style={styles.mainContent}>
+      <View style={[styles.mainContent, { backgroundColor: colors.background }]}>
         <View style={styles.screenContainer}>
           <ActiveComponent navigation={navigation} />
         </View>
@@ -98,6 +128,7 @@ const DesktopSidebarNavigator = () => {
 // Mobile Bottom Tab Navigator
 const MobileTabNavigator = () => {
   const { t } = useLanguage();
+  const colors = useColors();
 
   return (
     <Tab.Navigator
@@ -107,16 +138,16 @@ const MobileTabNavigator = () => {
           const iconName = focused ? item?.iconFocused : item?.iconOutline;
           return <Ionicons name={iconName || 'home-outline'} size={size} color={color} />;
         },
-        tabBarActiveTintColor: COLORS.primary,
-        tabBarInactiveTintColor: COLORS.textSecondary,
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: colors.textSecondary,
         tabBarStyle: {
-          backgroundColor: COLORS.surface,
-          borderTopColor: COLORS.border,
+          backgroundColor: colors.surface,
+          borderTopColor: colors.border,
         },
         headerStyle: {
-          backgroundColor: COLORS.surface,
+          backgroundColor: colors.surface,
         },
-        headerTintColor: COLORS.text,
+        headerTintColor: colors.text,
         headerTitleStyle: {
           fontWeight: 'bold',
         },
@@ -142,16 +173,19 @@ const MainTabNavigator = () => {
   return isDesktop ? <DesktopSidebarNavigator /> : <MobileTabNavigator />;
 };
 
-const LoadingScreen = () => (
-  <View style={{
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: COLORS.background
-  }}>
-    <ActivityIndicator size="large" color={COLORS.primary} />
-  </View>
-);
+const LoadingScreen = () => {
+  const colors = useColors();
+  return (
+    <View style={{
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: colors.background
+    }}>
+      <ActivityIndicator size="large" color={colors.primary} />
+    </View>
+  );
+};
 
 export const AppNavigator: React.FC = () => {
   const { isAuthenticated, isInitializing, checkAuth } = useAuthStore();
@@ -171,6 +205,8 @@ export const AppNavigator: React.FC = () => {
           <>
             <Stack.Screen name="Main" component={MainTabNavigator} />
             <Stack.Screen name="Profile" component={ProfileSetupScreen} />
+            <Stack.Screen name="EditProfile" component={EditProfileScreen} />
+            <Stack.Screen name="PrivacySettings" component={PrivacySettingsScreen} />
             <Stack.Screen name="Verification" component={VerificationScreen} />
             <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} />
           </>

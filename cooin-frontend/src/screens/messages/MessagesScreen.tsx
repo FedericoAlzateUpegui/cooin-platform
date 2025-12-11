@@ -14,7 +14,9 @@ import { useFocusEffect } from '@react-navigation/native';
 import { messagingService } from '../../services/messagingService';
 import { COLORS, SPACING, FONTS } from '../../constants/config';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useColors } from '../../hooks/useColors';
 
+import { logger } from '../../utils/logger';
 interface MessagesScreenProps {
   navigation: any;
 }
@@ -33,6 +35,7 @@ export const MessagesScreen: React.FC<MessagesScreenProps> = ({ navigation }) =>
   const [isLoading, setIsLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const { t } = useLanguage();
+  const colors = useColors();
 
   useFocusEffect(
     useCallback(() => {
@@ -48,8 +51,8 @@ export const MessagesScreen: React.FC<MessagesScreenProps> = ({ navigation }) =>
         page_size: 50,
       });
       setConversations(response.data || []);
-    } catch (error: any) {
-      console.error('Failed to load conversations:', error);
+    } catch (error: unknown) {
+      logger.error('Failed to load conversations:', error);
     } finally {
       setIsLoading(false);
     }
@@ -90,7 +93,7 @@ export const MessagesScreen: React.FC<MessagesScreenProps> = ({ navigation }) =>
       onPress={() => handleConversationPress(item)}
     >
       <View style={styles.avatar}>
-        <Ionicons name="person" size={24} color={COLORS.textSecondary} />
+        <Ionicons name="person" size={24} color={colors.textSecondary} />
       </View>
 
       <View style={styles.conversationContent}>
@@ -129,13 +132,13 @@ export const MessagesScreen: React.FC<MessagesScreenProps> = ({ navigation }) =>
         )}
       </View>
 
-      <Ionicons name="chevron-forward" size={20} color={COLORS.textSecondary} />
+      <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
     </TouchableOpacity>
   );
 
   const renderEmptyState = () => (
     <View style={styles.emptyState}>
-      <Ionicons name="chatbubbles" size={64} color={COLORS.textSecondary} />
+      <Ionicons name="chatbubbles" size={64} color={colors.textSecondary} />
       <Text style={styles.emptyTitle}>{t('messages.no_messages')}</Text>
       <Text style={styles.emptyDescription}>
         {t('messages.start_connecting')}
@@ -148,6 +151,8 @@ export const MessagesScreen: React.FC<MessagesScreenProps> = ({ navigation }) =>
       </TouchableOpacity>
     </View>
   );
+
+  const styles = createStyles(colors);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -173,22 +178,22 @@ export const MessagesScreen: React.FC<MessagesScreenProps> = ({ navigation }) =>
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ReturnType<typeof useColors>) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: colors.background,
   },
   header: {
     paddingHorizontal: SPACING.lg,
     paddingVertical: SPACING.md,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
-    backgroundColor: COLORS.surface,
+    borderBottomColor: colors.border,
+    backgroundColor: colors.surface,
   },
   title: {
     fontSize: 28,
     fontFamily: FONTS.bold,
-    color: COLORS.text,
+    color: colors.text,
   },
   content: {
     padding: SPACING.lg,
@@ -200,18 +205,18 @@ const styles = StyleSheet.create({
   conversationItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.surface,
+    backgroundColor: colors.surface,
     borderRadius: 12,
     padding: SPACING.md,
     marginBottom: SPACING.md,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: colors.border,
   },
   avatar: {
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: COLORS.background,
+    backgroundColor: colors.background,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: SPACING.md,
@@ -228,12 +233,12 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: 16,
     fontFamily: FONTS.bold,
-    color: COLORS.text,
+    color: colors.text,
   },
   timestamp: {
     fontSize: 12,
     fontFamily: FONTS.regular,
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
   },
   messagePreview: {
     flexDirection: 'row',
@@ -243,16 +248,16 @@ const styles = StyleSheet.create({
   lastMessage: {
     fontSize: 14,
     fontFamily: FONTS.regular,
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
     flex: 1,
     marginRight: SPACING.sm,
   },
   unreadMessage: {
     fontFamily: FONTS.medium,
-    color: COLORS.text,
+    color: colors.text,
   },
   unreadBadge: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: colors.primary,
     borderRadius: 10,
     minWidth: 20,
     height: 20,
@@ -263,11 +268,11 @@ const styles = StyleSheet.create({
   unreadCount: {
     fontSize: 12,
     fontFamily: FONTS.bold,
-    color: COLORS.surface,
+    color: colors.surface,
   },
   statusBadge: {
     alignSelf: 'flex-start',
-    backgroundColor: COLORS.accent,
+    backgroundColor: colors.accent,
     paddingHorizontal: SPACING.sm,
     paddingVertical: 2,
     borderRadius: 8,
@@ -276,7 +281,7 @@ const styles = StyleSheet.create({
   statusText: {
     fontSize: 10,
     fontFamily: FONTS.medium,
-    color: COLORS.surface,
+    color: colors.surface,
   },
   emptyState: {
     alignItems: 'center',
@@ -286,20 +291,20 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 20,
     fontFamily: FONTS.bold,
-    color: COLORS.text,
+    color: colors.text,
     marginTop: SPACING.md,
     marginBottom: SPACING.sm,
   },
   emptyDescription: {
     fontSize: 16,
     fontFamily: FONTS.regular,
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
     textAlign: 'center',
     lineHeight: 24,
     marginBottom: SPACING.lg,
   },
   discoverButton: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: colors.primary,
     paddingHorizontal: SPACING.lg,
     paddingVertical: SPACING.md,
     borderRadius: 8,
@@ -307,6 +312,6 @@ const styles = StyleSheet.create({
   discoverButtonText: {
     fontSize: 16,
     fontFamily: FONTS.medium,
-    color: COLORS.surface,
+    color: colors.surface,
   },
 });

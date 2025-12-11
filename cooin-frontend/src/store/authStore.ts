@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import { User } from '../types/api';
 import { authService } from '../services/authService';
+import { logger } from '../utils/logger';
+import { getErrorMessage, hasDetail } from '../utils/errorUtils';
 
 interface AuthState {
   user: User | null;
@@ -40,10 +42,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         isLoading: false,
         error: null,
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = hasDetail(error) ? error.detail : 'Login failed';
       set({
         isLoading: false,
-        error: error.detail || 'Login failed',
+        error: errorMessage,
         isAuthenticated: false,
         user: null,
       });
@@ -52,7 +55,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   register: async (email: string, username: string, password: string, confirmPassword: string, role: 'lender' | 'borrower' | 'both', agreeToTerms: boolean) => {
-    console.log('[authStore] Starting registration...');
+    logger.info('[authStore] Starting registration');
     set({ isLoading: true, error: null, isAuthenticated: false, user: null });
     try {
       const response = await authService.register({
@@ -64,11 +67,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         agree_to_terms: agreeToTerms,
       });
 
-      console.log('[authStore] Registration response received:', { hasUser: !!response.user, hasToken: !!response.access_token });
+      logger.debug('[authStore] Registration response received', { hasUser: !!response.user, hasToken: !!response.access_token });
 
       // Only set authenticated if we have a valid user and tokens
       if (response.user && response.access_token) {
-        console.log('[authStore] Setting user as authenticated');
+        logger.info('[authStore] Setting user as authenticated');
         set({
           user: response.user,
           isAuthenticated: true,
@@ -77,16 +80,16 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         });
       } else {
         // Registration response incomplete
-        console.error('[authStore] Invalid registration response - missing user or token');
+        logger.error('[authStore] Invalid registration response - missing user or token');
         throw new Error('Invalid registration response');
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Make sure we DON'T authenticate on error
-      console.error('[authStore] Registration error:', error);
-      console.log('[authStore] Setting isAuthenticated to FALSE due to error');
+      logger.error('[authStore] Registration error', error);
+      logger.warn('[authStore] Setting isAuthenticated to FALSE due to error');
       set({
         isLoading: false,
-        error: error.detail || error.message || 'Registration failed',
+        error: getErrorMessage(error),
         isAuthenticated: false,
         user: null,
       });
@@ -99,7 +102,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     try {
       await authService.logout();
     } catch (error) {
-      console.warn('Logout error:', error);
+      logger.warn('Logout error', error);
     } finally {
       set({
         user: null,
@@ -129,7 +132,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         });
       }
     } catch (error) {
-      console.error('Auth check failed:', error);
+      logger.error('Auth check failed', error);
       set({
         user: null,
         isAuthenticated: false,

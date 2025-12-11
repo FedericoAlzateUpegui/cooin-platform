@@ -366,6 +366,15 @@ class ProfileService:
                         error_code="INVALID_FINANCIAL_DATA"
                     )
 
+            # Convert enum string values to enum instances
+            if 'income_range' in update_data and update_data['income_range'] is not None:
+                if isinstance(update_data['income_range'], str):
+                    update_data['income_range'] = IncomeRange(update_data['income_range'])
+
+            if 'employment_status' in update_data and update_data['employment_status'] is not None:
+                if isinstance(update_data['employment_status'], str):
+                    update_data['employment_status'] = EmploymentStatus(update_data['employment_status'])
+
             # Update fields
             for field, value in update_data.items():
                 setattr(profile, field, value)
@@ -463,6 +472,11 @@ class ProfileService:
                         detail="Minimum loan term must be less than maximum loan term",
                         error_code="INVALID_LOAN_TERM_RANGE"
                     )
+
+            # Convert enum string values to enum instances
+            if 'loan_purpose' in update_data and update_data['loan_purpose'] is not None:
+                if isinstance(update_data['loan_purpose'], str):
+                    update_data['loan_purpose'] = LoanPurpose(update_data['loan_purpose'])
 
             # Update fields
             for field, value in update_data.items():

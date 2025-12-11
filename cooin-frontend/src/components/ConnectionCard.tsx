@@ -59,6 +59,16 @@ export const ConnectionCard: React.FC<ConnectionCardProps> = ({
   };
 
   const renderConnectionType = () => {
+    // Check if this is a deal (created from a ticket)
+    if (connection.source_ticket_id) {
+      return (
+        <View style={[styles.dealBadge, { backgroundColor: `${COLORS.warning}20` }]}>
+          <Ionicons name="ticket" size={14} color={COLORS.warning} />
+          <Text style={[styles.typeText, { color: COLORS.warning }]}>Deal</Text>
+        </View>
+      );
+    }
+
     const typeMap = {
       lending_inquiry: { icon: 'cash', text: 'Lending Inquiry', color: COLORS.success },
       borrowing_request: { icon: 'card', text: 'Borrowing Request', color: COLORS.primary },
@@ -77,35 +87,47 @@ export const ConnectionCard: React.FC<ConnectionCardProps> = ({
   };
 
   const renderFinancialDetails = () => {
-    if (!connection.loan_amount_requested && !connection.interest_rate_proposed) {
+    // For deals, prioritize proposed terms
+    const amount = connection.proposed_amount || connection.loan_amount_requested;
+    const rate = connection.proposed_interest_rate || connection.interest_rate_proposed;
+    const term = connection.proposed_term_months || connection.loan_term_months;
+
+    if (!amount && !rate && !term) {
       return null;
     }
 
     return (
       <View style={styles.financialSection}>
-        {connection.loan_amount_requested && (
+        {connection.source_ticket_id && (
+          <View style={styles.dealHeader}>
+            <Ionicons name="information-circle" size={16} color={COLORS.warning} />
+            <Text style={styles.dealHeaderText}>Deal Terms from Ticket</Text>
+          </View>
+        )}
+
+        {amount && (
           <View style={styles.detailRow}>
             <Ionicons name="cash" size={16} color={COLORS.textSecondary} />
             <Text style={styles.detailText}>
-              Amount: ${connection.loan_amount_requested.toLocaleString()}
+              Amount: ${amount.toLocaleString()}
             </Text>
           </View>
         )}
 
-        {connection.loan_term_months && (
+        {term && (
           <View style={styles.detailRow}>
             <Ionicons name="calendar" size={16} color={COLORS.textSecondary} />
             <Text style={styles.detailText}>
-              Term: {connection.loan_term_months} months
+              Term: {term} months
             </Text>
           </View>
         )}
 
-        {connection.interest_rate_proposed && (
+        {rate && (
           <View style={styles.detailRow}>
             <Ionicons name="trending-up" size={16} color={COLORS.textSecondary} />
             <Text style={styles.detailText}>
-              Rate: {connection.interest_rate_proposed}%
+              Rate: {rate}% APR
             </Text>
           </View>
         )}
@@ -429,5 +451,26 @@ const styles = StyleSheet.create({
   singleActionButton: {
     alignSelf: 'flex-start',
     minWidth: 120,
+  },
+  dealBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: SPACING.xs,
+    borderRadius: 6,
+  },
+  dealHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: SPACING.sm,
+    paddingBottom: SPACING.xs,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border,
+  },
+  dealHeaderText: {
+    fontSize: 13,
+    fontFamily: FONTS.medium,
+    color: COLORS.warning,
+    marginLeft: 6,
   },
 });

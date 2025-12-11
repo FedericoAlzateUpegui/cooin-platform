@@ -45,6 +45,9 @@ class Connection(Base):
     message = Column(Text, nullable=True)  # Initial message from requester
     response_message = Column(Text, nullable=True)  # Response from receiver
 
+    # Source ticket (if connection was created from a ticket/offer)
+    source_ticket_id = Column(Integer, ForeignKey("tickets.id"), nullable=True, index=True)
+
     # Financial details (if applicable)
     loan_amount_requested = Column(Float, nullable=True)
     loan_term_months = Column(Integer, nullable=True)
@@ -70,6 +73,7 @@ class Connection(Base):
     # Relationships
     requester = relationship("User", foreign_keys=[requester_id], back_populates="sent_connections")
     receiver = relationship("User", foreign_keys=[receiver_id], back_populates="received_connections")
+    source_ticket = relationship("Ticket", back_populates="connections", foreign_keys=[source_ticket_id])
     messages = relationship("Message", back_populates="connection", cascade="all, delete-orphan")
 
     def __repr__(self):

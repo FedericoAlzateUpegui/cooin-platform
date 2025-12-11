@@ -14,13 +14,17 @@ import { useFocusEffect } from '@react-navigation/native';
 
 import systemNotificationService, { SystemMessage } from '../../services/systemNotificationService';
 import { COLORS, SPACING, FONTS } from '../../constants/config';
+import { useColors } from '../../hooks/useColors';
 import { useLanguage } from '../../contexts/LanguageContext';
 
+import { logger } from '../../utils/logger';
 interface NotificationsScreenProps {
   navigation: any;
 }
 
 export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ navigation }) => {
+  const colors = useColors();
+  const styles = createStyles(colors);
   const [notifications, setNotifications] = useState<SystemMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -50,8 +54,8 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
         false // not archived
       );
       setNotifications(response.messages || []);
-    } catch (error: any) {
-      console.error('Failed to load notifications:', error);
+    } catch (error: unknown) {
+      logger.error('Failed to load notifications:', error);
     } finally {
       setIsLoading(false);
     }
@@ -62,7 +66,7 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
       const count = await systemNotificationService.getUnreadCount();
       setUnreadCount(count);
     } catch (error) {
-      console.error('Failed to load unread count:', error);
+      logger.error('Failed to load unread count:', error);
     }
   };
 
@@ -84,7 +88,7 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
         );
         setUnreadCount(prev => Math.max(0, prev - 1));
       } catch (error) {
-        console.error('Failed to mark as read:', error);
+        logger.error('Failed to mark as read:', error);
       }
     }
 
@@ -92,7 +96,7 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
     if (notification.action_url) {
       // Navigate based on action_url
       // This is a placeholder - you can implement routing logic here
-      console.log('Navigate to:', notification.action_url);
+      logger.debug('Navigate to:', notification.action_url);
     }
   };
 
@@ -102,7 +106,7 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
       setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
       setUnreadCount(0);
     } catch (error) {
-      console.error('Failed to mark all as read:', error);
+      logger.error('Failed to mark all as read:', error);
     }
   };
 
@@ -111,7 +115,7 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
       await systemNotificationService.deleteMessage(notificationId);
       setNotifications(prev => prev.filter(n => n.id !== notificationId));
     } catch (error) {
-      console.error('Failed to delete notification:', error);
+      logger.error('Failed to delete notification:', error);
     }
   };
 
@@ -132,20 +136,21 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
   };
 
   const getMessageTypeColor = (type: string) => {
-    const colors: { [key: string]: string } = {
-      match_notification: COLORS.success,
-      educational: COLORS.info,
-      announcement: COLORS.primary,
-      reminder: COLORS.warning,
-      safety_tip: COLORS.error,
-      feature_update: COLORS.accent,
+    const typeColors: { [key: string]: string } = {
+      match_notification: colors.success,
+      educational: colors.info,
+      announcement: colors.primary,
+      reminder: colors.warning,
+      safety_tip: colors.error,
+      feature_update: colors.accent,
     };
-    return colors[type] || COLORS.primary;
+    return typeColors[type] || colors.primary;
   };
 
   const renderNotification = ({ item }: { item: SystemMessage }) => {
     const typeColor = getMessageTypeColor(item.message_type);
     const icon = systemNotificationService.getMessageTypeIcon(item.message_type);
+
 
     return (
       <TouchableOpacity
@@ -232,7 +237,7 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
 
   const renderEmptyState = () => (
     <View style={styles.emptyState}>
-      <Ionicons name="notifications-outline" size={64} color={COLORS.textSecondary} />
+      <Ionicons name="notifications-outline" size={64} color={colors.textSecondary} />
       <Text style={styles.emptyTitle}>{t('notifications.no_notifications')}</Text>
       <Text style={styles.emptyDescription}>
         {filter === 'educational'
@@ -276,10 +281,10 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ReturnType<typeof useColors>) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: colors.background,
   },
   header: {
     flexDirection: 'row',
@@ -288,13 +293,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.lg,
     paddingVertical: SPACING.md,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
-    backgroundColor: COLORS.surface,
+    borderBottomColor: colors.border,
+    backgroundColor: colors.surface,
   },
   headerTitle: {
     fontSize: 28,
     fontFamily: FONTS.bold,
-    color: COLORS.text,
+    color: colors.text,
   },
   markAllButton: {
     paddingHorizontal: SPACING.md,
@@ -303,33 +308,33 @@ const styles = StyleSheet.create({
   markAllText: {
     fontSize: 14,
     fontFamily: FONTS.medium,
-    color: COLORS.primary,
+    color: colors.primary,
   },
   filterContainer: {
     flexDirection: 'row',
     paddingHorizontal: SPACING.lg,
     paddingVertical: SPACING.md,
-    backgroundColor: COLORS.surface,
+    backgroundColor: colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: colors.border,
   },
   filterTab: {
     paddingHorizontal: SPACING.md,
     paddingVertical: SPACING.sm,
     marginRight: SPACING.sm,
     borderRadius: 20,
-    backgroundColor: COLORS.background,
+    backgroundColor: colors.background,
   },
   activeFilterTab: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: colors.primary,
   },
   filterText: {
     fontSize: 14,
     fontFamily: FONTS.medium,
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
   },
   activeFilterText: {
-    color: COLORS.surface,
+    color: colors.surface,
   },
   content: {
     padding: SPACING.lg,
@@ -340,15 +345,15 @@ const styles = StyleSheet.create({
   },
   notificationItem: {
     flexDirection: 'row',
-    backgroundColor: COLORS.surface,
+    backgroundColor: colors.surface,
     borderRadius: 12,
     padding: SPACING.md,
     marginBottom: SPACING.md,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: colors.border,
   },
   unreadNotification: {
-    borderColor: COLORS.primary,
+    borderColor: colors.primary,
     borderWidth: 2,
   },
   iconContainer: {
@@ -374,7 +379,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 16,
     fontFamily: FONTS.medium,
-    color: COLORS.text,
+    color: colors.text,
     flex: 1,
     marginRight: SPACING.sm,
   },
@@ -384,12 +389,12 @@ const styles = StyleSheet.create({
   timestamp: {
     fontSize: 12,
     fontFamily: FONTS.regular,
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
   },
   content: {
     fontSize: 14,
     fontFamily: FONTS.regular,
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
     lineHeight: 20,
     marginBottom: SPACING.xs,
   },
@@ -411,7 +416,7 @@ const styles = StyleSheet.create({
   },
   urgentBadge: {
     alignSelf: 'flex-start',
-    backgroundColor: COLORS.error,
+    backgroundColor: colors.error,
     paddingHorizontal: SPACING.sm,
     paddingVertical: 2,
     borderRadius: 8,
@@ -420,13 +425,13 @@ const styles = StyleSheet.create({
   urgentText: {
     fontSize: 10,
     fontFamily: FONTS.bold,
-    color: COLORS.surface,
+    color: colors.surface,
   },
   unreadDot: {
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: COLORS.primary,
+    backgroundColor: colors.primary,
     position: 'absolute',
     top: SPACING.md,
     right: SPACING.md,
@@ -439,14 +444,14 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 20,
     fontFamily: FONTS.bold,
-    color: COLORS.text,
+    color: colors.text,
     marginTop: SPACING.md,
     marginBottom: SPACING.sm,
   },
   emptyDescription: {
     fontSize: 16,
     fontFamily: FONTS.regular,
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
     textAlign: 'center',
     lineHeight: 24,
     marginBottom: SPACING.lg,
